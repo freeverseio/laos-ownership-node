@@ -1,5 +1,5 @@
 [relaychain]
-default_command = "./binaries/polkadot-v0.9.42"
+default_command = "../binaries/polkadot-v0.9.42"
 default_args = [ "-lparachain=debug" ]
 
 chain = "rococo-local"
@@ -18,4 +18,4 @@ cumulus_based = true
 
   [parachains.collator]
   name = "ownership-collator"
-  command = "./binaries/parachain-template-node-v0.9.42"
+  command = "../binaries/parachain-template-node"
