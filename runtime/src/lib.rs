@@ -497,9 +497,8 @@ construct_runtime!(
 		DmpQueue: cumulus_pallet_dmp_queue = 33,
 		
 		// Template
-		TemplatePallet: pallet_template = 40,
-		Sudo: pallet_sudo = 41,
-		LivingassetsOwnership: pallet_livingassets_ownership = 42,
+		Sudo: pallet_sudo = 40,
+		LivingassetsOwnership: pallet_livingassets_ownership = 41,
 	}
 );
 
