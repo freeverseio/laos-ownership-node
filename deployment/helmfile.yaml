@@ -85,6 +85,36 @@ releases:
               storageClass: do-block-storage
             flags:
               - --bootnodes "/ip4/178.128.139.214/tcp/30333/p2p/12D3KooWAqER4km9NPSeiSVRr2yKzq8VByLoFpwihny4C5dD2VZB"
+  - name: collator-car-sudo
+    namespace: ziggy-pandora
+    chart: parity/node
+    version: 4.7.2
+    values:
+      - image:
+          repository: freeverseio/laos-ownership-node
+          tag: v0.0.4-test
+      - node:
+          legacyRpcFlags: true
+          command: "parachain-template-node"
+          replicas: 1
+          customChainspecUrl: "https://purple-mathematical-cephalopod-484.mypinata.cloud/ipfs/QmPwvRtQ66i7PbQGC1A12y1zP7cvyWsXFkwuCZgvsbUfdk"
+          role: authority
+          chainData:
+            storageClass: do-block-storage
+          perNodeServices:
+            paraP2pService:
+              enabled: true
+              type: LoadBalancer
+              ws:
+                enabled: true
+          allowUnsafeRpcMethods: true
+          isParachain: true
+          collatorRelayChain:
+            customChainspecUrl: "https://purple-mathematical-cephalopod-484.mypinata.cloud/ipfs/QmRoeZNxMyZtaQQevpWPoWo6yRgpjnVtJTccxszaJ6M7Fj"
+            chainData:
+              storageClass: do-block-storage
+            flags:
+              - --bootnodes "/ip4/178.128.139.214/tcp/30333/p2p/12D3KooWAqER4km9NPSeiSVRr2yKzq8VByLoFpwihny4C5dD2VZB"
         
   # - name: public-node
   #   namespace: ziggy-pandora
