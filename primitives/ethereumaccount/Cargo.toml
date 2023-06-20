@@ -12,6 +12,9 @@ parity-scale-codec = { package = "parity-scale-codec", version = "3.0.0", defaul
 
 sp-core = { git = "https://github.com/paritytech/substrate", default-features = false, branch = "polkadot-v0.9.42" }
 
+[dev-dependencies]
+hex = "0.4"
+
 [features]
 default = ["std"]
 std = [

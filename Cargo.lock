@@ -2512,6 +2512,7 @@ dependencies = [
 name = "ethereumaccount"
 version = "0.1.0"
 dependencies = [
+ "hex",
  "parity-scale-codec",
  "scale-info",
  "serde",
