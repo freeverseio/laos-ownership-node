@@ -15,6 +15,8 @@ targets = ["x86_64-unknown-linux-gnu"]
 substrate-wasm-builder = { git = "https://github.com/paritytech/substrate", optional = true , branch = "polkadot-v0.9.42" }
 
 [dependencies]
+ethereumaccount = { path="../primitives/ethereumaccount", default-features = false}
+
 codec = { package = "parity-scale-codec", version = "3.0.0", default-features = false, features = ["derive"] }
 hex-literal = { version = "0.4.1", optional = true }
 log = { version = "0.4.17", default-features = false }
@@ -72,6 +74,8 @@ cumulus-primitives-utility = { git = "https://github.com/paritytech/cumulus.git"
 pallet-collator-selection = { git = "https://github.com/paritytech/cumulus.git", branch = "polkadot-v0.9.42", default-features = false }
 parachain-info = { git = "https://github.com/paritytech/cumulus.git", branch = "polkadot-v0.9.42", default-features = false }
 
+getrandom = { version = "0.2", features = ["js"] }
+
 [features]
 default = [
 	"std",
@@ -121,6 +125,7 @@ std = [
 	"xcm-executor/std",
 	"xcm/std",
 	"substrate-wasm-builder",
+	"ethereumaccount/std",
 ]
 
 runtime-benchmarks = [
