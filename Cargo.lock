@@ -2511,6 +2511,12 @@ dependencies = [
 [[package]]
 name = "ethereumaccount"
 version = "0.1.0"
+dependencies = [
+ "parity-scale-codec",
+ "scale-info",
+ "serde",
+ "sp-core",
+]
 
 [[package]]
 name = "event-listener"
