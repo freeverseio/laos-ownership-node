@@ -12,16 +12,23 @@ import (
 )
 
 const (
-	ownershipChainURL = "wss://arrakis.gorengine.com/own"
+	arrakisOwnershipURL = "wss://arrakis.gorengine.com/own"
 )
 
-func TransferFromEveToBob() error {
-	api, err := gsrpc.NewSubstrateAPI(ownershipChainURL)
-	if err != nil {
-		return err
-	}
+type substrateClient struct {
+	api *gsrpc.SubstrateAPI
+}
 
-	meta, err := api.RPC.State.GetMetadataLatest()
+func NewSubstrateClient(url string) (*substrateClient, error) {
+	api, err := gsrpc.NewSubstrateAPI(url)
+	if err != nil {
+		return nil, err
+	}
+	return &substrateClient{api: api}, nil
+}
+
+func (cli substrateClient) transfer() error {
+	meta, err := cli.api.RPC.State.GetMetadataLatest()
 	if err != nil {
 		return err
 	}
@@ -46,12 +53,12 @@ func TransferFromEveToBob() error {
 	// Create the extrinsic
 	ext := types.NewExtrinsic(c)
 
-	genesisHash, err := api.RPC.Chain.GetBlockHash(0)
+	genesisHash, err := cli.api.RPC.Chain.GetBlockHash(0)
 	if err != nil {
 		return err
 	}
 
-	rv, err := api.RPC.State.GetRuntimeVersionLatest()
+	rv, err := cli.api.RPC.State.GetRuntimeVersionLatest()
 	if err != nil {
 		return err
 	}
@@ -67,7 +74,7 @@ func TransferFromEveToBob() error {
 	}
 
 	var accountInfo types.AccountInfo
-	ok, err = api.RPC.State.GetStorageLatest(key, &accountInfo)
+	ok, err = cli.api.RPC.State.GetStorageLatest(key, &accountInfo)
 	if err != nil {
 		return err
 	}
@@ -98,7 +105,7 @@ func TransferFromEveToBob() error {
 	}
 
 	// Send the extrinsic
-	_, err = api.RPC.Author.SubmitExtrinsic(ext)
+	_, err = cli.api.RPC.Author.SubmitExtrinsic(ext)
 	if err != nil {
 		return err
 	}
@@ -107,12 +114,8 @@ func TransferFromEveToBob() error {
 	return nil
 }
 
-func GetOwnerOfCollection(collectionId uint64) (*types.AccountID, error) {
-	api, err := gsrpc.NewSubstrateAPI(ownershipChainURL)
-	if err != nil {
-		return nil, err
-	}
-	meta, err := api.RPC.State.GetMetadataLatest()
+func (cli substrateClient) getOwnerOfCollection(collectionId uint64) (*types.AccountID, error) {
+	meta, err := cli.api.RPC.State.GetMetadataLatest()
 	if err != nil {
 		return nil, err
 	}
@@ -135,7 +138,7 @@ func GetOwnerOfCollection(collectionId uint64) (*types.AccountID, error) {
 		return nil, err
 	}
 	var accountId types.AccountID
-	ok, err := api.RPC.State.GetStorageLatest(types.NewStorageKey(key), &accountId)
+	ok, err := cli.api.RPC.State.GetStorageLatest(types.NewStorageKey(key), &accountId)
 	if err != nil {
 		return nil, err
 	}
