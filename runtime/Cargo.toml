@@ -72,6 +72,9 @@ cumulus-primitives-utility = { git = "https://github.com/paritytech/cumulus.git"
 pallet-collator-selection = { git = "https://github.com/paritytech/cumulus.git", branch = "polkadot-v0.9.42", default-features = false }
 parachain-info = { git = "https://github.com/paritytech/cumulus.git", branch = "polkadot-v0.9.42", default-features = false }
 
+# local
+ethereum-account = { version = "0.1.0", default-features = false, path = "../primitives/ethereum-account" }
+
 [features]
 default = [
 	"std",
@@ -121,6 +124,7 @@ std = [
 	"xcm-executor/std",
 	"xcm/std",
 	"substrate-wasm-builder",
+	"ethereum-account/std",
 ]
 
 runtime-benchmarks = [
