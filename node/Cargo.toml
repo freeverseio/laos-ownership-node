@@ -67,6 +67,9 @@ cumulus-primitives-parachain-inherent = { git = "https://github.com/paritytech/c
 cumulus-relay-chain-interface = { git = "https://github.com/paritytech/cumulus.git", branch = "polkadot-v0.9.42" }
 color-print = "0.3.4"
 
+# Frontier
+fp-evm = { git = "https://github.com/paritytech/frontier", branch = "bar/polkadot-v0.9.42" }
+
 [build-dependencies]
 substrate-build-script-utils = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.42" }
 

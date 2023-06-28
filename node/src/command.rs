@@ -23,7 +23,9 @@ use crate::{
 
 fn load_spec(id: &str) -> std::result::Result<Box<dyn ChainSpec>, String> {
 	Ok(match id {
-		"arrakis" => Box::new(chain_spec::ChainSpec::from_json_bytes(&include_bytes!("../../specs/arrakis.json")[..])?),
+		"arrakis" => Box::new(chain_spec::ChainSpec::from_json_bytes(
+			&include_bytes!("../../specs/arrakis.json")[..],
+		)?),
 		"dev" => Box::new(chain_spec::development_config()),
 		"template-rococo" => Box::new(chain_spec::local_testnet_config()),
 		"" | "local" => Box::new(chain_spec::local_testnet_config()),
@@ -104,8 +106,11 @@ impl SubstrateCli for RelayChainCli {
 
 	fn load_spec(&self, id: &str) -> std::result::Result<Box<dyn sc_service::ChainSpec>, String> {
 		match id {
-			"rococo_freeverse" => Ok(Box::new(RococoChainSpec::from_json_bytes(&include_bytes!("../../specs/rococo-freeverse-chainspec.json")[..])?)),
-			_ => polkadot_cli::Cli::from_iter([RelayChainCli::executable_name()].iter()).load_spec(id),
+			"rococo_freeverse" => Ok(Box::new(RococoChainSpec::from_json_bytes(
+				&include_bytes!("../../specs/rococo-freeverse-chainspec.json")[..],
+			)?)),
+			_ => polkadot_cli::Cli::from_iter([RelayChainCli::executable_name()].iter())
+				.load_spec(id),
 		}
 	}
 
