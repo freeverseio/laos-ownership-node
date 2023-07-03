@@ -11,14 +11,16 @@ use sc_cli::{
 	ChainSpec, CliConfiguration, DefaultConfigurationValues, ImportParams, KeystoreParams,
 	NetworkParams, Result, RuntimeVersion, SharedParams, SubstrateCli,
 };
-use sc_service::config::{BasePath, PrometheusConfig};
+use sc_service::config::{BasePath, /*DatabaseSource,*/ PrometheusConfig};
 use sp_core::hexdisplay::HexDisplay;
 use sp_runtime::traits::{AccountIdConversion, Block as BlockT};
+// Frontier
+// use fc_db::frontier_database_dir;
 
 use crate::{
 	chain_spec,
 	cli::{Cli, RelayChainCli, Subcommand},
-	service::{new_partial, ParachainNativeExecutor},
+	service::{/*db_config_dir,*/ new_partial, ParachainNativeExecutor},
 };
 
 fn load_spec(id: &str) -> std::result::Result<Box<dyn ChainSpec>, String> {
@@ -120,10 +122,10 @@ impl SubstrateCli for RelayChainCli {
 }
 
 macro_rules! construct_async_run {
-	(|$components:ident, $cli:ident, $cmd:ident, $config:ident| $( $code:tt )* ) => {{
+	(|$components:ident, $cli:ident, $cmd:ident, $config:ident, $eth_config:ident| $( $code:tt )* ) => {{
 		let runner = $cli.create_runner($cmd)?;
 		runner.async_run(|$config| {
-			let $components = new_partial(&$config)?;
+			let $components = new_partial(&$config, &$eth_config)?;
 			let task_manager = $components.task_manager;
 			{ $( $code )* }.map(|v| (v, task_manager))
 		})
@@ -133,6 +135,7 @@ macro_rules! construct_async_run {
 /// Parse command line arguments into service configuration.
 pub fn run() -> Result<()> {
 	let cli = Cli::from_args();
+	let eth_cfg = cli.eth.clone();
 
 	match &cli.subcommand {
 		Some(Subcommand::BuildSpec(cmd)) => {
@@ -140,34 +143,49 @@ pub fn run() -> Result<()> {
 			runner.sync_run(|config| cmd.run(config.chain_spec, config.network))
 		},
 		Some(Subcommand::CheckBlock(cmd)) => {
-			construct_async_run!(|components, cli, cmd, config| {
+			construct_async_run!(|components, cli, cmd, config, eth_cfg| {
 				Ok(cmd.run(components.client, components.import_queue))
 			})
 		},
 		Some(Subcommand::ExportBlocks(cmd)) => {
-			construct_async_run!(|components, cli, cmd, config| {
+			construct_async_run!(|components, cli, cmd, config, eth_cfg| {
 				Ok(cmd.run(components.client, config.database))
 			})
 		},
 		Some(Subcommand::ExportState(cmd)) => {
-			construct_async_run!(|components, cli, cmd, config| {
+			construct_async_run!(|components, cli, cmd, config, eth_cfg| {
 				Ok(cmd.run(components.client, config.chain_spec))
 			})
 		},
 		Some(Subcommand::ImportBlocks(cmd)) => {
-			construct_async_run!(|components, cli, cmd, config| {
+			construct_async_run!(|components, cli, cmd, config, eth_cfg| {
 				Ok(cmd.run(components.client, components.import_queue))
 			})
 		},
 		Some(Subcommand::Revert(cmd)) => {
-			construct_async_run!(|components, cli, cmd, config| {
+			construct_async_run!(|components, cli, cmd, config, eth_cfg| {
 				Ok(cmd.run(components.client, components.backend, None))
 			})
 		},
 		Some(Subcommand::PurgeChain(cmd)) => {
 			let runner = cli.create_runner(cmd)?;
-
 			runner.sync_run(|config| {
+				// Remove Frontier offchain db
+				// let db_config_dir = db_config_dir(&config);
+				// let frontier_database_config = match config.database {
+				// 	DatabaseSource::RocksDb { .. } => DatabaseSource::RocksDb {
+				// 		path: frontier_database_dir(&db_config_dir, "db"),
+				// 		cache_size: 0,
+				// 	},
+				// 	DatabaseSource::ParityDb { .. } => DatabaseSource::ParityDb {
+				// 		path: frontier_database_dir(&db_config_dir, "paritydb"),
+				// 	},
+				// 	_ => {
+				// 		return Err(format!("Cannot purge `{:?}` database", config.database).into())
+				// 	}
+				// };
+				// cmd.run(frontier_database_config)?;
+
 				let polkadot_cli = RelayChainCli::new(
 					&config,
 					[RelayChainCli::executable_name()].iter().chain(cli.relay_chain_args.iter()),
@@ -211,7 +229,7 @@ pub fn run() -> Result<()> {
 							.into())
 					},
 				BenchmarkCmd::Block(cmd) => runner.sync_run(|config| {
-					let partials = new_partial(&config)?;
+					let partials = new_partial(&config, &eth_cfg)?;
 					cmd.run(partials.client)
 				}),
 				#[cfg(not(feature = "runtime-benchmarks"))]
@@ -224,7 +242,7 @@ pub fn run() -> Result<()> {
 					.into()),
 				#[cfg(feature = "runtime-benchmarks")]
 				BenchmarkCmd::Storage(cmd) => runner.sync_run(|config| {
-					let partials = new_partial(&config)?;
+					let partials = new_partial(&config, &eth_cfg)?;
 					let db = partials.backend.expose_db();
 					let storage = partials.backend.expose_storage();
 					cmd.run(config, partials.client.clone(), db, storage)
@@ -239,12 +257,9 @@ pub fn run() -> Result<()> {
 		},
 		#[cfg(feature = "try-runtime")]
 		Some(Subcommand::TryRuntime(cmd)) => {
-			use parachain_template_runtime::MILLISECS_PER_BLOCK;
-			use sc_executor::{sp_wasm_interface::ExtendedHostFunctions, NativeExecutionDispatch};
-			use try_runtime_cli::block_building_info::timestamp_with_aura_info;
-
 			let runner = cli.create_runner(cmd)?;
 
+			use sc_executor::{sp_wasm_interface::ExtendedHostFunctions, NativeExecutionDispatch};
 			type HostFunctionsOf<E> = ExtendedHostFunctions<
 				sp_io::SubstrateHostFunctions,
 				<E as NativeExecutionDispatch>::ExtendHostFunctions,
@@ -256,31 +271,36 @@ pub fn run() -> Result<()> {
 				sc_service::TaskManager::new(runner.config().tokio_handle.clone(), *registry)
 					.map_err(|e| format!("Error: {:?}", e))?;
 
-			let info_provider = timestamp_with_aura_info(MILLISECS_PER_BLOCK);
-
 			runner.async_run(|_| {
-				Ok((
-					cmd.run::<Block, HostFunctionsOf<ParachainNativeExecutor>, _>(Some(
-						info_provider,
-					)),
-					task_manager,
-				))
+				Ok((cmd.run::<Block, HostFunctionsOf<ParachainNativeExecutor>>(), task_manager))
 			})
 		},
 		#[cfg(not(feature = "try-runtime"))]
 		Some(Subcommand::TryRuntime) => Err("Try-runtime was not enabled when building the node. \
 			You can enable it with `--features try-runtime`."
 			.into()),
+		Some(Subcommand::FrontierDb(cmd)) => {
+			let runner = cli.create_runner(cmd)?;
+			runner.sync_run(|config| {
+				let params = crate::service::new_partial(&config, &cli.eth)?;
+				let client = params.client;
+				let (_, _, _, frontier_backend) = params.other;
+				cmd.run(client, frontier_backend)
+			})
+		},
 		None => {
 			let runner = cli.create_runner(&cli.run.normalize())?;
 			let collator_options = cli.run.collator_options();
 
 			runner.run_node_until_exit(|config| async move {
-				let hwbench = (!cli.no_hardware_benchmarks).then_some(
+				let hwbench = if !cli.no_hardware_benchmarks {
 					config.database.path().map(|database_path| {
 						let _ = std::fs::create_dir_all(&database_path);
 						sc_sysinfo::gather_hwbench(Some(database_path))
-					})).flatten();
+					})
+				} else {
+					None
+				};
 
 				let para_id = chain_spec::Extensions::try_get(&*config.chain_spec)
 					.map(|e| e.para_id)
@@ -294,7 +314,7 @@ pub fn run() -> Result<()> {
 				let id = ParaId::from(para_id);
 
 				let parachain_account =
-					AccountIdConversion::<polkadot_primitives::AccountId>::into_account_truncating(&id);
+					AccountIdConversion::<polkadot_primitives::v2::AccountId>::into_account_truncating(&id);
 
 				let state_version = Cli::native_runtime_version(&config.chain_spec).state_version();
 				let block: Block = generate_genesis_block(&*config.chain_spec, state_version)
@@ -318,6 +338,7 @@ pub fn run() -> Result<()> {
 				crate::service::start_parachain_node(
 					config,
 					polkadot_config,
+					eth_cfg,
 					collator_options,
 					id,
 					hwbench,

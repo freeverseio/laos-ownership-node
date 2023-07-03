@@ -2968,6 +2968,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "fp-self-contained"
+version = "1.0.0-dev"
+source = "git+https://github.com/paritytech/frontier?branch=bar/polkadot-v0.9.42#a5a5e1e6ec08cd542a6084c310863150fb8841b1"
+dependencies = [
+ "frame-support",
+ "parity-scale-codec",
+ "scale-info",
+ "serde",
+ "sp-runtime",
+]
+
+[[package]]
 name = "fp-storage"
 version = "2.0.0"
 source = "git+https://github.com/paritytech/frontier?branch=bar/polkadot-v0.9.42#a5a5e1e6ec08cd542a6084c310863150fb8841b1"
@@ -6301,6 +6313,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "pallet-hotfix-sufficients"
+version = "1.0.0"
+source = "git+https://github.com/paritytech/frontier?branch=bar/polkadot-v0.9.42#a5a5e1e6ec08cd542a6084c310863150fb8841b1"
+dependencies = [
+ "frame-benchmarking",
+ "frame-support",
+ "frame-system",
+ "pallet-evm",
+ "parity-scale-codec",
+ "scale-info",
+ "sp-core",
+ "sp-runtime",
+ "sp-std",
+]
+
+[[package]]
 name = "pallet-identity"
 version = "4.0.0-dev"
 source = "git+https://github.com/paritytech/substrate?branch=polkadot-v0.9.42#ff24c60ac7d9f87727ecdd0ded9a80c56e4f4b65"
@@ -7020,6 +7048,8 @@ dependencies = [
  "cumulus-primitives-core",
  "cumulus-primitives-timestamp",
  "cumulus-primitives-utility",
+ "fp-rpc",
+ "fp-self-contained",
  "frame-benchmarking",
  "frame-executive",
  "frame-support",
@@ -7040,6 +7070,7 @@ dependencies = [
  "pallet-evm-precompile-modexp",
  "pallet-evm-precompile-sha3fips",
  "pallet-evm-precompile-simple",
+ "pallet-hotfix-sufficients",
  "pallet-livingassets-ownership",
  "pallet-session",
  "pallet-sudo",
