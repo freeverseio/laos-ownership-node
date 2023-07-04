@@ -9,6 +9,7 @@ include!(concat!(env!("OUT_DIR"), "/wasm_binary.rs"));
 mod weights;
 pub mod xcm_config;
 
+use core::marker::PhantomData;
 use cumulus_pallet_parachain_system::RelayNumberStrictlyIncreases;
 use smallvec::smallvec;
 use sp_api::impl_runtime_apis;
@@ -16,13 +17,15 @@ use sp_core::{
 	crypto::{ByteArray, KeyTypeId},
 	OpaqueMetadata, H160, H256, U256,
 };
-use core::{marker::PhantomData};
 
 use sp_runtime::{
 	create_runtime_str, generic, impl_opaque_keys,
-	traits::{AccountIdLookup, BlakeTwo256, Block as BlockT, IdentifyAccount, Verify, UniqueSaturatedInto},
-	transaction_validity::{TransactionSource, TransactionValidity},
-	ApplyExtrinsicResult, MultiSignature, ConsensusEngineId
+	traits::{
+		AccountIdLookup, BlakeTwo256, Block as BlockT, IdentifyAccount, UniqueSaturatedInto, Verify, Get,
+		PostDispatchInfoOf, Dispatchable, DispatchInfoOf,
+	},
+	transaction_validity::{TransactionSource, TransactionValidity, TransactionValidityError},
+	ApplyExtrinsicResult, ConsensusEngineId, MultiSignature,
 };
 
 use sp_std::prelude::*;
@@ -34,7 +37,10 @@ use frame_support::{
 	construct_runtime,
 	dispatch::DispatchClass,
 	parameter_types,
-	traits::{ConstU32, ConstU64, ConstU8, EitherOfDiverse, Everything, FindAuthor, OnUnbalanced, Currency, Imbalance},
+	traits::{
+		ConstU32, ConstU64, ConstU8, Currency, EitherOfDiverse, Everything, FindAuthor, Imbalance,
+		OnUnbalanced,
+	},
 	weights::{
 		constants::WEIGHT_REF_TIME_PER_SECOND, ConstantMultiplier, Weight, WeightToFeeCoefficient,
 		WeightToFeeCoefficients, WeightToFeePolynomial,
@@ -68,12 +74,12 @@ use xcm::latest::prelude::BodyId;
 use xcm_executor::XcmExecutor;
 
 // Frontier
-use pallet_ethereum::{Call::transact, Transaction as EthereumTransaction, PostLogContent};
+use fp_rpc::TransactionStatus;
+use pallet_ethereum::{Call::transact, PostLogContent, Transaction as EthereumTransaction};
 use pallet_evm::{
 	Account as EVMAccount, EVMCurrencyAdapter, EnsureAddressTruncated, FeeCalculator,
 	HashedAddressMapping, OnChargeEVMTransaction, Runner,
 };
-use fp_rpc::TransactionStatus;
 
 mod precompiles;
 use precompiles::FrontierPrecompiles;
@@ -129,10 +135,11 @@ pub type SignedExtra = (
 
 /// Unchecked extrinsic type as expected by this runtime.
 pub type UncheckedExtrinsic =
-	generic::UncheckedExtrinsic<Address, RuntimeCall, Signature, SignedExtra>;
+	fp_self_contained::UncheckedExtrinsic<Address, RuntimeCall, Signature, SignedExtra>;
 
 /// Extrinsic type that has already been checked.
-pub type CheckedExtrinsic = generic::CheckedExtrinsic<AccountId, RuntimeCall, SignedExtra>;
+pub type CheckedExtrinsic =
+	fp_self_contained::CheckedExtrinsic<AccountId, RuntimeCall, SignedExtra, H160>;
 
 /// Executive: handles dispatch to the various modules.
 pub type Executive = frame_executive::Executive<
@@ -687,6 +694,64 @@ construct_runtime!(
 		// HotfixSufficients: pallet_hotfix_sufficients = 45,
 	}
 );
+
+impl fp_self_contained::SelfContainedCall for RuntimeCall {
+	type SignedInfo = H160;
+
+	fn is_self_contained(&self) -> bool {
+		match self {
+			RuntimeCall::Ethereum(call) => call.is_self_contained(),
+			_ => false,
+		}
+	}
+
+	fn check_self_contained(&self) -> Option<Result<Self::SignedInfo, TransactionValidityError>> {
+		match self {
+			RuntimeCall::Ethereum(call) => call.check_self_contained(),
+			_ => None,
+		}
+	}
+
+	fn validate_self_contained(
+		&self,
+		info: &Self::SignedInfo,
+		dispatch_info: &DispatchInfoOf<RuntimeCall>,
+		len: usize,
+	) -> Option<TransactionValidity> {
+		match self {
+			RuntimeCall::Ethereum(call) => call.validate_self_contained(info, dispatch_info, len),
+			_ => None,
+		}
+	}
+
+	fn pre_dispatch_self_contained(
+		&self,
+		info: &Self::SignedInfo,
+		dispatch_info: &DispatchInfoOf<RuntimeCall>,
+		len: usize,
+	) -> Option<Result<(), TransactionValidityError>> {
+		match self {
+			RuntimeCall::Ethereum(call) => {
+				call.pre_dispatch_self_contained(info, dispatch_info, len)
+			},
+			_ => None,
+		}
+	}
+
+	fn apply_self_contained(
+		self,
+		info: Self::SignedInfo,
+	) -> Option<sp_runtime::DispatchResultWithInfo<PostDispatchInfoOf<Self>>> {
+		match self {
+			call @ RuntimeCall::Ethereum(pallet_ethereum::Call::transact { .. }) => {
+				Some(call.dispatch(RuntimeOrigin::from(
+					pallet_ethereum::RawOrigin::EthereumTransaction(info),
+				)))
+			},
+			_ => None,
+		}
+	}
+}
 
 #[cfg(feature = "runtime-benchmarks")]
 mod benches {

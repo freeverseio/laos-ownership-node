@@ -76,6 +76,7 @@ parachains-common = { git = "https://github.com/paritytech/cumulus.git", branch 
 
 # Frontier
 fp-rpc = { git = "https://github.com/paritytech/frontier", branch = "bar/polkadot-v0.9.42", default-features = false }
+fp-self-contained = { git = "https://github.com/paritytech/frontier", branch = "bar/polkadot-v0.9.42", default-features = false }
 
 
 # Frontier FRAME
@@ -140,6 +141,7 @@ std = [
 	"substrate-wasm-builder",
 	# Frontier
 	"fp-rpc/std",
+	"fp-self-contained/std",
 	# Frontier FRAME
 	"pallet-base-fee/std",
 	"pallet-ethereum/std",
@@ -187,4 +189,10 @@ try-runtime = [
 	"pallet-transaction-payment/try-runtime",
 	"pallet-xcm/try-runtime",
 	"parachain-info/try-runtime",
+	"pallet-evm/try-runtime",
+	"pallet-evm-chain-id/try-runtime",
+	"pallet-ethereum/try-runtime",
+  	"pallet-base-fee/try-runtime",
+	"fp-self-contained/try-runtime",
 ]
+
