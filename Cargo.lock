@@ -7020,6 +7020,7 @@ dependencies = [
  "cumulus-primitives-core",
  "cumulus-primitives-timestamp",
  "cumulus-primitives-utility",
+ "fp-rpc",
  "frame-benchmarking",
  "frame-executive",
  "frame-support",

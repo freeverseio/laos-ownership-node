@@ -75,6 +75,10 @@ parachain-info = { git = "https://github.com/paritytech/cumulus.git", branch = "
 parachains-common = { git = "https://github.com/paritytech/cumulus.git", branch = "polkadot-v0.9.42", default-features = false }
 
 # Frontier
+fp-rpc = { git = "https://github.com/paritytech/frontier", branch = "bar/polkadot-v0.9.42", default-features = false }
+
+
+# Frontier FRAME
 pallet-base-fee = { git = "https://github.com/paritytech/frontier", branch = "bar/polkadot-v0.9.42", default-features = false }
 pallet-evm = { git = "https://github.com/paritytech/frontier.git", branch = "bar/polkadot-v0.9.42", default-features = false }
 pallet-ethereum = { git = "https://github.com/paritytech/frontier.git", branch = "bar/polkadot-v0.9.42", default-features = false }
@@ -134,6 +138,8 @@ std = [
 	"xcm-executor/std",
 	"xcm/std",
 	"substrate-wasm-builder",
+	# Frontier
+	"fp-rpc/std",
 	# Frontier FRAME
 	"pallet-base-fee/std",
 	"pallet-ethereum/std",
