@@ -69,6 +69,9 @@ color-print = "0.3.4"
 
 # Frontier
 fp-evm = { git = "https://github.com/paritytech/frontier", branch = "bar/polkadot-v0.9.42" }
+fp-rpc = { git = "https://github.com/paritytech/frontier", branch = "bar/polkadot-v0.9.42" }
+fc-rpc = { git = "https://github.com/paritytech/frontier", branch = "bar/polkadot-v0.9.42", features = [ "rpc-binary-search-estimate" ] }
+fc-rpc-core = { git = "https://github.com/paritytech/frontier", branch = "bar/polkadot-v0.9.42" }
 
 [build-dependencies]
 substrate-build-script-utils = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.42" }
