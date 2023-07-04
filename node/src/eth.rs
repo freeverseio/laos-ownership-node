@@ -9,6 +9,8 @@ use futures::{future, prelude::*};
 // Substrate
 use sc_client_api::{BlockchainEvents, StateBackendFor};
 use sc_executor::{NativeElseWasmExecutor, NativeExecutionDispatch};
+use sc_network_sync::SyncingService;
+
 
 use sc_service::{
 	error::Error as ServiceError, BasePath, Configuration, TFullBackend, TFullClient, TaskManager,
@@ -114,6 +116,12 @@ pub fn spawn_frontier_tasks<RuntimeApi, Executor>(
 	overrides: Arc<OverrideHandle<Block>>,
 	fee_history_cache: FeeHistoryCache,
 	fee_history_cache_limit: FeeHistoryCacheLimit,
+	sync: Arc<SyncingService<Block>>,
+	pubsub_notification_sinks: Arc<
+		fc_mapping_sync::EthereumBlockNotificationSinks<
+			fc_mapping_sync::EthereumBlockNotification<Block>,
+		>,
+	>,
 ) where
 	RuntimeApi: ConstructRuntimeApi<
 		Block,
@@ -132,10 +140,13 @@ pub fn spawn_frontier_tasks<RuntimeApi, Executor>(
 			Duration::new(6, 0),
 			client.clone(),
 			backend,
+			overrides.clone(),
 			frontier_backend,
 			3,
 			0,
 			SyncStrategy::Parachain,
+			sync,
+			pubsub_notification_sinks,
 		)
 		.for_each(|()| future::ready(())),
 	);
