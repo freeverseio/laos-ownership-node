@@ -23,7 +23,9 @@ use crate::{
 
 fn load_spec(id: &str) -> std::result::Result<Box<dyn ChainSpec>, String> {
 	Ok(match id {
-		"arrakis" => Box::new(chain_spec::ChainSpec::from_json_bytes(&include_bytes!("../../specs/arrakis.json")[..])?),
+		"arrakis" => Box::new(chain_spec::ChainSpec::from_json_bytes(
+			&include_bytes!("../../specs/arrakis.json")[..],
+		)?),
 		"dev" => Box::new(chain_spec::development_config()),
 		"template-rococo" => Box::new(chain_spec::local_testnet_config()),
 		"" | "local" => Box::new(chain_spec::local_testnet_config()),
@@ -104,8 +106,11 @@ impl SubstrateCli for RelayChainCli {
 
 	fn load_spec(&self, id: &str) -> std::result::Result<Box<dyn sc_service::ChainSpec>, String> {
 		match id {
-			"rococo_freeverse" => Ok(Box::new(RococoChainSpec::from_json_bytes(&include_bytes!("../../specs/rococo-freeverse-chainspec.json")[..])?)),
-			_ => polkadot_cli::Cli::from_iter([RelayChainCli::executable_name()].iter()).load_spec(id),
+			"rococo_freeverse" => Ok(Box::new(RococoChainSpec::from_json_bytes(
+				&include_bytes!("../../specs/rococo-freeverse-chainspec.json")[..],
+			)?)),
+			_ => polkadot_cli::Cli::from_iter([RelayChainCli::executable_name()].iter())
+				.load_spec(id),
 		}
 	}
 
@@ -173,7 +178,7 @@ pub fn run() -> Result<()> {
 					&polkadot_cli,
 					config.tokio_handle.clone(),
 				)
-				.map_err(|err| format!("Relay chain argument error: {}", err))?;
+				.map_err(|err| format!("Relay chain argument error: {err}"))?;
 
 				cmd.run(config, polkadot_config)
 			})
@@ -249,7 +254,7 @@ pub fn run() -> Result<()> {
 			let registry = &runner.config().prometheus_config.as_ref().map(|cfg| &cfg.registry);
 			let task_manager =
 				sc_service::TaskManager::new(runner.config().tokio_handle.clone(), *registry)
-					.map_err(|e| format!("Error: {:?}", e))?;
+					.map_err(|e| format!("Error: {e}"))?;
 
 			let info_provider = timestamp_with_aura_info(MILLISECS_PER_BLOCK);
 
@@ -273,13 +278,13 @@ pub fn run() -> Result<()> {
 			runner.run_node_until_exit(|config| async move {
 				let hwbench = (!cli.no_hardware_benchmarks).then_some(
 					config.database.path().map(|database_path| {
-						let _ = std::fs::create_dir_all(&database_path);
+						let _ = std::fs::create_dir_all(database_path);
 						sc_sysinfo::gather_hwbench(Some(database_path))
 					})).flatten();
 
 				let para_id = chain_spec::Extensions::try_get(&*config.chain_spec)
 					.map(|e| e.para_id)
-					.ok_or_else(|| "Could not find parachain ID in chain-spec.")?;
+					.ok_or("Could not find parachain ID in chain-spec.")?;
 
 				let polkadot_cli = RelayChainCli::new(
 					&config,
@@ -293,7 +298,7 @@ pub fn run() -> Result<()> {
 
 				let state_version = Cli::native_runtime_version(&config.chain_spec).state_version();
 				let block: Block = generate_genesis_block(&*config.chain_spec, state_version)
-					.map_err(|e| format!("{:?}", e))?;
+					.map_err(|e| format!("{e}"))?;
 				let genesis_state = format!("0x{:?}", HexDisplay::from(&block.header().encode()));
 
 				let tokio_handle = config.tokio_handle.clone();
