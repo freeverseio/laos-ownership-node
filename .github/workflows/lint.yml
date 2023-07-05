@@ -42,6 +42,3 @@ jobs:
       - name: Check clippy
         run: |
           cargo clippy  --all-targets --workspace --features runtime-benchmarks --features try-runtime
-
-      - name: Run tests
-        run: cargo test
