@@ -32,6 +32,7 @@ jobs:
         run: |
           rustup update stable --no-self-update
           rustup target add wasm32-unknown-unknown
+          rustup component add clippy
 
       # Check the build
       - name: Check Build
