@@ -5912,7 +5912,7 @@ dependencies = [
 [[package]]
 name = "pallet-livingassets-ownership"
 version = "0.0.1"
-source = "git+https://github.com/freeverseio/pallet-livingassets-ownership?branch=fix/clippy#7b0765d4bd26fa107aadc4e4986905db635271fe"
+source = "git+https://github.com/freeverseio/pallet-livingassets-ownership?branch=dev#939d6dcc0e745eab5c96b21c6ea1b2947281c3d1"
 dependencies = [
  "frame-benchmarking",
  "frame-support",
