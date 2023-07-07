@@ -5932,6 +5932,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "pallet-livingassets-ownership"
+version = "0.0.1"
+source = "git+https://github.com/freeverseio/pallet-livingassets-ownership?branch=feature/updated_substrate_0.9.43#666101084885bf57e644b957f12a44bb790ba9ee"
+dependencies = [
+ "frame-benchmarking",
+ "frame-support",
+ "frame-system",
+ "parity-scale-codec",
+ "scale-info",
+]
+
+[[package]]
 name = "pallet-membership"
 version = "4.0.0-dev"
 source = "git+https://github.com/paritytech/substrate?branch=polkadot-v0.9.43#a2037bdedef0aa812017efee1d0fa63d4f5fcbae"
@@ -6574,6 +6586,7 @@ dependencies = [
  "parity-scale-codec",
  "polkadot-cli",
  "polkadot-primitives",
+ "polkadot-service",
  "sc-basic-authorship",
  "sc-chain-spec",
  "sc-cli",
@@ -6632,6 +6645,7 @@ dependencies = [
  "pallet-authorship",
  "pallet-balances",
  "pallet-collator-selection",
+ "pallet-livingassets-ownership",
  "pallet-parachain-template",
  "pallet-session",
  "pallet-sudo",
