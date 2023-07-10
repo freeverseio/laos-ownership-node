@@ -14,7 +14,7 @@ use smallvec::smallvec;
 use sp_api::impl_runtime_apis;
 use sp_core::{
 	crypto::{ByteArray, KeyTypeId},
-	OpaqueMetadata, H160, H256, U256,
+	OpaqueMetadata, H160, U256,
 };
 use core::{marker::PhantomData};
 
@@ -68,10 +68,10 @@ use xcm::latest::prelude::BodyId;
 use xcm_executor::XcmExecutor;
 
 // Frontier
-use pallet_ethereum::{Call::transact, Transaction as EthereumTransaction, PostLogContent};
+use pallet_ethereum::{PostLogContent};
 use pallet_evm::{
-	Account as EVMAccount, EVMCurrencyAdapter, EnsureAddressTruncated, FeeCalculator,
-	HashedAddressMapping, OnChargeEVMTransaction, Runner,
+	EVMCurrencyAdapter, EnsureAddressTruncated, 
+	HashedAddressMapping, OnChargeEVMTransaction, 
 };
 
 mod precompiles;
