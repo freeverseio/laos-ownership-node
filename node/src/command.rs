@@ -11,7 +11,10 @@ use sc_cli::{
 	ChainSpec, CliConfiguration, DefaultConfigurationValues, ImportParams, KeystoreParams,
 	NetworkParams, Result, RuntimeVersion, SharedParams, SubstrateCli,
 };
-use sc_service::config::{BasePath, /*DatabaseSource,*/ PrometheusConfig};
+use sc_service::{
+	config::{BasePath, /*DatabaseSource,*/ PrometheusConfig},
+	Arc,
+};
 use sp_core::hexdisplay::HexDisplay;
 use sp_runtime::traits::{AccountIdConversion, Block as BlockT};
 // Frontier
@@ -220,28 +223,26 @@ pub fn run() -> Result<()> {
 			let runner = cli.create_runner(cmd)?;
 			// Switch on the concrete benchmark sub-command-
 			match cmd {
-				BenchmarkCmd::Pallet(cmd) => {
+				BenchmarkCmd::Pallet(cmd) =>
 					if cfg!(feature = "runtime-benchmarks") {
 						runner.sync_run(|config| cmd.run::<Block, ParachainNativeExecutor>(config))
 					} else {
 						Err("Benchmarking wasn't enabled when building the node. \
 					You can enable it with `--features runtime-benchmarks`."
 							.into())
-					}
-				},
+					},
 				BenchmarkCmd::Block(cmd) => runner.sync_run(|config| {
 					let partials = new_partial(&config, &eth_cfg)?;
 					cmd.run(partials.client)
 				}),
 				#[cfg(not(feature = "runtime-benchmarks"))]
-				BenchmarkCmd::Storage(_) => {
+				BenchmarkCmd::Storage(_) =>
 					return Err(sc_cli::Error::Input(
 						"Compile with --features=runtime-benchmarks \
 						to enable storage benchmarks."
 							.into(),
 					)
-					.into())
-				},
+					.into()),
 				#[cfg(feature = "runtime-benchmarks")]
 				BenchmarkCmd::Storage(cmd) => runner.sync_run(|config| {
 					let partials = new_partial(&config, &eth_cfg)?;
@@ -249,9 +250,8 @@ pub fn run() -> Result<()> {
 					let storage = partials.backend.expose_storage();
 					cmd.run(config, partials.client.clone(), db, storage)
 				}),
-				BenchmarkCmd::Machine(cmd) => {
-					runner.sync_run(|config| cmd.run(&config, SUBSTRATE_REFERENCE_HARDWARE.clone()))
-				},
+				BenchmarkCmd::Machine(cmd) =>
+					runner.sync_run(|config| cmd.run(&config, SUBSTRATE_REFERENCE_HARDWARE.clone())),
 				// NOTE: this allows the Client to leniently implement
 				// new benchmark commands without requiring a companion MR.
 				#[allow(unreachable_patterns)]
@@ -298,6 +298,7 @@ pub fn run() -> Result<()> {
 				let params = crate::service::new_partial(&config, &cli.eth)?;
 				let client = params.client;
 				let (_, _, _, frontier_backend) = params.other;
+
 				cmd.run(client, frontier_backend)
 			})
 		},

@@ -1,5 +1,6 @@
 use std::{collections::BTreeMap, sync::Arc};
 
+use fc_rpc::TxPool;
 use jsonrpsee::RpcModule;
 // Substrate
 use sc_client_api::{
@@ -20,6 +21,7 @@ use sp_runtime::traits::Block as BlockT;
 use fc_db::Backend as FrontierBackend;
 pub use fc_rpc::{EthBlockDataCacheTask, OverrideHandle, StorageOverride};
 pub use fc_rpc_core::types::{FeeHistoryCache, FeeHistoryCacheLimit, FilterPool};
+use fc_rpc_core::{EthApiServer, EthFilterApiServer, NetApiServer, Web3ApiServer};
 pub use fc_storage::overrides_handle;
 use fp_rpc::{ConvertTransaction, ConvertTransactionRuntimeApi, EthereumRuntimeRPCApi};
 
@@ -42,7 +44,7 @@ pub struct EthDeps<C, P, A: ChainApi, CT, B: BlockT> {
 	/// Chain syncing service
 	pub sync: Arc<SyncingService<B>>,
 	/// Frontier Backend.
-	pub frontier_backend: Arc<FrontierBackend<B>>,
+	pub frontier_backend: Arc<fc_db::kv::Backend<B>>,
 	/// Ethereum data access overrides.
 	pub overrides: Arc<OverrideHandle<B>>,
 	/// Cache for Ethereum block data.
@@ -103,10 +105,7 @@ where
 	A: ChainApi<Block = B> + 'static,
 	CT: ConvertTransaction<<B as BlockT>::Extrinsic> + Send + Sync + 'static,
 {
-	use fc_rpc::{
-		Eth, EthApiServer, EthDevSigner, EthFilter, EthFilterApiServer, EthPubSub,
-		EthPubSubApiServer, EthSigner, Net, NetApiServer, Web3, Web3ApiServer,
-	};
+	use fc_rpc::{Eth, EthDevSigner, EthFilter, EthPubSub, EthSigner, Net, Web3};
 
 	let EthDeps {
 		client,
@@ -137,7 +136,7 @@ where
 		Eth::new(
 			client.clone(),
 			pool.clone(),
-			graph,
+			graph.clone(),
 			converter,
 			sync.clone(),
 			signers,
@@ -153,11 +152,14 @@ where
 		.into_rpc(),
 	)?;
 
+	let tx_pool = TxPool::new(client.clone(), graph);
+
 	if let Some(filter_pool) = filter_pool {
 		io.merge(
 			EthFilter::new(
 				client.clone(),
 				frontier_backend,
+				tx_pool.clone(),
 				filter_pool,
 				500_usize, // max stored filters
 				max_past_logs,

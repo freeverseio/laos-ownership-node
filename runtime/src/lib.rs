@@ -10,9 +10,9 @@ mod weights;
 pub mod xcm_config;
 
 use codec::{Decode, Encode};
-
 use core::marker::PhantomData;
 use cumulus_pallet_parachain_system::RelayNumberStrictlyIncreases;
+use ethereum_account::EthereumSignature;
 use smallvec::smallvec;
 use sp_api::impl_runtime_apis;
 use sp_core::{
@@ -20,6 +20,7 @@ use sp_core::{
 	OpaqueMetadata, H160, H256, U256,
 };
 
+use frame_support::traits::Hooks;
 use sp_runtime::{
 	create_runtime_str, generic, impl_opaque_keys,
 	traits::{
@@ -90,7 +91,7 @@ use precompiles::FrontierPrecompiles;
 pub use pallet_livingassets_ownership;
 
 /// Alias to 512-bit hash when used in the context of a transaction signature on the chain.
-pub type Signature = MultiSignature;
+pub type Signature = EthereumSignature;
 
 /// Some way of identifying an account on the chain. We intentionally make it equivalent
 /// to the public key of our transaction signing scheme.
@@ -109,7 +110,7 @@ pub type Hash = sp_core::H256;
 pub type BlockNumber = u32;
 
 /// The address format for describing accounts.
-pub type Address = MultiAddress<AccountId, ()>;
+pub type Address = AccountId;
 
 /// Block header type as expected by this runtime.
 pub type Header = generic::Header<BlockNumber, BlakeTwo256>;
@@ -313,7 +314,7 @@ impl frame_system::Config for Runtime {
 	/// The aggregated dispatch type that is available for extrinsics.
 	type RuntimeCall = RuntimeCall;
 	/// The lookup mechanism to get account ID from whatever is passed in dispatchers.
-	type Lookup = AccountIdLookup<AccountId, ()>;
+	type Lookup = sp_runtime::traits::IdentityLookup<AccountId>;
 	/// The index type for storing how many extrinsics an account has signed.
 	type Index = Index;
 	/// The index type for blocks.
@@ -589,10 +590,13 @@ where
 	}
 }
 
+const MAX_POV_SIZE: u64 = 5 * 1024 * 1024;
+
 parameter_types! {
 	pub BlockGasLimit: U256 = U256::from(NORMAL_DISPATCH_RATIO * MAXIMUM_BLOCK_WEIGHT.ref_time() / WEIGHT_PER_GAS);
 	pub PrecompilesValue: FrontierPrecompiles<Runtime> = FrontierPrecompiles::<_>::new();
-	pub WeightPerGas: Weight = Weight::from_ref_time(WEIGHT_PER_GAS);
+	pub WeightPerGas: Weight = Weight::from_parts(WEIGHT_PER_GAS, 0);
+	pub GasLimitPovSizeRatio: u64 = BlockGasLimit::get().checked_div(MAX_POV_SIZE.into()).expect("should be safe; qed").as_u64();
 }
 
 impl pallet_evm::Config for Runtime {
@@ -615,6 +619,7 @@ impl pallet_evm::Config for Runtime {
 	type FindAuthor = FindAuthorTruncated<Aura>;
 	type Timestamp = Timestamp;
 	type WeightInfo = pallet_evm::weights::SubstrateWeight<Runtime>;
+	type GasLimitPovSizeRatio = GasLimitPovSizeRatio;
 }
 
 parameter_types! {
@@ -961,6 +966,8 @@ impl_runtime_apis! {
 				access_list.unwrap_or_default(),
 				is_transactional,
 				validate,
+				None,
+				None,
 				evm_config,
 			).map_err(|err| err.error.into())
 		}
@@ -998,6 +1005,8 @@ impl_runtime_apis! {
 				access_list.unwrap_or_default(),
 				is_transactional,
 				validate,
+				None,
+				None,
 				evm_config,
 			).map_err(|err| err.error.into())
 		}
@@ -1040,6 +1049,21 @@ impl_runtime_apis! {
 		}
 
 		fn gas_limit_multiplier_support() {}
+
+		fn pending_block(
+			xts: Vec<<Block as BlockT>::Extrinsic>,
+		) -> (Option<pallet_ethereum::Block>, Option<Vec<TransactionStatus>>) {
+			for ext in xts.into_iter() {
+				let _ = Executive::apply_extrinsic(ext);
+			}
+
+			Ethereum::on_finalize(System::block_number() + 1);
+
+			(
+				pallet_ethereum::CurrentBlock::<Runtime>::get(),
+				pallet_ethereum::CurrentTransactionStatuses::<Runtime>::get()
+			)
+		}
 	}
 
 	impl fp_rpc::ConvertTransactionRuntimeApi<Block> for Runtime {

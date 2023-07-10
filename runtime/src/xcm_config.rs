@@ -5,20 +5,22 @@ use super::{
 use core::{marker::PhantomData, ops::ControlFlow};
 use frame_support::{
 	log, match_types, parameter_types,
-	traits::{ConstU32, Everything, Nothing, ProcessMessageError},
+	traits::{ConstU32, Everything, Get, Nothing, OriginTrait, ProcessMessageError},
 	weights::Weight,
 };
 use frame_system::EnsureRoot;
 use pallet_xcm::XcmPassthrough;
 use polkadot_parachain::primitives::Sibling;
 use polkadot_runtime_common::impls::ToAuthor;
+use sp_core::H160;
 use xcm::latest::prelude::*;
 use xcm_builder::{
-	AccountId32Aliases, AllowExplicitUnpaidExecutionFrom, AllowTopLevelPaidExecutionFrom,
-	CreateMatcher, CurrencyAdapter, EnsureXcmOrigin, FixedWeightBounds, IsConcrete, MatchXcm,
-	NativeAsset, ParentIsPreset, RelayChainAsNative, SiblingParachainAsNative,
-	SiblingParachainConvertsVia, SignedAccountId32AsNative, SignedToAccountId32,
-	SovereignSignedViaLocation, TakeWeightCredit, UsingComponents, WithComputedOrigin,
+	AccountId32Aliases, AccountKey20Aliases, AllowExplicitUnpaidExecutionFrom,
+	AllowTopLevelPaidExecutionFrom, CreateMatcher, CurrencyAdapter, EnsureXcmOrigin,
+	FixedWeightBounds, IsConcrete, MatchXcm, NativeAsset, ParentIsPreset, RelayChainAsNative,
+	SiblingParachainAsNative, SiblingParachainConvertsVia, SignedAccountId32AsNative,
+	SignedToAccountId32, SovereignSignedViaLocation, TakeWeightCredit, UsingComponents,
+	WithComputedOrigin,
 };
 use xcm_executor::{traits::ShouldExecute, XcmExecutor};
 
@@ -38,8 +40,40 @@ pub type LocationToAccountId = (
 	// Sibling parachain origins convert to AccountId via the `ParaId::into`.
 	SiblingParachainConvertsVia<Sibling, AccountId>,
 	// Straight up local `AccountId32` origins just alias directly to `AccountId`.
-	AccountId32Aliases<RelayNetwork, AccountId>,
+	AccountKey20Aliases<RelayNetwork, AccountId>,
 );
+
+/// Wrapper type around `LocationToAccountId` to convert an `AccountId` to type `H160`.
+pub struct LocationToH160;
+impl xcm_executor::traits::Convert<MultiLocation, H160> for LocationToH160 {
+	fn convert(location: MultiLocation) -> Result<H160, MultiLocation> {
+		<LocationToAccountId as xcm_executor::traits::Convert<MultiLocation, AccountId>>::convert(
+			location,
+		)
+		.map(Into::into)
+	}
+}
+
+// Convert a local Origin (i.e., a signed 20 byte account Origin)  to a Multilocation
+pub struct SignedToAccountId20<Origin, AccountId, Network>(
+	sp_std::marker::PhantomData<(Origin, AccountId, Network)>,
+);
+impl<Origin: OriginTrait + Clone, AccountId: Into<[u8; 20]>, Network: Get<NetworkId>>
+	xcm_executor::traits::Convert<Origin, MultiLocation>
+	for SignedToAccountId20<Origin, AccountId, Network>
+where
+	Origin::PalletsOrigin: From<frame_system::RawOrigin<AccountId>>
+		+ TryInto<frame_system::RawOrigin<AccountId>, Error = Origin::PalletsOrigin>,
+{
+	fn convert(o: Origin) -> Result<MultiLocation, Origin> {
+		o.try_with_caller(|caller| match caller.try_into() {
+			Ok(frame_system::RawOrigin::Signed(who)) =>
+				Ok(AccountKey20 { key: who.into(), network: Some(Network::get()) }.into()),
+			Ok(other) => Err(other.into()),
+			Err(other) => Err(other),
+		})
+	}
+}
 
 /// Means for transacting assets on this chain.
 pub type LocalAssetTransactor = CurrencyAdapter<
@@ -186,8 +220,7 @@ impl xcm_executor::Config for XcmConfig {
 	type UniversalLocation = UniversalLocation;
 	type Barrier = Barrier;
 	type Weigher = FixedWeightBounds<UnitWeightCost, RuntimeCall, MaxInstructions>;
-	type Trader =
-		UsingComponents<WeightToFee, RelayLocation, AccountId, Balances, ToAuthor<Runtime>>;
+	type Trader = (); // Trading is disabled.
 	type ResponseHandler = PolkadotXcm;
 	type AssetTrap = PolkadotXcm;
 	type AssetClaims = PolkadotXcm;
@@ -204,7 +237,7 @@ impl xcm_executor::Config for XcmConfig {
 }
 
 /// No local origins on this chain are allowed to dispatch XCM sends/executions.
-pub type LocalOriginToLocation = SignedToAccountId32<RuntimeOrigin, AccountId, RelayNetwork>;
+pub type LocalOriginToLocation = SignedToAccountId20<RuntimeOrigin, AccountId, RelayNetwork>;
 
 /// The means for routing XCM messages which are not for local execution into the right message
 /// queues.
@@ -224,7 +257,7 @@ impl pallet_xcm::Config for Runtime {
 	type RuntimeEvent = RuntimeEvent;
 	type SendXcmOrigin = EnsureXcmOrigin<RuntimeOrigin, LocalOriginToLocation>;
 	type XcmRouter = XcmRouter;
-	type ExecuteXcmOrigin = EnsureXcmOrigin<RuntimeOrigin, LocalOriginToLocation>;
+	type ExecuteXcmOrigin = xcm_builder::EnsureXcmOrigin<RuntimeOrigin, LocalOriginToLocation>;
 	type XcmExecuteFilter = Nothing;
 	// ^ Disable dispatchable execute on the XCM pallet.
 	// Needs to be `Everything` for local testing.

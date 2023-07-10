@@ -11,7 +11,6 @@ use sc_client_api::{BlockchainEvents, StateBackendFor};
 use sc_executor::{NativeElseWasmExecutor, NativeExecutionDispatch};
 use sc_network_sync::SyncingService;
 
-
 use sc_service::{
 	error::Error as ServiceError, BasePath, Configuration, TFullBackend, TFullClient, TaskManager,
 };
@@ -19,25 +18,14 @@ use sp_api::ConstructRuntimeApi;
 use sp_runtime::traits::BlakeTwo256;
 // Frontier
 pub use fc_consensus::FrontierBlockImport;
-pub use fc_db::frontier_database_dir;
-use fc_mapping_sync::{MappingSyncWorker, SyncStrategy};
+use fc_mapping_sync::{kv::MappingSyncWorker, SyncStrategy};
 use fc_rpc::{EthTask, OverrideHandle};
 pub use fc_rpc_core::types::{FeeHistoryCache, FeeHistoryCacheLimit, FilterPool};
 // Local
 use parachain_template_runtime::opaque::Block;
 
-/// Frontier DB backend type.
-pub type FrontierBackend = fc_db::Backend<Block>;
-
 pub fn db_config_dir(config: &Configuration) -> PathBuf {
-	let application = &config.impl_name;
-	config
-		.base_path
-		.as_ref()
-		.map(|base_path| base_path.config_dir(config.chain_spec.id()))
-		.unwrap_or_else(|| {
-			BasePath::from_project("", "", application).config_dir(config.chain_spec.id())
-		})
+	config.base_path.config_dir(config.chain_spec.id())
 }
 
 /// The ethereum-compatibility configuration used to run a node.
@@ -111,7 +99,7 @@ pub fn spawn_frontier_tasks<RuntimeApi, Executor>(
 	task_manager: &TaskManager,
 	client: Arc<TFullClient<Block, RuntimeApi, NativeElseWasmExecutor<Executor>>>,
 	backend: Arc<TFullBackend<Block>>,
-	frontier_backend: Arc<FrontierBackend>,
+	frontier_backend: Arc<fc_db::kv::Backend<Block>>,
 	filter_pool: Option<FilterPool>,
 	overrides: Arc<OverrideHandle<Block>>,
 	fee_history_cache: FeeHistoryCache,

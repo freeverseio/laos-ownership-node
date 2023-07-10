@@ -48,44 +48,47 @@ sp-session = { git = "https://github.com/paritytech/substrate", default-features
 sp-std = { git = "https://github.com/paritytech/substrate", default-features = false, branch = "polkadot-v0.9.43" }
 sp-transaction-pool = { git = "https://github.com/paritytech/substrate", default-features = false, branch = "polkadot-v0.9.43" }
 sp-version = { git = "https://github.com/paritytech/substrate", default-features = false, branch = "polkadot-v0.9.43" }
-pallet-livingassets-ownership = { git = "https://github.com/freeverseio/pallet-livingassets-ownership", branch="dev", default-features = false }
+
+# Our pallets
+pallet-livingassets-ownership = { git = "https://github.com/freeverseio/pallet-livingassets-ownership", branch="fix/runtime-benchmarks", default-features = false }
+ethereum-account = { version = "0.1.0", default-features = false, path = "../primitives/ethereum-account" }
 
 # Polkadot
-pallet-xcm = { git = "https://github.com/paritytech/polkadot", default-features = false, branch = "release-v0.9.42" }
-polkadot-parachain = { git = "https://github.com/paritytech/polkadot", default-features = false, branch = "release-v0.9.42" }
-polkadot-runtime-common = { git = "https://github.com/paritytech/polkadot", default-features = false, branch = "release-v0.9.42" }
-xcm = { git = "https://github.com/paritytech/polkadot", default-features = false, branch = "release-v0.9.42" }
-xcm-builder = { git = "https://github.com/paritytech/polkadot", default-features = false, branch = "release-v0.9.42" }
-xcm-executor = { git = "https://github.com/paritytech/polkadot", default-features = false, branch = "release-v0.9.42" }
-polkadot-primitives = { git = "https://github.com/paritytech/polkadot", default-features = false, branch = "release-v0.9.42" }
+pallet-xcm = { git = "https://github.com/paritytech/polkadot", default-features = false, branch = "release-v0.9.43" }
+polkadot-parachain = { git = "https://github.com/paritytech/polkadot", default-features = false, branch = "release-v0.9.43" }
+polkadot-runtime-common = { git = "https://github.com/paritytech/polkadot", default-features = false, branch = "release-v0.9.43" }
+xcm = { git = "https://github.com/paritytech/polkadot", default-features = false, branch = "release-v0.9.43" }
+xcm-builder = { git = "https://github.com/paritytech/polkadot", default-features = false, branch = "release-v0.9.43" }
+xcm-executor = { git = "https://github.com/paritytech/polkadot", default-features = false, branch = "release-v0.9.43" }
+polkadot-primitives = { git = "https://github.com/paritytech/polkadot", default-features = false, branch = "release-v0.9.43" }
 
 # Cumulus
-cumulus-pallet-aura-ext = { git = "https://github.com/paritytech/cumulus.git", branch = "polkadot-v0.9.42", default-features = false }
-cumulus-pallet-dmp-queue = { git = "https://github.com/paritytech/cumulus.git", branch = "polkadot-v0.9.42", default-features = false }
-cumulus-pallet-parachain-system = { git = "https://github.com/paritytech/cumulus.git", branch = "polkadot-v0.9.42", default-features = false }
-cumulus-pallet-session-benchmarking = {git = "https://github.com/paritytech/cumulus.git", branch = "polkadot-v0.9.42", default-features = false, version = "3.0.0"}
-cumulus-pallet-xcm = { git = "https://github.com/paritytech/cumulus.git", branch = "polkadot-v0.9.42", default-features = false }
-cumulus-pallet-xcmp-queue = { git = "https://github.com/paritytech/cumulus.git", branch = "polkadot-v0.9.42", default-features = false }
-cumulus-primitives-core = { git = "https://github.com/paritytech/cumulus.git", branch = "polkadot-v0.9.42", default-features = false }
-cumulus-primitives-timestamp = { git = "https://github.com/paritytech/cumulus.git", branch = "polkadot-v0.9.42", default-features = false }
-cumulus-primitives-utility = { git = "https://github.com/paritytech/cumulus.git", branch = "polkadot-v0.9.42", default-features = false }
-pallet-collator-selection = { git = "https://github.com/paritytech/cumulus.git", branch = "polkadot-v0.9.42", default-features = false }
-parachain-info = { git = "https://github.com/paritytech/cumulus.git", branch = "polkadot-v0.9.42", default-features = false }
-parachains-common = { git = "https://github.com/paritytech/cumulus.git", branch = "polkadot-v0.9.42", default-features = false }
+cumulus-pallet-aura-ext = { git = "https://github.com/paritytech/cumulus.git", branch = "polkadot-v0.9.43", default-features = false }
+cumulus-pallet-dmp-queue = { git = "https://github.com/paritytech/cumulus.git", branch = "polkadot-v0.9.43", default-features = false }
+cumulus-pallet-parachain-system = { git = "https://github.com/paritytech/cumulus.git", branch = "polkadot-v0.9.43", default-features = false }
+cumulus-pallet-session-benchmarking = {git = "https://github.com/paritytech/cumulus.git", branch = "polkadot-v0.9.43", default-features = false, version = "3.0.0"}
+cumulus-pallet-xcm = { git = "https://github.com/paritytech/cumulus.git", branch = "polkadot-v0.9.43", default-features = false }
+cumulus-pallet-xcmp-queue = { git = "https://github.com/paritytech/cumulus.git", branch = "polkadot-v0.9.43", default-features = false }
+cumulus-primitives-core = { git = "https://github.com/paritytech/cumulus.git", branch = "polkadot-v0.9.43", default-features = false }
+cumulus-primitives-timestamp = { git = "https://github.com/paritytech/cumulus.git", branch = "polkadot-v0.9.43", default-features = false }
+cumulus-primitives-utility = { git = "https://github.com/paritytech/cumulus.git", branch = "polkadot-v0.9.43", default-features = false }
+pallet-collator-selection = { git = "https://github.com/paritytech/cumulus.git", branch = "polkadot-v0.9.43", default-features = false }
+parachain-info = { git = "https://github.com/paritytech/cumulus.git", branch = "polkadot-v0.9.43", default-features = false }
+parachains-common = { git = "https://github.com/paritytech/cumulus.git", branch = "polkadot-v0.9.43", default-features = false }
 
 # Frontier
-fp-rpc = { git = "https://github.com/paritytech/frontier", branch = "bar/polkadot-v0.9.42", default-features = false }
-fp-self-contained = { git = "https://github.com/paritytech/frontier", branch = "bar/polkadot-v0.9.42", default-features = false }
+fp-rpc = { git = "https://github.com/paritytech/frontier", branch = "polkadot-v0.9.43", default-features = false }
+fp-self-contained = { git = "https://github.com/paritytech/frontier", branch = "polkadot-v0.9.43", default-features = false }
 
 # Frontier FRAME
-pallet-base-fee = { git = "https://github.com/paritytech/frontier", branch = "bar/polkadot-v0.9.42", default-features = false }
-pallet-evm = { git = "https://github.com/paritytech/frontier.git", branch = "bar/polkadot-v0.9.42", default-features = false }
-pallet-ethereum = { git = "https://github.com/paritytech/frontier.git", branch = "bar/polkadot-v0.9.42", default-features = false }
-pallet-evm-chain-id = { git = "https://github.com/paritytech/frontier", branch = "bar/polkadot-v0.9.42", default-features = false }
-pallet-evm-precompile-modexp = { git = "https://github.com/paritytech/frontier", branch = "bar/polkadot-v0.9.42", default-features = false }
-pallet-evm-precompile-sha3fips = { git = "https://github.com/paritytech/frontier", branch = "bar/polkadot-v0.9.42", default-features = false }
-pallet-evm-precompile-simple = { git = "https://github.com/paritytech/frontier", branch = "bar/polkadot-v0.9.42", default-features = false }
-pallet-hotfix-sufficients = { git = "https://github.com/paritytech/frontier", branch = "bar/polkadot-v0.9.42", default-features = false }
+pallet-base-fee = { git = "https://github.com/paritytech/frontier", branch = "polkadot-v0.9.43", default-features = false }
+pallet-evm = { git = "https://github.com/paritytech/frontier.git", branch = "polkadot-v0.9.43", default-features = false }
+pallet-ethereum = { git = "https://github.com/paritytech/frontier.git", branch = "polkadot-v0.9.43", default-features = false }
+pallet-evm-chain-id = { git = "https://github.com/paritytech/frontier", branch = "polkadot-v0.9.43", default-features = false }
+pallet-evm-precompile-modexp = { git = "https://github.com/paritytech/frontier", branch = "polkadot-v0.9.43", default-features = false }
+pallet-evm-precompile-sha3fips = { git = "https://github.com/paritytech/frontier", branch = "polkadot-v0.9.43", default-features = false }
+pallet-evm-precompile-simple = { git = "https://github.com/paritytech/frontier", branch = "polkadot-v0.9.43", default-features = false }
+pallet-hotfix-sufficients = { git = "https://github.com/paritytech/frontier", branch = "polkadot-v0.9.43", default-features = false }
 
 [features]
 default = [
@@ -150,6 +153,11 @@ std = [
 	"pallet-evm-precompile-sha3fips/std",
 	"pallet-evm-precompile-simple/std",
 	"pallet-hotfix-sufficients/std",
+	"cumulus-pallet-session-benchmarking/std",
+	"frame-benchmarking",
+	"frame-system-benchmarking",
+	"frame-try-runtime",
+	"ethereum-account/std",
 ]
 
 runtime-benchmarks = [
@@ -167,6 +175,15 @@ runtime-benchmarks = [
 	"xcm-builder/runtime-benchmarks",
 	"cumulus-pallet-session-benchmarking/runtime-benchmarks",
 	"cumulus-pallet-xcmp-queue/runtime-benchmarks",
+	"cumulus-pallet-parachain-system/runtime-benchmarks",
+	"pallet-ethereum/runtime-benchmarks",
+	"pallet-evm/runtime-benchmarks",
+	"pallet-hotfix-sufficients/runtime-benchmarks",
+	"pallet-sudo/runtime-benchmarks",
+	"polkadot-parachain/runtime-benchmarks",
+	"polkadot-primitives/runtime-benchmarks",
+	"polkadot-runtime-common/runtime-benchmarks",
+	"xcm-executor/runtime-benchmarks",
 ]
 
 try-runtime = [

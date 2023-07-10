@@ -34,7 +34,7 @@ use substrate_prometheus_endpoint::Registry;
 
 // Frontier
 use crate::eth::{
-	db_config_dir, new_frontier_partial, spawn_frontier_tasks, EthConfiguration, FrontierBackend,
+	db_config_dir, new_frontier_partial, spawn_frontier_tasks, EthConfiguration,
 	FrontierBlockImport as TFrontierBlockImport, FrontierPartialComponents,
 };
 
@@ -82,7 +82,7 @@ pub fn new_partial(
 			ParachainBlockImport,
 			Option<Telemetry>,
 			Option<TelemetryWorkerHandle>,
-			Arc<FrontierBackend>,
+			Arc<fc_db::kv::Backend<Block>>,
 		),
 	>,
 	sc_service::Error,
@@ -135,10 +135,13 @@ pub fn new_partial(
 		client.clone(),
 	);
 
-	let frontier_backend =
-		Arc::new(FrontierBackend::open(client.clone(), &config.database, &db_config_dir(config))?);
-	let frontier_block_import =
-		FrontierBlockImport::new(client.clone(), client.clone(), frontier_backend.clone());
+	let frontier_backend = Arc::new(fc_db::kv::Backend::open(
+		Arc::clone(&client),
+		&config.database,
+		&db_config_dir(config),
+	)?);
+
+	let frontier_block_import = FrontierBlockImport::new(client.clone(), client.clone());
 
 	let parachain_block_import = ParachainBlockImport::new(frontier_block_import, backend.clone());
 
@@ -203,6 +206,8 @@ async fn start_node_impl(
 	let prometheus_registry = parachain_config.prometheus_registry().cloned();
 	let transaction_pool = params.transaction_pool.clone();
 	let import_queue_service = params.import_queue.service();
+
+	let net_config = sc_network::config::FullNetworkConfiguration::new(&parachain_config.network);
 
 	// Sinks for pubsub notifications.
 	// Everytime a new subscription is created, a new mpsc channel is added to the sink pool.

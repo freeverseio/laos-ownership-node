@@ -1,11 +1,12 @@
 use cumulus_primitives_core::ParaId;
+use hex_literal::hex;
 use parachain_template_runtime::{AccountId, AuraId, Signature, EXISTENTIAL_DEPOSIT};
 use sc_chain_spec::{ChainSpecExtension, ChainSpecGroup};
 use sc_service::ChainType;
 use serde::{Deserialize, Serialize};
 use sp_core::{sr25519, Pair, Public, H160, U256};
 use sp_runtime::traits::{IdentifyAccount, Verify};
-use std::{collections::BTreeMap, marker::PhantomData, str::FromStr};
+use std::{collections::BTreeMap, str::FromStr};
 
 /// Specialized `ChainSpec` for the normal parachain runtime.
 pub type ChainSpec =
@@ -38,21 +39,11 @@ impl Extensions {
 	}
 }
 
-type AccountPublic = <Signature as Verify>::Signer;
-
 /// Generate collator keys from seed.
 ///
 /// This function's return type must always match the session keys of the chain in tuple format.
 pub fn get_collator_keys_from_seed(seed: &str) -> AuraId {
 	get_from_seed::<AuraId>(seed)
-}
-
-/// Helper function to generate an account ID from seed
-pub fn get_account_id_from_seed<TPublic: Public>(seed: &str) -> AccountId
-where
-	AccountPublic: From<<TPublic::Pair as Pair>::Public>,
-{
-	AccountPublic::from(get_from_seed::<TPublic>(seed)).into_account()
 }
 
 /// Generate the session keys from individual elements.
@@ -80,30 +71,22 @@ pub fn development_config() -> ChainSpec {
 				// initial collators.
 				vec![
 					(
-						get_account_id_from_seed::<sr25519::Public>("Alice"),
+						AccountId::from(hex!("f24FF3a9CF04c71Dbc94D0b566f7A27B94566cac")),
 						get_collator_keys_from_seed("Alice"),
 					),
 					(
-						get_account_id_from_seed::<sr25519::Public>("Bob"),
+						AccountId::from(hex!("3Cd0A705a2DC65e5b1E1205896BaA2be8A07c6e0")),
 						get_collator_keys_from_seed("Bob"),
 					),
 				],
 				vec![
-					get_account_id_from_seed::<sr25519::Public>("Alice"),
-					get_account_id_from_seed::<sr25519::Public>("Bob"),
-					get_account_id_from_seed::<sr25519::Public>("Charlie"),
-					get_account_id_from_seed::<sr25519::Public>("Dave"),
-					get_account_id_from_seed::<sr25519::Public>("Eve"),
-					get_account_id_from_seed::<sr25519::Public>("Ferdie"),
-					get_account_id_from_seed::<sr25519::Public>("Alice//stash"),
-					get_account_id_from_seed::<sr25519::Public>("Bob//stash"),
-					get_account_id_from_seed::<sr25519::Public>("Charlie//stash"),
-					get_account_id_from_seed::<sr25519::Public>("Dave//stash"),
-					get_account_id_from_seed::<sr25519::Public>("Eve//stash"),
-					get_account_id_from_seed::<sr25519::Public>("Ferdie//stash"),
+					AccountId::from(hex!("f24FF3a9CF04c71Dbc94D0b566f7A27B94566cac")),
+					AccountId::from(hex!("3Cd0A705a2DC65e5b1E1205896BaA2be8A07c6e0")),
+					AccountId::from(hex!("798d4Ba9baf0064Ec19eB4F0a1a45785ae9D6DFc")),
+					AccountId::from(hex!("773539d4Ac0e786233D90A233654ccEE26a613D9")),
 				],
 				// Give Alice root privileges
-				Some(get_account_id_from_seed::<sr25519::Public>("Alice")),
+				AccountId::from(hex!("f24FF3a9CF04c71Dbc94D0b566f7A27B94566cac")),
 				1000.into(),
 			)
 		},
@@ -137,30 +120,22 @@ pub fn local_testnet_config() -> ChainSpec {
 				// initial collators.
 				vec![
 					(
-						get_account_id_from_seed::<sr25519::Public>("Alice"),
+						AccountId::from(hex!("f24FF3a9CF04c71Dbc94D0b566f7A27B94566cac")),
 						get_collator_keys_from_seed("Alice"),
 					),
 					(
-						get_account_id_from_seed::<sr25519::Public>("Bob"),
+						AccountId::from(hex!("3Cd0A705a2DC65e5b1E1205896BaA2be8A07c6e0")),
 						get_collator_keys_from_seed("Bob"),
 					),
 				],
 				vec![
-					get_account_id_from_seed::<sr25519::Public>("Alice"),
-					get_account_id_from_seed::<sr25519::Public>("Bob"),
-					get_account_id_from_seed::<sr25519::Public>("Charlie"),
-					get_account_id_from_seed::<sr25519::Public>("Dave"),
-					get_account_id_from_seed::<sr25519::Public>("Eve"),
-					get_account_id_from_seed::<sr25519::Public>("Ferdie"),
-					get_account_id_from_seed::<sr25519::Public>("Alice//stash"),
-					get_account_id_from_seed::<sr25519::Public>("Bob//stash"),
-					get_account_id_from_seed::<sr25519::Public>("Charlie//stash"),
-					get_account_id_from_seed::<sr25519::Public>("Dave//stash"),
-					get_account_id_from_seed::<sr25519::Public>("Eve//stash"),
-					get_account_id_from_seed::<sr25519::Public>("Ferdie//stash"),
+					AccountId::from(hex!("f24FF3a9CF04c71Dbc94D0b566f7A27B94566cac")),
+					AccountId::from(hex!("3Cd0A705a2DC65e5b1E1205896BaA2be8A07c6e0")),
+					AccountId::from(hex!("798d4Ba9baf0064Ec19eB4F0a1a45785ae9D6DFc")),
+					AccountId::from(hex!("773539d4Ac0e786233D90A233654ccEE26a613D9")),
 				],
 				// Give Alice root privileges
-				Some(get_account_id_from_seed::<sr25519::Public>("Alice")),
+				AccountId::from(hex!("f24FF3a9CF04c71Dbc94D0b566f7A27B94566cac")),
 				1000.into(),
 			)
 		},
