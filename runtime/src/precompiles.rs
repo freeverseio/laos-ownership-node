@@ -1,4 +1,6 @@
-use pallet_evm::{Precompile, PrecompileHandle, PrecompileResult, PrecompileSet, IsPrecompileResult};
+use pallet_evm::{
+	IsPrecompileResult, Precompile, PrecompileHandle, PrecompileResult, PrecompileSet,
+};
 use sp_core::H160;
 use sp_std::marker::PhantomData;
 
@@ -6,6 +8,7 @@ use pallet_evm_precompile_modexp::Modexp;
 use pallet_evm_precompile_sha3fips::Sha3FIPS256;
 use pallet_evm_precompile_simple::{ECRecover, ECRecoverPublicKey, Identity, Ripemd160, Sha256};
 
+#[allow(clippy::new_without_default)]
 pub struct FrontierPrecompiles<R>(PhantomData<R>);
 
 impl<R> FrontierPrecompiles<R>
@@ -19,6 +22,7 @@ where
 		[hash(1), hash(2), hash(3), hash(4), hash(5), hash(1024), hash(1025)]
 	}
 }
+
 impl<R> PrecompileSet for FrontierPrecompiles<R>
 where
 	R: pallet_evm::Config,

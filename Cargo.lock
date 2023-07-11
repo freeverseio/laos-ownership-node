@@ -6397,6 +6397,7 @@ dependencies = [
  "frame-benchmarking",
  "frame-support",
  "frame-system",
+ "hex",
  "hex-literal",
  "impl-trait-for-tuples",
  "log",

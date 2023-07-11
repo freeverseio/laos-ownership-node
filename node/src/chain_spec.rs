@@ -5,7 +5,7 @@ use sc_service::ChainType;
 use serde::{Deserialize, Serialize};
 use sp_core::{sr25519, Pair, Public, H160, U256};
 use sp_runtime::traits::{IdentifyAccount, Verify};
-use std::{collections::BTreeMap, marker::PhantomData, str::FromStr};
+use std::{collections::BTreeMap, str::FromStr};
 
 /// Specialized `ChainSpec` for the normal parachain runtime.
 pub type ChainSpec =
