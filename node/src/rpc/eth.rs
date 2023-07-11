@@ -91,7 +91,7 @@ impl<C, P, A: ChainApi, CT: Clone, B: BlockT> Clone for EthDeps<C, P, A, CT, B> 
 pub fn create_eth<C, BE, P, A, CT, B>(
 	mut io: RpcModule<()>,
 	deps: EthDeps<C, P, A, CT, B>,
-	subscription_task_executor: SubscriptionTaskExecutor,
+	_subscription_task_executor: SubscriptionTaskExecutor,
 ) -> Result<RpcModule<()>, Box<dyn std::error::Error + Send + Sync>>
 where
 	B: BlockT,
@@ -104,7 +104,7 @@ where
 	A: ChainApi<Block = B> + 'static,
 	CT: ConvertTransaction<<B as BlockT>::Extrinsic> + Send + Sync + 'static,
 {
-	use fc_rpc::{Eth, EthDevSigner, EthFilter, EthPubSub, EthSigner, Net, Web3};
+	use fc_rpc::{Eth, EthDevSigner, EthFilter, EthSigner, Net, Web3};
 
 	let EthDeps {
 		client,
@@ -123,7 +123,7 @@ where
 		fee_history_cache,
 		fee_history_cache_limit,
 		execute_gas_limit_multiplier,
-		forced_parent_hashes,
+		forced_parent_hashes: _,
 	} = deps;
 
 	let mut signers = Vec::new();
@@ -167,18 +167,6 @@ where
 			.into_rpc(),
 		)?;
 	}
-
-	// io.merge(
-	// 	EthPubSub::new(
-	// 		pool,
-	// 		client.clone(),
-	// 		network.clone(),
-	// 		subscription_task_executor,
-	// 		overrides,
-	// 		pubsub_notification_sinks,
-	// 	)
-	// 	.into_rpc(),
-	// )?;
 
 	io.merge(
 		Net::new(

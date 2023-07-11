@@ -13,7 +13,6 @@ use sc_cli::{
 };
 use sc_service::{
 	config::{BasePath, /*DatabaseSource,*/ PrometheusConfig},
-	Arc,
 };
 use sp_core::hexdisplay::HexDisplay;
 use sp_runtime::traits::{AccountIdConversion, Block as BlockT};

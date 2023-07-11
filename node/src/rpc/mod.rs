@@ -42,7 +42,7 @@ pub struct FullDeps<C, P, A: ChainApi, CT> {
 pub fn create_full<C, P, BE, A, CT>(
 	deps: FullDeps<C, P, A, CT>,
 	subscription_task_executor: SubscriptionTaskExecutor,
-	pubsub_notification_sinks: Arc<
+	_pubsub_notification_sinks: Arc<
 		fc_mapping_sync::EthereumBlockNotificationSinks<
 			fc_mapping_sync::EthereumBlockNotification<Block>,
 		>,

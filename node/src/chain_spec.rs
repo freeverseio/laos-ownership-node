@@ -5,7 +5,7 @@ use sc_service::ChainType;
 use serde::{Deserialize, Serialize};
 use sp_core::{sr25519, Pair, Public, H160, U256};
 use sp_runtime::traits::{IdentifyAccount, Verify};
-use std::{collections::BTreeMap, marker::PhantomData, str::FromStr};
+use std::{collections::BTreeMap, str::FromStr};
 
 /// Specialized `ChainSpec` for the normal parachain runtime.
 pub type ChainSpec =
@@ -188,8 +188,6 @@ fn testnet_genesis(
 	root_key: Option<AccountId>,
 	id: ParaId,
 ) -> parachain_template_runtime::GenesisConfig {
-	let alice = get_from_seed::<sr25519::Public>("Alice");
-	let bob = get_from_seed::<sr25519::Public>("Bob");
 
 	parachain_template_runtime::GenesisConfig {
 		system: parachain_template_runtime::SystemConfig {
