@@ -161,6 +161,7 @@ runtime-benchmarks = [
 	"pallet-collator-selection/runtime-benchmarks",
 	"pallet-livingassets-ownership/runtime-benchmarks",
 	"pallet-timestamp/runtime-benchmarks",
+	"pallet-ethereum/runtime-benchmarks",
 	"pallet-xcm/runtime-benchmarks",
 	"sp-runtime/runtime-benchmarks",
 	"xcm-builder/runtime-benchmarks",
