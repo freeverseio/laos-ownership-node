@@ -149,9 +149,9 @@ std = [
 	"pallet-evm-precompile-sha3fips/std",
 	"pallet-evm-precompile-simple/std",
 	"cumulus-pallet-session-benchmarking/std",
-	"frame-benchmarking/std",
-	"frame-system-benchmarking/std",
-	"frame-try-runtime/std"
+	"frame-benchmarking",
+	"frame-system-benchmarking",
+	"frame-try-runtime"
 ]
 
 runtime-benchmarks = [
