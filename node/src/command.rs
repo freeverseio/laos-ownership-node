@@ -11,10 +11,7 @@ use sc_cli::{
 	ChainSpec, CliConfiguration, DefaultConfigurationValues, ImportParams, KeystoreParams,
 	NetworkParams, Result, RuntimeVersion, SharedParams, SubstrateCli,
 };
-use sc_service::{
-	config::{BasePath, /*DatabaseSource,*/ PrometheusConfig},
-	Arc,
-};
+use sc_service::config::{BasePath, /*DatabaseSource,*/ PrometheusConfig};
 use sp_core::hexdisplay::HexDisplay;
 use sp_runtime::traits::{AccountIdConversion, Block as BlockT};
 // Frontier
@@ -199,7 +196,7 @@ pub fn run() -> Result<()> {
 					&polkadot_cli,
 					config.tokio_handle.clone(),
 				)
-				.map_err(|err| format!("Relay chain argument error: {}", err))?;
+				.map_err(|err| format!("Relay chain argument error: {err}"))?;
 
 				cmd.run(config, polkadot_config)
 			})
@@ -266,7 +263,6 @@ pub fn run() -> Result<()> {
 
 			let runner = cli.create_runner(cmd)?;
 
-			use sc_executor::{sp_wasm_interface::ExtendedHostFunctions, NativeExecutionDispatch};
 			type HostFunctionsOf<E> = ExtendedHostFunctions<
 				sp_io::SubstrateHostFunctions,
 				<E as NativeExecutionDispatch>::ExtendHostFunctions,
@@ -276,7 +272,7 @@ pub fn run() -> Result<()> {
 			let registry = &runner.config().prometheus_config.as_ref().map(|cfg| &cfg.registry);
 			let task_manager =
 				sc_service::TaskManager::new(runner.config().tokio_handle.clone(), *registry)
-					.map_err(|e| format!("Error: {:?}", e))?;
+					.map_err(|e| format!("Error: {e}"))?;
 			let info_provider = timestamp_with_aura_info(MILLISECS_PER_BLOCK);
 
 			runner.async_run(|_| {
@@ -332,13 +328,13 @@ pub fn run() -> Result<()> {
 
 				let state_version = Cli::native_runtime_version(&config.chain_spec).state_version();
 				let block: Block = generate_genesis_block(&*config.chain_spec, state_version)
-					.map_err(|e| format!("{:?}", e))?;
+					.map_err(|e| e.to_string()))?;
 				let genesis_state = format!("0x{:?}", HexDisplay::from(&block.header().encode()));
 
 				let tokio_handle = config.tokio_handle.clone();
 				let polkadot_config =
 					SubstrateCli::create_configuration(&polkadot_cli, &polkadot_cli, tokio_handle)
-						.map_err(|err| format!("Relay chain argument error: {}", err))?;
+						.map_err(|err| format!("Relay chain argument error: {err}"))?;
 
 				info!("Parachain id: {:?}", id);
 				info!("Parachain Account: {}", parachain_account);

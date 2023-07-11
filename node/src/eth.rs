@@ -12,7 +12,7 @@ use sc_executor::{NativeElseWasmExecutor, NativeExecutionDispatch};
 use sc_network_sync::SyncingService;
 
 use sc_service::{
-	error::Error as ServiceError, BasePath, Configuration, TFullBackend, TFullClient, TaskManager,
+	error::Error as ServiceError, Configuration, TFullBackend, TFullClient, TaskManager,
 };
 use sp_api::ConstructRuntimeApi;
 use sp_runtime::traits::BlakeTwo256;
@@ -95,6 +95,7 @@ where
 {
 }
 
+#[allow(clippy::too_many_arguments)]
 pub fn spawn_frontier_tasks<RuntimeApi, Executor>(
 	task_manager: &TaskManager,
 	client: Arc<TFullClient<Block, RuntimeApi, NativeElseWasmExecutor<Executor>>>,

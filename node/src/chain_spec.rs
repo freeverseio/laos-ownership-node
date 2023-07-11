@@ -16,7 +16,7 @@ const SAFE_XCM_VERSION: u32 = xcm::prelude::XCM_VERSION;
 
 /// Helper function to generate a crypto pair from seed
 pub fn get_from_seed<TPublic: Public>(seed: &str) -> <TPublic::Pair as Pair>::Public {
-	TPublic::Pair::from_string(&format!("//{}", seed), None)
+	TPublic::Pair::from_string(&format!("//{seed}"), None)
 		.expect("static values are valid; qed")
 		.public()
 }
@@ -188,8 +188,8 @@ fn testnet_genesis(
 	root_key: Option<AccountId>,
 	id: ParaId,
 ) -> parachain_template_runtime::GenesisConfig {
-	let alice = get_from_seed::<sr25519::Public>("Alice");
-	let bob = get_from_seed::<sr25519::Public>("Bob");
+	// let alice = get_from_seed::<sr25519::Public>("Alice");
+	// let bob = get_from_seed::<sr25519::Public>("Bob");
 
 	parachain_template_runtime::GenesisConfig {
 		system: parachain_template_runtime::SystemConfig {
