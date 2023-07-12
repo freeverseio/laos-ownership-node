@@ -1,4 +1,4 @@
-name: Build & Publish Docker Image Fast
+name: Build & Publish Docker Image
 
 # Controls when the action will run.
 on:
@@ -38,11 +38,11 @@ jobs:
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
             target/
-          key: ${{ runner.os }}-cargo-build-${{ hashFiles('**/Cargo.lock') }} 
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }} 
  
       - name: Check clippy
         run: |
-          cargo clippy  --all-targets --workspace --features runtime-benchmarks --features try-runtime
+          cargo clippy --release --all-targets --workspace --features runtime-benchmarks --features try-runtime
 
       # Check the build
       - name: Build
