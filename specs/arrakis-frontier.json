@@ -11,7 +11,7 @@
     "tokenDecimals": 12,
     "tokenSymbol": "UNIT"
   },
-  "relay_chain": "rococo-freeverse",
+  "relay_chain": "rococo_freeverse",
   "para_id": 1666,
   "codeSubstitutes": {},
   "genesis": {
