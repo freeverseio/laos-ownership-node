@@ -1,19 +1,18 @@
 {
-  "name": "Local Testnet",
-  "id": "local_testnet",
-  "chainType": "Local",
+  "name": "arrakis_ownership_chain",
+  "id": "arrakis_ownership_chain",
+  "chainType": "Live",
   "bootNodes": [
-    "/ip4/127.0.0.1/tcp/30333/p2p/12D3KooWNzowSUPLFTwhLjcZEB77Q9noznWa69gwagQYumbe8do7"
   ],
   "telemetryEndpoints": null,
-  "protocolId": "template-local",
+  "protocolId": "arrakis_ownership_chain",
   "properties": {
     "ss58Format": 42,
     "tokenDecimals": 12,
     "tokenSymbol": "UNIT"
   },
   "relay_chain": "rococo-local",
-  "para_id": 1000,
+  "para_id": 1666,
   "codeSubstitutes": {},
   "genesis": {
     "runtime": {
@@ -22,7 +21,7 @@
       },
       "parachainSystem": null,
       "parachainInfo": {
-        "parachainId": 1000
+        "parachainId": 1666
       },
       "balances": {
         "balances": [
@@ -86,28 +85,22 @@
               0
             ]
           },
-          "0x6be02d1d3665660d22ff9624b7be0551ee1ac91b": {
+          "0xB7469C43535c826E29C30D25a9F3a035759cf132": {
             "nonce": "0x0",
             "balance": "0xffffffffffffffffffffffffffffffff",
             "storage": {},
             "code": []
           },
-          "0xc0f0f4ab324c46e55d02d0033343b4be8a55532d": {
+          "0x7bbeaEe9a166b095AD6FcBb87Cbfc6D5414030B1": {
             "nonce": "0x0",
             "balance": "0xef000000000000000000000000000",
-            "storage": {},
-            "code": []
-          },
-          "0xd43593c715fdd31c61141abd04a99fd6822c8558": {
-            "nonce": "0x0",
-            "balance": "0xffffffffffffffffffffffffffffffff",
             "storage": {},
             "code": []
           }
         }
       },
       "evmChainId": {
-        "chainId": 1000
+        "chainId": 666
       },
       "baseFee": {
         "baseFeePerGas": "0x3b9aca00",
