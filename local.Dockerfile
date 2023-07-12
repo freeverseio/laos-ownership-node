@@ -15,7 +15,7 @@ RUN mkdir -p /data /laos/.local/share && \
 USER laos
 
 # copy the compiled binary to the container
-COPY --chown=laos:laos --chmod=774 parachain-template-node /usr/bin/parachain-template-node
+COPY --chown=laos:laos --chmod=774 target/release/parachain-template-node /usr/bin/parachain-template-node
 
 # check if executable works in this container
 RUN /usr/bin/parachain-template-node --version
