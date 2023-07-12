@@ -14,7 +14,7 @@
     "tokenSymbol": "UNIT"
   },
   "relay_chain": "rococo_freeverse",
-  "para_id": 1666,
+  "para_id": 2666,
   "codeSubstitutes": {},
   "genesis": {
     "runtime": {
@@ -23,7 +23,7 @@
       },
       "parachainSystem": null,
       "parachainInfo": {
-        "parachainId": 1666
+        "parachainId": 2666
       },
       "balances": {
         "balances": [
