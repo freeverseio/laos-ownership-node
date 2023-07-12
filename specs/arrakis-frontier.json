@@ -28,11 +28,11 @@
       "balances": {
         "balances": [
           [
-            "5DoFRDgmjkF4AHA3DPkYfWrYA1ZaN6kTT1SK7FhDDEMsjUnd",
+            "5HQmMyrZQgxzM8tprXxRrV6C68WHemm47ZnbxQfnrTQDrS9Y",
             11529215046068469760
           ],
           [
-            "5F7PncCh9s2hoPwnp8GMN3vEN7i93ZAAvvDFoQPTMv9E7hri",
+            "5F1p5vCM1EHHUWksN75vEXKFEyq1Bqeu7yVjLse16wyPvnLY",
             11529215046068469760
           ]
         ]
@@ -42,8 +42,8 @@
       },
       "collatorSelection": {
         "invulnerables": [
-          "5DoFRDgmjkF4AHA3DPkYfWrYA1ZaN6kTT1SK7FhDDEMsjUnd",
-          "5F7PncCh9s2hoPwnp8GMN3vEN7i93ZAAvvDFoQPTMv9E7hri"
+          "5HQmMyrZQgxzM8tprXxRrV6C68WHemm47ZnbxQfnrTQDrS9Y",
+          "5F1p5vCM1EHHUWksN75vEXKFEyq1Bqeu7yVjLse16wyPvnLY"
         ],
         "candidacyBond": 16000000000,
         "desiredCandidates": 0
@@ -51,17 +51,17 @@
       "session": {
         "keys": [
           [
-            "5DoFRDgmjkF4AHA3DPkYfWrYA1ZaN6kTT1SK7FhDDEMsjUnd",
-            "5DoFRDgmjkF4AHA3DPkYfWrYA1ZaN6kTT1SK7FhDDEMsjUnd",
+            "5HQmMyrZQgxzM8tprXxRrV6C68WHemm47ZnbxQfnrTQDrS9Y",
+            "5HQmMyrZQgxzM8tprXxRrV6C68WHemm47ZnbxQfnrTQDrS9Y",
             {
-              "aura": "5DoFRDgmjkF4AHA3DPkYfWrYA1ZaN6kTT1SK7FhDDEMsjUnd"
+              "aura": "5HQmMyrZQgxzM8tprXxRrV6C68WHemm47ZnbxQfnrTQDrS9Y"
             }
           ],
           [
-            "5F7PncCh9s2hoPwnp8GMN3vEN7i93ZAAvvDFoQPTMv9E7hri",
-            "5F7PncCh9s2hoPwnp8GMN3vEN7i93ZAAvvDFoQPTMv9E7hri",
+            "5F1p5vCM1EHHUWksN75vEXKFEyq1Bqeu7yVjLse16wyPvnLY",
+            "5F1p5vCM1EHHUWksN75vEXKFEyq1Bqeu7yVjLse16wyPvnLY",
             {
-              "aura": "5F7PncCh9s2hoPwnp8GMN3vEN7i93ZAAvvDFoQPTMv9E7hri"
+              "aura": "5F1p5vCM1EHHUWksN75vEXKFEyq1Bqeu7yVjLse16wyPvnLY"
             }
           ]
         ]
@@ -74,7 +74,7 @@
         "safeXcmVersion": 3
       },
       "sudo": {
-        "key": "5DoFRDgmjkF4AHA3DPkYfWrYA1ZaN6kTT1SK7FhDDEMsjUnd"
+        "key": "5HQmMyrZQgxzM8tprXxRrV6C68WHemm47ZnbxQfnrTQDrS9Y"
       },
       "ethereum": {},
       "evm": {
