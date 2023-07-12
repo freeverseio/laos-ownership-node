@@ -3,8 +3,9 @@
   "id": "arrakis_ownership_chain",
   "chainType": "Live",
   "bootNodes": [
-    "/ip4/178.128.137.122/tcp/30334/p2p/12D3KooWGutc6ywHxDNxpAzmd82RCMvsXgtWbgysvWdB4oEpPQA6",
-    "/ip4/167.99.18.161/tcp/30334/p2p/12D3KooW9sAf1iYMBD1GxmUZW2ukStxpSEAWfAxweket2tFD7bFx"
+    "/ip4/161.35.246.244/tcp/30334/p2p/12D3KooWC1n4rH65mVV8wTVF3KeduCAEVMj2G1SfmMooNhgpmY6S",
+    "/ip4/134.209.139.172/tcp/30334/p2p/12D3KooWD5i5NVN6cXxzXG4kZf1qsp2Mfy7mCXm4bgmheUdk8iCN",
+    "/ip4/188.166.203.31/tcp/30334/p2p/12D3KooWFU6fmZ6mtdFTBxWEE76z9SPmVJUmW1hnEUVbESXsh62f"
   ],
   "telemetryEndpoints": null,
   "protocolId": "arrakis_ownership_chain",
