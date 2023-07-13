@@ -13,7 +13,7 @@ env:
   DOCKER_REPO: freeverseio/laos-ownership-node
 
 jobs:
-  check:
+  build_and_push:
     runs-on: ubuntu-22.04
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE
@@ -37,7 +37,7 @@ jobs:
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
             target/
-          key: ${{ runner.os }}-cargo-build-${{ hashFiles('**/Cargo.lock') }} 
+          key: ${{ runner.os }}-cargo-${{ job.name }}-${{ hashFiles('**/Cargo.lock') }} 
  
       # Check the build
       - name: Build
@@ -59,3 +59,67 @@ jobs:
           file: ./local.Dockerfile
           push: true
           tags: ${{ env.DOCKER_REPO }}:${{ github.sha }}
+
+  lint:
+    runs-on: ubuntu-22.04
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE
+      - uses: actions/checkout@v3
+
+      - name: Install linux dependencies
+        run: sudo apt-get install -y clang libssl-dev llvm libudev-dev protobuf-compiler
+
+      - name: Install Rust
+        run: |
+          rustup update stable --no-self-update
+          rustup target add wasm32-unknown-unknown
+          rustup component add clippy
+
+       # Caching paths to speed up builds
+      - name: Cache Paths
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: ${{ runner.os }}-cargo-lint-${{ hashFiles('**/Cargo.lock') }} 
+ 
+      - name: Check clippy
+        run: |
+          cargo clippy --all-targets --workspace --features runtime-benchmarks --features try-runtime
+
+  test:
+    runs-on: ubuntu-22.04
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE
+      - uses: actions/checkout@v3
+
+      - name: Install linux dependencies
+        run: sudo apt-get install -y clang libssl-dev llvm libudev-dev protobuf-compiler
+
+      - name: Install Rust
+        run: |
+          rustup update stable --no-self-update
+          rustup target add wasm32-unknown-unknown
+          rustup component add clippy
+
+       # Caching paths to speed up builds
+      - name: Cache Paths
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: ${{ runner.os }}-cargo-test-${{ hashFiles('**/Cargo.lock') }} 
+ 
+      - name: Test
+        run: |
+          cargo test
+
+
