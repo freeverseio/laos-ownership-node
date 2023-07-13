@@ -13,8 +13,9 @@ env:
   DOCKER_REPO: freeverseio/laos-ownership-node
 
 jobs:
-  test_build_and_push:
-    runs-on: ubuntu-22.04-8cores
+  build_and_push:
+    runs-on: 
+      labels: ubuntu-22.04-8cores
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE
       - uses: actions/checkout@v3
@@ -60,7 +61,8 @@ jobs:
           tags: ${{ env.DOCKER_REPO }}:${{ github.sha }}
 
   lint:
-    runs-on: ubuntu-22.04-8cores
+    runs-on: 
+      labels: ubuntu-22.04-8cores
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE
       - uses: actions/checkout@v3
