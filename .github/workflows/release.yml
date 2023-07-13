@@ -5,7 +5,7 @@
 # The following are setup as an environment variable below
 # - DOCKER_REPO: The unique name of the DockerHub repository. E.g. parity/polkadot
 
-name: Build & Publish Docker Image
+name: Build release
 
 # Controls when the action will run.
 on:
