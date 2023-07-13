@@ -26,7 +26,6 @@ jobs:
         run: |
           rustup update stable --no-self-update
           rustup target add wasm32-unknown-unknown
-          rustup component add clippy
 
        # Caching paths to speed up builds
       - name: Cache Paths
@@ -38,12 +37,8 @@ jobs:
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
             target/
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }} 
+          key: ${{ runner.os }}-cargo-build-${{ hashFiles('**/Cargo.lock') }} 
  
-      - name: Check clippy
-        run: |
-          cargo clippy --release --all-targets --workspace --features runtime-benchmarks --features try-runtime
-
       # Check the build
       - name: Build
         run: |
