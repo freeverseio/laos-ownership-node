@@ -13,7 +13,7 @@ env:
   DOCKER_REPO: freeverseio/laos-ownership-node
 
 jobs:
-  build_and_push:
+  test_build_and_push:
     runs-on: ubuntu-22.04
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE
