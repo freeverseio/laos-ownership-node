@@ -14,8 +14,7 @@ env:
 
 jobs:
   build_and_push:
-    runs-on: 
-      labels: ubuntu-22.04-8cores
+    runs-on: ubuntu-22.04
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE
       - uses: actions/checkout@v3
@@ -61,8 +60,7 @@ jobs:
           tags: ${{ env.DOCKER_REPO }}:${{ github.sha }}
 
   lint:
-    runs-on: 
-      labels: ubuntu-22.04-8cores
+    runs-on: ubuntu-22.04
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE
       - uses: actions/checkout@v3
