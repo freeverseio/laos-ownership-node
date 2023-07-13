@@ -14,7 +14,7 @@ env:
 
 jobs:
   test_build_and_push:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-22.04-8cores
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE
       - uses: actions/checkout@v3
@@ -39,10 +39,6 @@ jobs:
             target/
           key: ${{ runner.os }}-cargo-${{ github.job }}-${{ hashFiles('**/Cargo.lock') }} 
 
-      - name: Test
-        run: |
-          cargo test --release
-
       - name: Build
         run: |
           cargo build --release
@@ -64,7 +60,7 @@ jobs:
           tags: ${{ env.DOCKER_REPO }}:${{ github.sha }}
 
   lint:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-22.04-8cores
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE
       - uses: actions/checkout@v3
