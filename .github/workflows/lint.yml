@@ -1,4 +1,4 @@
-name: Build & Publish Docker Image
+name: Lint
 
 # Controls when the action will run.
 on:
