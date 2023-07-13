@@ -109,7 +109,6 @@ jobs:
         run: |
           rustup update stable --no-self-update
           rustup target add wasm32-unknown-unknown
-          rustup component add clippy
 
        # Caching paths to speed up builds
       - name: Cache Paths
