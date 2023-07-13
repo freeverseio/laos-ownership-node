@@ -15,7 +15,8 @@ env:
 jobs:
   build_and_push:
     runs-on: 
-      labels: ubuntu-22.04-8cores
+      group: laos
+      labels: ubuntu-16-cores
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE
       - uses: actions/checkout@v3
