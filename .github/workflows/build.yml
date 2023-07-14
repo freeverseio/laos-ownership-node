@@ -34,22 +34,9 @@ jobs:
       labels: ubuntu-16-cores
     steps:
       - uses: actions/checkout@v3
-      - name: Install linux dependencies
-        run: sudo apt-get install -y clang libssl-dev llvm libudev-dev protobuf-compiler
-      - name: Install Rust
-        run: |
-          rustup update stable --no-self-update
-          rustup target add wasm32-unknown-unknown
-      - name: Cache Paths
-        uses: actions/cache@v3
+      - uses: ./.github/actions/setup
         with:
-          path: |
-            ~/.cargo/bin/
-            ~/.cargo/registry/index/
-            ~/.cargo/registry/cache/
-            ~/.cargo/git/db/
-            target/
-          key: ${{ runner.os }}-cargo-build_and_push-${{ hashFiles('**/Cargo.lock') }} 
+          cache-key: build_and_push
       - name: Build
         run: |
           cargo build --release
@@ -73,27 +60,9 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE
       - uses: actions/checkout@v3
-
-      - name: Install linux dependencies
-        run: sudo apt-get install -y clang libssl-dev llvm libudev-dev protobuf-compiler
-
-      - name: Install Rust
-        run: |
-          rustup update stable --no-self-update
-          rustup target add wasm32-unknown-unknown
-          rustup component add clippy
-
-       # Caching paths to speed up builds
-      - name: Cache Paths
-        uses: actions/cache@v3
+      - uses: ./.github/actions/setup
         with:
-          path: |
-            ~/.cargo/bin/
-            ~/.cargo/registry/index/
-            ~/.cargo/registry/cache/
-            ~/.cargo/git/db/
-            target/
-          key: ${{ runner.os }}-cargo-lint-${{ hashFiles('**/Cargo.lock') }} 
+          cache-key: lint
  
       - name: Check clippy
         run: |
@@ -106,26 +75,9 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE
       - uses: actions/checkout@v3
-
-      - name: Install linux dependencies
-        run: sudo apt-get install -y clang libssl-dev llvm libudev-dev protobuf-compiler
-
-      - name: Install Rust
-        run: |
-          rustup update stable --no-self-update
-          rustup target add wasm32-unknown-unknown
-
-       # Caching paths to speed up builds
-      - name: Cache Paths
-        uses: actions/cache@v3
+      - uses: ./.github/actions/setup
         with:
-          path: |
-            ~/.cargo/bin/
-            ~/.cargo/registry/index/
-            ~/.cargo/registry/cache/
-            ~/.cargo/git/db/
-            target/
-          key: ${{ runner.os }}-cargo-test-${{ hashFiles('**/Cargo.lock') }} 
+          cache-key: test
  
       - name: Test
         run: |
