@@ -48,7 +48,8 @@ sp-session = { git = "https://github.com/paritytech/substrate", default-features
 sp-std = { git = "https://github.com/paritytech/substrate", default-features = false, branch = "polkadot-v0.9.43" }
 sp-transaction-pool = { git = "https://github.com/paritytech/substrate", default-features = false, branch = "polkadot-v0.9.43" }
 sp-version = { git = "https://github.com/paritytech/substrate", default-features = false, branch = "polkadot-v0.9.43" }
-pallet-livingassets-ownership = { git = "https://github.com/freeverseio/pallet-livingassets-ownership", branch="feature/updated_substrate_0.9.43", default-features = false }
+
+pallet-livingassets-ownership = { version = "0.0.1", default-features = false, path = "../pallets/livingassets-ownership" }
 
 # Polkadot
 pallet-xcm = { git = "https://github.com/paritytech/polkadot", default-features = false, branch = "release-v0.9.43" }
