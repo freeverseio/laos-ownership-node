@@ -1,29 +1,14 @@
 name: 'Setup'
 description: 'Common setup steps'
-inputs:
-  cache-key:
-    description: 'Key to use when caching paths'
-    required: true
-    default: 'cargo-default'
 runs:
   using: "composite"
   steps:
+    - uses: actions/checkout@v3
     - name: Install linux dependencies
-      shell: bash
       run: sudo apt-get install -y clang libssl-dev llvm libudev-dev protobuf-compiler
-    - name: Install Rust
       shell: bash
+    - name: Install Rust
       run: |
         rustup update stable --no-self-update
         rustup target add wasm32-unknown-unknown
-    - name: Cache Paths
-      uses: actions/cache@v3
-      with:
-        path: |
-          ~/.cargo/bin/
-          ~/.cargo/registry/index/
-          ~/.cargo/registry/cache/
-          ~/.cargo/git/db/
-          target/
-        key: ${{ runner.os }}-cargo-${{ inputs.cache-key }}-${{ hashFiles('**/Cargo.lock') }} 
-
+      shell: bash

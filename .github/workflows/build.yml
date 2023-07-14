@@ -21,6 +21,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: ./.github/actions/setup
+      - uses: ./.github/actions/cache
         with:
           cache-key: build_and_push
       - name: Check
@@ -35,6 +36,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: ./.github/actions/setup
+      - uses: ./.github/actions/cache
         with:
           cache-key: build_and_push
       - name: Build
@@ -58,9 +60,9 @@ jobs:
       group: laos
       labels: ubuntu-16-cores
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE
       - uses: actions/checkout@v3
       - uses: ./.github/actions/setup
+      - uses: ./.github/actions/cache
         with:
           cache-key: lint
       - name: install clippy
@@ -76,7 +78,6 @@ jobs:
       group: laos
       labels: ubuntu-16-cores
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE
       - uses: actions/checkout@v3
       - uses: ./.github/actions/setup
         with:
