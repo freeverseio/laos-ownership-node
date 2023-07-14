@@ -19,6 +19,7 @@ jobs:
       group: laos
       labels: ubuntu-16-cores
     steps:
+      - uses: actions/checkout@v3
       - uses: ./.github/actions/setup.yaml
         with:
           cache-key: build_and_push
