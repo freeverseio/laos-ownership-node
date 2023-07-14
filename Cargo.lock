@@ -6422,6 +6422,25 @@ dependencies = [
 ]
 
 [[package]]
+name = "pallet-evm-living-assets-ownership"
+version = "0.1.0"
+dependencies = [
+ "fp-evm",
+ "frame-support",
+ "frame-system",
+ "pallet-balances",
+ "pallet-evm",
+ "pallet-living-assets-ownership",
+ "pallet-timestamp",
+ "parity-scale-codec",
+ "scale-info",
+ "sp-core",
+ "sp-io",
+ "sp-runtime",
+ "sp-std",
+]
+
+[[package]]
 name = "pallet-evm-precompile-modexp"
 version = "2.0.0-dev"
 source = "git+https://github.com/paritytech/frontier?branch=polkadot-v0.9.43#adf7117f373b68d4128385ad08c28a9f7c597cd0"
@@ -6544,7 +6563,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "pallet-livingassets-ownership"
+name = "pallet-living-assets-ownership"
 version = "0.0.1"
 dependencies = [
  "frame-benchmarking",
@@ -7266,7 +7285,7 @@ dependencies = [
  "pallet-evm-precompile-modexp",
  "pallet-evm-precompile-sha3fips",
  "pallet-evm-precompile-simple",
- "pallet-livingassets-ownership",
+ "pallet-living-assets-ownership",
  "pallet-session",
  "pallet-sudo",
  "pallet-timestamp",

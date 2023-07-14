@@ -5,4 +5,16 @@ panic = "unwind"
 members = [
 	"node",
 	"runtime",
+	"pallets/*",
+	"precompiles/*",
 ]
+
+[workspace.dependencies]
+
+
+parity-scale-codec = { version = "3.2.2", default-features = false, features = [
+	"derive",
+] }
+scale-info = { version = "2.0", default-features = false, features = [
+	"derive",
+] }

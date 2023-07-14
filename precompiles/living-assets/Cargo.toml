@@ -1,0 +1,46 @@
+[package]
+name = "pallet-evm-living-assets-ownership"
+authors = ["Freeverse"]
+description = "A Precompile to make pallet-living-assets-ownership compatible with pallet-evm"
+edition = "2021"
+version = "0.1.0"
+
+[dependencies]
+
+# Substrate
+frame-support = { git = "https://github.com/paritytech/substrate", default-features = false, branch = "polkadot-v0.9.43" }
+frame-system = { git = "https://github.com/paritytech/substrate", default-features = false, branch = "polkadot-v0.9.43" }
+pallet-balances = { git = "https://github.com/paritytech/substrate", default-features = false, branch = "polkadot-v0.9.43" }
+parity-scale-codec = { workspace = true, features = ["max-encoded-len"] }
+sp-core = { git = "https://github.com/paritytech/substrate", default-features = false, branch = "polkadot-v0.9.43" }
+sp-io = { git = "https://github.com/paritytech/substrate", default-features = false, branch = "polkadot-v0.9.43" }
+sp-runtime = { git = "https://github.com/paritytech/substrate", default-features = false, branch = "polkadot-v0.9.43" }
+sp-std = { git = "https://github.com/paritytech/substrate", default-features = false, branch = "polkadot-v0.9.43" }
+
+# Frontier
+fp-evm = {  git = "https://github.com/paritytech/frontier", default-features = false, branch = "polkadot-v0.9.43" }
+pallet-evm = {  git = "https://github.com/paritytech/frontier", default-features = false, branch = "polkadot-v0.9.43" }
+
+# LAOS
+pallet-living-assets-ownership = { path = "../../pallets/living-assets-ownership", default-features = false }
+
+[dev-dependencies]
+# Substrate
+pallet-balances = { git = "https://github.com/paritytech/substrate", default-features = false, branch = "polkadot-v0.9.43" }
+pallet-timestamp = { git = "https://github.com/paritytech/substrate", default-features = false, branch = "polkadot-v0.9.43" }
+scale-info = { workspace = true, features = [ "derive" ] }
+sp-runtime = { git = "https://github.com/paritytech/substrate", default-features = false, branch = "polkadot-v0.9.43" }
+
+[features]
+default = [ "std" ]
+std = [
+	"fp-evm/std",
+	"frame-support/std",
+	"frame-system/std",
+	"pallet-evm/std",
+	"parity-scale-codec/std",
+	"sp-core/std",
+	"sp-io/std",
+	"sp-std/std",
+    "pallet-living-assets-ownership/std",
+]
