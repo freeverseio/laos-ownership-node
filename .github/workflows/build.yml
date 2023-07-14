@@ -63,6 +63,9 @@ jobs:
       - uses: ./.github/actions/setup
         with:
           cache-key: lint
+      - name: install clippy
+        run: |
+          rustup component add clippy
  
       - name: Check clippy
         run: |
