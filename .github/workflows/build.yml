@@ -20,23 +20,9 @@ jobs:
       group: laos
       labels: ubuntu-16-cores
     steps:
-      - uses: actions/checkout@v3
-      - name: Install linux dependencies
-        run: sudo apt-get install -y clang libssl-dev llvm libudev-dev protobuf-compiler
-      - name: Install Rust
-        run: |
-          rustup update stable --no-self-update
-          rustup target add wasm32-unknown-unknown
-      - name: Cache Paths
-        uses: actions/cache@v3
+      - uses: ./.github/actions/setup.yaml
         with:
-          path: |
-            ~/.cargo/bin/
-            ~/.cargo/registry/index/
-            ~/.cargo/registry/cache/
-            ~/.cargo/git/db/
-            target/
-          key: ${{ runner.os }}-cargo-build_and_push-${{ hashFiles('**/Cargo.lock') }} 
+          cache-key: build_and_push
       - name: Check
         run: |
           SKIP_WASM_BUILD=1 cargo check --release
