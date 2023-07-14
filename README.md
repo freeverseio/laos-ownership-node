@@ -6,7 +6,7 @@ It offers several functionalities that enable the management and transfer of LAO
 
 ## LAOS Ownership Node
 
-```
+You can start and sync ownership node locally with the following command:
 $ docker run freeverseio/laos-ownership-node:<release> --chain=arrakis
 ```
 
