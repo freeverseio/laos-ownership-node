@@ -20,7 +20,7 @@ jobs:
       labels: ubuntu-16-cores
     steps:
       - uses: actions/checkout@v3
-      - uses: ./.github/actions/setup.yaml
+      - uses: ./.github/actions/setup
         with:
           cache-key: build_and_push
       - name: Check
