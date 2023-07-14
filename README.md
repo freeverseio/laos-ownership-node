@@ -6,9 +6,8 @@ It offers several functionalities that enable the management and transfer of LAO
 
 ## LAOS Ownership Node
 
-Run an Arrakis testnet node
 ```
-$ docker run freeverseio/laos-ownership-node:v0.0.5 --chain=arrakis
+$ docker run freeverseio/laos-ownership-node:<release> --chain=arrakis
 ```
 
 ### Networks
@@ -25,18 +24,6 @@ The Arrakis network serves as the testnet for the LAOS Ownership Parachain. It c
 * **Chain ID**: 667
 * **RPC URL**: https://arrakis.gorengine.com/own
 * **Currency Symbol**: DROP
-
-## Installation and Setup
-
-To get started with the LAOS Ownership Parachain, follow the steps below:
-
-1. Install the necessary dependencies for interacting with the Parachain.
-
-2. Connect to the Arrakis network using either the Substrate RPC or Ethereum RPC.
-
-3. Use the provided RPC URL and network/chain IDs to configure your connection.
-
-4. Access the LAOS Ownership Parachain functionalities through the chosen interface (Substrate RPC or Ethereum RPC) to manage LAOS tokens, Living Assets, and perform trustless transfers.
 
 ## Contributing
 
