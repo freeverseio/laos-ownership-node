@@ -15,7 +15,6 @@ $ docker run freeverseio/laos-ownership-node:<release> --chain=arrakis
 
 The Arrakis network serves as the testnet for the LAOS Ownership Parachain. It can be accessed and interacted with using either the Substrate RPC (Polkadot JS extension) or the Ethereum RPC wallet (Metamask).
 
-
 ##### Substrate RPC
 * **RPC URL**: https://arrakis.gorengine.com/own
 
