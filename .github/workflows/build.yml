@@ -14,7 +14,7 @@ env:
   DOCKER_REPO: freeverseio/laos-ownership-node
 
 jobs:
-  cargo_check:
+  check:
     if: github.event_name == 'pull_request'
     runs-on: 
       group: laos
