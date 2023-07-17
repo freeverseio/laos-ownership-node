@@ -19,7 +19,7 @@ pub mod pallet {
     use frame_support::pallet_prelude::{OptionQuery, *};
     use frame_system::pallet_prelude::*;
 
-    trait LivingAssetsOwnership<AccountId> {
+    pub trait LivingAssetsOwnership<AccountId> {
         fn owner_of_collection(collection_id: u64) -> Option<AccountId>;
         fn create_collection(collection_id: u64, who: AccountId) -> DispatchResult;
     }

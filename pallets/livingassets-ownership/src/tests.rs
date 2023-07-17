@@ -1,4 +1,4 @@
-use crate::{mock::*, Error, Event};
+use crate::{mock::*, Error, Event, LivingAssetsOwnership};
 use frame_support::{assert_noop, assert_ok};
 
 #[cfg(test)]
@@ -40,6 +40,13 @@ mod test {
 
 			assert_ok!(LivingAssetsModule::create_collection(RuntimeOrigin::signed(1), 0));
 			System::assert_last_event(Event::CollectionCreated { collection_id: 0, who: 1 }.into());
+		});
+	}
+
+	#[test]
+	fn pallet_statisfy_living_assets_ownership_trait() {
+		new_test_ext().execute_with(|| {
+			fn test(_: impl LivingAssetsOwnership<u64>) {}
 		});
 	}
 }
