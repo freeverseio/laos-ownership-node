@@ -1,4 +1,4 @@
-use crate::{mock::*, Error, Event};
+use crate::{mock::*, Error, Event, LivingAssetsOwnership};
 use frame_support::{assert_noop, assert_ok};
 
 #[cfg(test)]
@@ -43,11 +43,11 @@ mod test {
 		});
 	}
 
-	// #[test]
-	// fn pallet_statisfy_living_assets_ownership_trait() {
-	// 	new_test_ext().execute_with(|| {
-	// 		let _ = <LivingAssetsModule as LivingAssetsOwnership<Config::AccountId>>::owner_of_collection(0);
-
-	// 	});
-	// }
+	#[test]
+	fn pallet_statisfy_living_assets_ownership_trait() {
+		new_test_ext().execute_with(|| {
+			// This test is just to make sure the pallet satisfies the trait
+			let _ = <LivingAssetsModule as LivingAssetsOwnership<<Test as frame_system::Config>::AccountId>>::owner_of_collection(0);
+		});
+	}
 }
