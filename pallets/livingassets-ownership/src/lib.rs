@@ -69,8 +69,12 @@ pub mod pallet {
         }
     }
 
+    /// LivingAssetsOwnership trait:w
     pub trait LivingAssetsOwnership<AccountId> {
+        /// Get owner of collection
         fn owner_of_collection(collection_id: u64) -> Option<AccountId>;
+
+        /// Create collection
         fn create_collection(collection_id: u64, who: AccountId) -> DispatchResult;
     }
 
