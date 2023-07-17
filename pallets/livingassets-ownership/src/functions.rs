@@ -1,11 +1,11 @@
+// use crate::{Error, Event};
 use super::*;
 use frame_support::{
 	ensure,
-	traits::{ExistenceRequirement, Get},
+    sp_runtime::{DispatchResult}
 };
-use sp_runtime::{DispatchError, DispatchResult};
 
-impl<T: Config<I>, I: 'static> Pallet<T, I> {
+impl<T: Config> Pallet<T> {
     pub fn do_create_collection(collection_id: u64, who: T::AccountId) -> DispatchResult {
         ensure!(
             !OwnerOfCollection::<T>::contains_key(collection_id),

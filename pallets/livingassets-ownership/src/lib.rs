@@ -5,6 +5,8 @@
 /// <https://docs.substrate.io/reference/frame-pallets/>
 pub use pallet::*;
 
+mod functions;
+
 #[cfg(test)]
 mod mock;
 
@@ -63,17 +65,7 @@ pub mod pallet {
         #[pallet::weight(10_000 + T::DbWeight::get().writes(1).ref_time())] // TODO set proper weight
         pub fn create_collection(origin: OriginFor<T>, collection_id: u64) -> DispatchResult {
             let who = ensure_signed(origin)?;
-
-            ensure!(
-                !OwnerOfCollection::<T>::contains_key(collection_id),
-                Error::<T>::CollectionAlreadyExists
-            );
-
-            OwnerOfCollection::<T>::insert(collection_id, &who);
-
-            Self::deposit_event(Event::CollectionCreated { collection_id, who });
-
-            Ok(())
+            Self::do_create_collection(collection_id, who)
         }
     }
 
@@ -88,16 +80,7 @@ pub mod pallet {
         }
 
         fn create_collection(collection_id: u64, who: T::AccountId) -> DispatchResult {
-            ensure!(
-                !OwnerOfCollection::<T>::contains_key(collection_id),
-                Error::<T>::CollectionAlreadyExists
-            );
-
-            OwnerOfCollection::<T>::insert(collection_id, &who);
-
-            Self::deposit_event(Event::CollectionCreated { collection_id, who });
-
-            Ok(())
+            Self::do_create_collection(collection_id, who)
         }
     }
 }
