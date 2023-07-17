@@ -19,11 +19,6 @@ pub mod pallet {
     use frame_support::pallet_prelude::{OptionQuery, *};
     use frame_system::pallet_prelude::*;
 
-    pub trait LivingAssetsOwnership<AccountId> {
-        fn owner_of_collection(collection_id: u64) -> Option<AccountId>;
-        fn create_collection(collection_id: u64, who: AccountId) -> DispatchResult;
-    }
-
     #[pallet::pallet]
     pub struct Pallet<T>(_);
 
@@ -77,6 +72,23 @@ pub mod pallet {
             OwnerOfCollection::<T>::insert(collection_id, &who);
 
             Self::deposit_event(Event::CollectionCreated { collection_id, who });
+
+            Ok(())
+        }
+    }
+
+    pub trait LivingAssetsOwnership<AccountId> {
+        fn owner_of_collection(collection_id: u64) -> Option<AccountId>;
+        fn create_collection(collection_id: u64, who: AccountId) -> DispatchResult;
+    }
+
+    impl <T: Config> LivingAssetsOwnership<T::AccountId> for Pallet<T> {
+        fn owner_of_collection(collection_id: u64) -> Option<T::AccountId> {
+            OwnerOfCollection::<T>::get(collection_id)
+        }
+
+        fn create_collection(collection_id: u64, who: T::AccountId) -> DispatchResult {
+            OwnerOfCollection::<T>::insert(collection_id, &who);
 
             Ok(())
         }
