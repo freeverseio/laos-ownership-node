@@ -1,4 +1,3 @@
-// use crate::{Error, Event};
 use super::*;
 use frame_support::{
 	ensure,
