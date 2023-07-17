@@ -21,6 +21,10 @@ sp-std = { git = "https://github.com/paritytech/substrate", default-features = f
 fp-evm = {  git = "https://github.com/paritytech/frontier", default-features = false, branch = "polkadot-v0.9.43" }
 pallet-evm = {  git = "https://github.com/paritytech/frontier", default-features = false, branch = "polkadot-v0.9.43" }
 
+# precompiles
+precompile-utils = { workspace = true }
+precompile-utils-macro = { workspace = true }
+
 # LAOS
 pallet-living-assets-ownership = { path = "../../pallets/living-assets-ownership", default-features = false }
 

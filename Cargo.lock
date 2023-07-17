@@ -850,6 +850,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "case"
+version = "1.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "fd6c0e7b807d60291f42f33f58480c0bfafe28ed08286446f45e463728cf9c1c"
+
+[[package]]
 name = "cc"
 version = "1.0.79"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3137,7 +3143,7 @@ dependencies = [
  "ethereum-types",
  "fp-evm",
  "frame-support",
- "num_enum",
+ "num_enum 0.6.1",
  "parity-scale-codec",
  "sp-std",
 ]
@@ -5844,11 +5850,31 @@ dependencies = [
 
 [[package]]
 name = "num_enum"
+version = "0.5.11"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1f646caf906c20226733ed5b1374287eb97e3c2a5c227ce668c1f2ce20ae57c9"
+dependencies = [
+ "num_enum_derive 0.5.11",
+]
+
+[[package]]
+name = "num_enum"
 version = "0.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7a015b430d3c108a207fd776d2e2196aaf8b1cf8cf93253e3a097ff3085076a1"
 dependencies = [
- "num_enum_derive",
+ "num_enum_derive 0.6.1",
+]
+
+[[package]]
+name = "num_enum_derive"
+version = "0.5.11"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "dcbff9bc912032c62bf65ef1d5aea88983b420f4f839db1e9b0c281a25c9c799"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 1.0.109",
 ]
 
 [[package]]
@@ -6433,6 +6459,7 @@ dependencies = [
  "pallet-living-assets-ownership",
  "pallet-timestamp",
  "parity-scale-codec",
+ "precompile-utils-macro",
  "scale-info",
  "sp-core",
  "sp-io",
@@ -8883,6 +8910,20 @@ name = "ppv-lite86"
 version = "0.2.17"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5b40af805b3121feab8a3c29f04d8ad262fa8e0561883e7653e024ae4479e6de"
+
+[[package]]
+name = "precompile-utils-macro"
+version = "0.1.0"
+source = "git+https://github.com/PureStake/moonbeam.git?branch=master#84c39610fcefbbfc57054ccbb8f5a10e9c2cb63d"
+dependencies = [
+ "case",
+ "num_enum 0.5.11",
+ "prettyplease 0.1.25",
+ "proc-macro2",
+ "quote",
+ "sha3",
+ "syn 1.0.109",
+]
 
 [[package]]
 name = "predicates"
