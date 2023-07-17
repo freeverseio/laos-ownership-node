@@ -44,10 +44,13 @@ mod test {
 	}
 
 	#[test]
-	fn pallet_statisfy_living_assets_ownership_trait() {
+	fn create_new_collection_by_living_assets_ownership_trait() {
 		new_test_ext().execute_with(|| {
-			// This test is just to make sure the pallet satisfies the trait
-			let _ = <LivingAssetsModule as LivingAssetsOwnership<<Test as frame_system::Config>::AccountId>>::owner_of_collection(0);
+			assert_ok!(<LivingAssetsModule as LivingAssetsOwnership<<Test as frame_system::Config>::AccountId>>::create_collection(
+				0,
+				1
+			));
+			assert_eq!(LivingAssetsModule::owner_of_collection(0), Some(1));
 		});
 	}
 }
