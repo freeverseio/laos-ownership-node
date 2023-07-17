@@ -46,7 +46,8 @@ mod test {
 	#[test]
 	fn pallet_statisfy_living_assets_ownership_trait() {
 		new_test_ext().execute_with(|| {
-			fn test(_: impl LivingAssetsOwnership<u64>) {}
+			let _ = <LivingAssetsModule as LivingAssetsOwnership<AccountId>>::owner_of_collection(0);
+
 		});
 	}
 }
