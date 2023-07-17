@@ -44,13 +44,43 @@ mod test {
 	}
 
 	#[test]
-	fn create_new_collection_by_living_assets_ownership_trait() {
+	fn living_assets_ownership_trait_create_new_collection_by_living() {
 		new_test_ext().execute_with(|| {
 			assert_ok!(<LivingAssetsModule as LivingAssetsOwnership<<Test as frame_system::Config>::AccountId>>::create_collection(
 				0,
 				1
 			));
 			assert_eq!(LivingAssetsModule::owner_of_collection(0), Some(1));
+		});
+	}
+
+	#[test]
+	fn living_assets_ownership_trait_owner_of_unexistent_collection_is_none() {
+		new_test_ext().execute_with(|| {
+			assert_eq!(<LivingAssetsModule as LivingAssetsOwnership<<Test as frame_system::Config>::AccountId>>::owner_of_collection(0), None);
+			assert_eq!(<LivingAssetsModule as LivingAssetsOwnership<<Test as frame_system::Config>::AccountId>>::owner_of_collection(1), None);
+		});
+	}
+
+	#[test]
+	fn living_assets_ownership_trait_create_an_existing_collection_should_fail() {
+		new_test_ext().execute_with(|| {
+			assert_ok!(<LivingAssetsModule as LivingAssetsOwnership<<Test as frame_system::Config>::AccountId>>::create_collection(0, 1));
+			assert_noop!(
+				<LivingAssetsModule as LivingAssetsOwnership<<Test as frame_system::Config>::AccountId>>::create_collection(0, 1),
+				Error::<Test>::CollectionAlreadyExists
+			);
+		});
+	}
+
+	#[test]
+	fn living_assets_ownership_trait_create_new_collection_should_emit_an_event() {
+		new_test_ext().execute_with(|| {
+			// Go past genesis block so events get deposited
+			System::set_block_number(1);
+
+			assert_ok!(<LivingAssetsModule as LivingAssetsOwnership<<Test as frame_system::Config>::AccountId>>::create_collection(0, 1));
+			System::assert_last_event(Event::CollectionCreated { collection_id: 0, who: 1 }.into());
 		});
 	}
 }
