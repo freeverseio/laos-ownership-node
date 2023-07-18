@@ -92,15 +92,15 @@ pub mod pallet {
     /// - `CollectionAlreadyExists`: This error is returned by the `create_collection` method when a collection
     /// with the provided `collection_id` already exists.
     ///
-    pub trait LivingAssetsOwnership<AccountId> {
+    pub trait LivingAssetsOwnership<T: Config> {
         /// Get owner of collection
-        fn owner_of_collection(collection_id: u64) -> Option<AccountId>;
+        fn owner_of_collection(collection_id: u64) -> Option<T::AccountId>;
 
         /// Create collection
-        fn create_collection(collection_id: u64, who: AccountId) -> DispatchResult;
+        fn create_collection(collection_id: u64, who: T::AccountId) -> DispatchResult;
     }
 
-    impl <T: Config> LivingAssetsOwnership<T::AccountId> for Pallet<T> {
+    impl <T: Config> LivingAssetsOwnership<T> for Pallet<T> {
         fn owner_of_collection(collection_id: u64) -> Option<T::AccountId> {
             OwnerOfCollection::<T>::get(collection_id)
         }
