@@ -23,12 +23,14 @@ scale-info = { version = "2.0", default-features = false, features = [
 ] }
 
 # Frontier
-evm = { git = "https://github.com/paritytech/frontier.git", branch = "polkadot-v0.9.43", default-features = false }
+evm = { git = "https://github.com/rust-blockchain/evm", rev = "b7b82c7e1fc57b7449d6dfa6826600de37cc1e65", default-features = false }
 fp-evm = { git = "https://github.com/paritytech/frontier.git", branch = "polkadot-v0.9.43", default-features = false }
-pallet-evm = { git = "https://github.com/paritytech/frontier.git", branch = "polkadot-v0.9.43", default-features = false }
+pallet-evm = { git = "https://github.com/paritytech/frontier.git", branch = "polkadot-v0.9.43", default-features = false, features = [
+	"forbid-evm-reentrancy"
+]}
 
 # Polkadot/xcm
-xcm = { git = "https://github.com/paritytech/polkadot", default-features = false, branch = "polkadot-v0.9.43" }
+xcm = { git = "https://github.com/paritytech/polkadot", default-features = false, branch = "release-v0.9.43" }
 
 # Substrate
 frame-support = { git = "https://github.com/paritytech/substrate", default-features = false, branch = "polkadot-v0.9.43" }
@@ -56,4 +58,3 @@ paste = "1.0.6"
 serde = { version = "1.0.101", default-features = false }
 sha3 = { version = "0.10", default-features = false }
 similar-asserts = "1.1.0"
-

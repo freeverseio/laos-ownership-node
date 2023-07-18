@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Moonbeam.  If not, see <http://www.gnu.org/licenses/>.
 
-#![doc = include_str!("../../docs/precompile_macro.md")]
+// #![doc = include_str!("../../docs/precompile_macro.md")]
 
 use proc_macro::TokenStream;
 use proc_macro2::Span;

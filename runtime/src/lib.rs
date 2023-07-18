@@ -83,7 +83,11 @@ use pallet_evm::{
 };
 
 mod precompiles;
-use precompiles::FrontierPrecompiles;
+use precompiles::LaosPrecompiles;
+
+/// Explicit precompiles
+pub type Precompiles = LaosPrecompiles<Runtime>;
+
 
 /// Import the template pallet.
 pub use pallet_living_assets_ownership;
@@ -590,7 +594,7 @@ where
 
 parameter_types! {
 	pub BlockGasLimit: U256 = U256::from(NORMAL_DISPATCH_RATIO * MAXIMUM_BLOCK_WEIGHT.ref_time() / WEIGHT_PER_GAS);
-	pub PrecompilesValue: FrontierPrecompiles<Runtime> = FrontierPrecompiles::<_>::new();
+	pub PrecompilesValue: Precompiles = LaosPrecompiles::<_>::new();
 	pub WeightPerGas: Weight = Weight::from_parts(WEIGHT_PER_GAS, 0);
 	pub GasLimitPovSizeRatio: u64 = BlockGasLimit::get().checked_div(MAX_POV_SIZE.into()).expect("should be safe; qed").as_u64();
 }
@@ -607,7 +611,7 @@ impl pallet_evm::Config for Runtime {
 	type AddressMapping = HashedAddressMapping<BlakeTwo256>;
 	type Currency = Balances;
 	type RuntimeEvent = RuntimeEvent;
-	type PrecompilesType = FrontierPrecompiles<Self>;
+	type PrecompilesType = Precompiles;
 	type PrecompilesValue = PrecompilesValue;
 	type ChainId = EVMChainId;
 	type BlockGasLimit = BlockGasLimit;
