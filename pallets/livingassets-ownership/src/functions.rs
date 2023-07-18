@@ -5,6 +5,7 @@ use frame_support::{
 };
 
 impl<T: Config> Pallet<T> {
+    /// See [Self::create_collection]
     pub fn do_create_collection(collection_id: u64, who: T::AccountId) -> DispatchResult {
         ensure!(
             !OwnerOfCollection::<T>::contains_key(collection_id),
