@@ -29,6 +29,8 @@ pub mod pallet {
     pub trait Config: frame_system::Config {
         /// Because this pallet emits events, it depends on the runtime's definition of an event.
         type RuntimeEvent: From<Event<Self>> + IsType<<Self as frame_system::Config>::RuntimeEvent>;
+
+        type CollectionId: Parameter + Member + Copy + Default + Ord;
     }
 
     /// Mapping from collection id to owner
