@@ -1,3 +1,4 @@
+//! Contains helper and utility functions of the pallet
 use super::*;
 use frame_support::{
 	ensure,
