@@ -29,15 +29,15 @@ pub mod pallet {
     pub trait Config: frame_system::Config {
         /// Because this pallet emits events, it depends on the runtime's definition of an event.
         type RuntimeEvent: From<Event<Self>> + IsType<<Self as frame_system::Config>::RuntimeEvent>;
-
-        type CollectionId: Parameter + Member + Copy + Default + Ord;
+        /// todo
+        type CollectionId: Member + Parameter + MaxEncodedLen + Copy;
     }
 
     /// Mapping from collection id to owner
     #[pallet::storage]
     #[pallet::getter(fn owner_of_collection)]
     pub(super) type OwnerOfCollection<T: Config> =
-        StorageMap<_, Blake2_128Concat, u64, T::AccountId, OptionQuery>;
+        StorageMap<_, Blake2_128Concat, T::CollectionId, T::AccountId, OptionQuery>;
 
     /// Pallet events
     #[pallet::event]
@@ -46,7 +46,7 @@ pub mod pallet {
         /// Collection created
         /// parameters. [collection_id, who]
         CollectionCreated {
-            collection_id: u64,
+            collection_id: T::CollectionId,
             who: T::AccountId,
         },
     }
@@ -65,7 +65,7 @@ pub mod pallet {
     impl<T: Config> Pallet<T> {
         #[pallet::call_index(0)]
         #[pallet::weight(10_000 + T::DbWeight::get().writes(1).ref_time())] // TODO set proper weight
-        pub fn create_collection(origin: OriginFor<T>, collection_id: u64) -> DispatchResult {
+        pub fn create_collection(origin: OriginFor<T>, collection_id: T::CollectionId) -> DispatchResult {
             let who = ensure_signed(origin)?;
             Self::do_create_collection(collection_id, who)
         }
@@ -81,11 +81,11 @@ pub mod pallet {
     ///
     /// # Methods
     /// 
-    /// - `owner_of_collection(collection_id: u64) -> Option<AccountId>`: This method retrieves the owner
+    /// - `owner_of_collection(collection_id: T::CollectionId) -> Option<AccountId>`: This method retrieves the owner
     /// of a collection given its `collection_id`. If no collection exists with the provided `collection_id`,
     /// the method returns `None`.
     ///
-    /// - `create_collection(collection_id: u64, who: AccountId) -> DispatchResult`: This method creates a
+    /// - `create_collection(collection_id: T::CollectionId, who: AccountId) -> DispatchResult`: This method creates a
     /// new collection with the specified `collection_id` and assigns ownership to the provided `AccountId`.
     /// If a collection already exists with the provided `collection_id`, the method will return an error.
     ///
@@ -96,18 +96,18 @@ pub mod pallet {
     ///
     pub trait LivingAssetsOwnership<T: Config> {
         /// Get owner of collection
-        fn owner_of_collection(collection_id: u64) -> Option<T::AccountId>;
+        fn owner_of_collection(collection_id: T::CollectionId) -> Option<T::AccountId>;
 
         /// Create collection
-        fn create_collection(collection_id: u64, who: T::AccountId) -> DispatchResult;
+        fn create_collection(collection_id: T::CollectionId, who: T::AccountId) -> DispatchResult;
     }
 
     impl <T: Config> LivingAssetsOwnership<T> for Pallet<T> {
-        fn owner_of_collection(collection_id: u64) -> Option<T::AccountId> {
+        fn owner_of_collection(collection_id: T::CollectionId) -> Option<T::AccountId> {
             OwnerOfCollection::<T>::get(collection_id)
         }
 
-        fn create_collection(collection_id: u64, who: T::AccountId) -> DispatchResult {
+        fn create_collection(collection_id: T::CollectionId, who: T::AccountId) -> DispatchResult {
             Self::do_create_collection(collection_id, who)
         }
     }
