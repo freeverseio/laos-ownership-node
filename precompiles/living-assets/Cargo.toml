@@ -19,9 +19,6 @@ sp-std = { workspace = true, default-features = false }
 fp-evm = { workspace = true }
 pallet-evm = { workspace = true }
 
-# precompiles
-precompile-utils = { workspace = true, default-features = false }
-
 # LAOS
 pallet-living-assets-ownership = { path = "../../pallets/living-assets-ownership", default-features = false }
 
@@ -41,8 +38,6 @@ sp-io = { workspace = true, default-features = false }
 sp-runtime = { workspace = true, default-features = false }
 frame-support = { workspace = true, default-features = false }
 
-precompile-utils = { workspace = true, features = [ "std", "testing" ] }
-
 [features]
 default = [ "std" ]
 std = [
@@ -55,5 +50,4 @@ std = [
 	"sp-std/std",
     "pallet-living-assets-ownership/std",
 	"num_enum/std",
-	"precompile-utils/std",
 ]
