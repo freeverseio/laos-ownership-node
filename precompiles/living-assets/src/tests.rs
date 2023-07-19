@@ -1,13 +1,17 @@
 use crate::LivingAssetsOwnershipPrecompile;
 use pallet_evm::Precompile;
-use pallet_evm_test_vector_support::MockHandle;
 
 #[cfg(test)]
 mod test {
     use super::*;
+
     #[test]
-    fn dddd() {
-        LivingAssetsOwnershipPrecompile::<bool>::new();
-        <LivingAssetsOwnershipPrecompile<bool> as Precompile>::execute(&mut 0);
+    fn livingassetownershipprocompile_has_to_satisfy_precompile_trait() {
+        fn requires_precompile_trait(_precompile: Precompile) {
+            // If we can pass an instance of LivingAssetsOwnershipPrecompile to this function,
+            // it means that LivingAssetsOwnershipPrecompile implements the Precompile trait.
+        }
+        let precompile = LivingAssetsOwnershipPrecompile::<bool>::new();
+        requires_precompile_trait(precompile);
     }
 }
