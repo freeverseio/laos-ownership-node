@@ -31,6 +31,7 @@ num_enum = { workspace = true }
 derive_more = { workspace = true }
 hex-literal = { workspace = true }
 serde = { workspace = true }
+pallet_evm_test_vector_support = { git = "https://github.com/paritytech/frontier", branch = "polkadot-v0.9.43", default-features = false }
 
 # Substrate
 pallet-balances = { workspace = true, default-features = false }
@@ -56,4 +57,5 @@ std = [
     "pallet-living-assets-ownership/std",
 	"num_enum/std",
 	"precompile-utils/std",
+	"pallet_evm_test_vector_support/std"
 ]
