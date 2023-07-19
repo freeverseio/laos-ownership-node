@@ -148,15 +148,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "affix"
-version = "0.1.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "50e7ea84d3fa2009f355f8429a0b418a96849135a4188fadf384f59127d5d4bc"
-dependencies = [
- "convert_case 0.5.0",
-]
-
-[[package]]
 name = "ahash"
 version = "0.7.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -553,15 +544,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8c3c1a368f70d6cf7302d78f8f7093da241fb8e8807c05cc9e51a125895a6d5b"
 
 [[package]]
-name = "basic-toml"
-version = "0.1.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7bfc506e7a2370ec239e1d072507b2a80c833083699d3c6fa176fbb4de8448c6"
-dependencies = [
- "serde",
-]
-
-[[package]]
 name = "beef"
 version = "0.5.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -870,12 +852,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "case"
-version = "1.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fd6c0e7b807d60291f42f33f58480c0bfafe28ed08286446f45e463728cf9c1c"
-
-[[package]]
 name = "cc"
 version = "1.0.79"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1028,9 +1004,9 @@ dependencies = [
 
 [[package]]
 name = "clap"
-version = "4.3.15"
+version = "4.3.16"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8f644d0dac522c8b05ddc39aaaccc5b136d5dc4ff216610c5641e3be5becf56c"
+checksum = "74bb1b4028935821b2d6b439bba2e970bdcf740832732437ead910c632e30d7d"
 dependencies = [
  "clap_builder",
  "clap_derive",
@@ -1039,9 +1015,9 @@ dependencies = [
 
 [[package]]
 name = "clap_builder"
-version = "4.3.15"
+version = "4.3.16"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "af410122b9778e024f9e0fb35682cc09cc3f85cad5e8d3ba8f47a9702df6e73d"
+checksum = "5ae467cbb0111869b765e13882a1dbbd6cb52f58203d8b80c44f667d4dd19843"
 dependencies = [
  "anstream",
  "anstyle",
@@ -1172,12 +1148,6 @@ name = "convert_case"
 version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6245d59a3e82a7fc217c5828a6692dbc6dfb63a0c8c90495621f7b9d79704a0e"
-
-[[package]]
-name = "convert_case"
-version = "0.5.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fb4a24b1aaf0fd0ce8b45161144d6f42cd91677fd5940fd431183eb023b3a2b8"
 
 [[package]]
 name = "core-foundation"
@@ -2257,18 +2227,12 @@ version = "0.99.17"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4fb810d30a7c1953f91334de7244731fc3f3c10d7fe163338a35b9f640960321"
 dependencies = [
- "convert_case 0.4.0",
+ "convert_case",
  "proc-macro2",
  "quote",
  "rustc_version",
  "syn 1.0.109",
 ]
-
-[[package]]
-name = "diff"
-version = "0.1.13"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "56254986775e3233ffa9c4d7d3faaf6d36a2c09d30b20687e9f88bc8bafc16c8"
 
 [[package]]
 name = "difflib"
@@ -2679,14 +2643,15 @@ checksum = "0206175f82b8d6bf6652ff7d71a1e27fd2e4efde587fd368662814d6ec1d9ce0"
 [[package]]
 name = "evm"
 version = "0.39.1"
-source = "git+https://github.com/rust-blockchain/evm?rev=b7b82c7e1fc57b7449d6dfa6826600de37cc1e65#b7b82c7e1fc57b7449d6dfa6826600de37cc1e65"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a49a4e11987c51220aa89dbe1a5cc877f5079fa6864c0a5b4533331db44e9365"
 dependencies = [
  "auto_impl",
  "environmental",
  "ethereum",
- "evm-core",
- "evm-gasometer",
- "evm-runtime",
+ "evm-core 0.39.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "evm-gasometer 0.39.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "evm-runtime 0.39.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "log",
  "parity-scale-codec",
  "primitive-types",
@@ -2694,6 +2659,38 @@ dependencies = [
  "scale-info",
  "serde",
  "sha3",
+]
+
+[[package]]
+name = "evm"
+version = "0.39.1"
+source = "git+https://github.com/rust-blockchain/evm?rev=b7b82c7e1fc57b7449d6dfa6826600de37cc1e65#b7b82c7e1fc57b7449d6dfa6826600de37cc1e65"
+dependencies = [
+ "auto_impl",
+ "environmental",
+ "ethereum",
+ "evm-core 0.39.0 (git+https://github.com/rust-blockchain/evm?rev=b7b82c7e1fc57b7449d6dfa6826600de37cc1e65)",
+ "evm-gasometer 0.39.0 (git+https://github.com/rust-blockchain/evm?rev=b7b82c7e1fc57b7449d6dfa6826600de37cc1e65)",
+ "evm-runtime 0.39.0 (git+https://github.com/rust-blockchain/evm?rev=b7b82c7e1fc57b7449d6dfa6826600de37cc1e65)",
+ "log",
+ "parity-scale-codec",
+ "primitive-types",
+ "rlp",
+ "scale-info",
+ "serde",
+ "sha3",
+]
+
+[[package]]
+name = "evm-core"
+version = "0.39.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4f1f13264b044cb66f0602180f0bc781c29accb41ff560669a3ec15858d5b606"
+dependencies = [
+ "parity-scale-codec",
+ "primitive-types",
+ "scale-info",
+ "serde",
 ]
 
 [[package]]
@@ -2710,12 +2707,37 @@ dependencies = [
 [[package]]
 name = "evm-gasometer"
 version = "0.39.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8d43eadc395bd1a52990787ca1495c26b0248165444912be075c28909a853b8c"
+dependencies = [
+ "environmental",
+ "evm-core 0.39.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "evm-runtime 0.39.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "primitive-types",
+]
+
+[[package]]
+name = "evm-gasometer"
+version = "0.39.0"
 source = "git+https://github.com/rust-blockchain/evm?rev=b7b82c7e1fc57b7449d6dfa6826600de37cc1e65#b7b82c7e1fc57b7449d6dfa6826600de37cc1e65"
 dependencies = [
  "environmental",
- "evm-core",
- "evm-runtime",
+ "evm-core 0.39.0 (git+https://github.com/rust-blockchain/evm?rev=b7b82c7e1fc57b7449d6dfa6826600de37cc1e65)",
+ "evm-runtime 0.39.0 (git+https://github.com/rust-blockchain/evm?rev=b7b82c7e1fc57b7449d6dfa6826600de37cc1e65)",
  "primitive-types",
+]
+
+[[package]]
+name = "evm-runtime"
+version = "0.39.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2aa5b32f59ec582a5651978004e5c784920291263b7dcb6de418047438e37f4f"
+dependencies = [
+ "auto_impl",
+ "environmental",
+ "evm-core 0.39.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "primitive-types",
+ "sha3",
 ]
 
 [[package]]
@@ -2725,7 +2747,7 @@ source = "git+https://github.com/rust-blockchain/evm?rev=b7b82c7e1fc57b7449d6dfa
 dependencies = [
  "auto_impl",
  "environmental",
- "evm-core",
+ "evm-core 0.39.0 (git+https://github.com/rust-blockchain/evm?rev=b7b82c7e1fc57b7449d6dfa6826600de37cc1e65)",
  "primitive-types",
  "sha3",
 ]
@@ -2917,7 +2939,7 @@ source = "git+https://github.com/paritytech/frontier?branch=polkadot-v0.9.43#c26
 dependencies = [
  "ethereum",
  "ethereum-types",
- "evm",
+ "evm 0.39.1 (git+https://github.com/rust-blockchain/evm?rev=b7b82c7e1fc57b7449d6dfa6826600de37cc1e65)",
  "fc-db",
  "fc-mapping-sync",
  "fc-rpc-core",
@@ -3185,7 +3207,7 @@ name = "fp-evm"
 version = "3.0.0-dev"
 source = "git+https://github.com/paritytech/frontier?branch=polkadot-v0.9.43#c2605558ad7e23362be1f16c7d2ec3e7d2e658ab"
 dependencies = [
- "evm",
+ "evm 0.39.1 (git+https://github.com/rust-blockchain/evm?rev=b7b82c7e1fc57b7449d6dfa6826600de37cc1e65)",
  "frame-support",
  "parity-scale-codec",
  "scale-info",
@@ -4665,6 +4687,9 @@ name = "lazy_static"
 version = "1.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e2abad23fbc42b3700f2f279844dc832adb2b2eb069b2df918f455c4e18cc646"
+dependencies = [
+ "spin",
+]
 
 [[package]]
 name = "lazycell"
@@ -5329,21 +5354,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b823e83b2affd8f40a9ee8c29dbc56404c1e34cd2710921f2801e2cf29527afa"
 dependencies = [
  "libc",
-]
-
-[[package]]
-name = "macrotest"
-version = "1.0.9"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7489ae0986ce45414b7b3122c2e316661343ecf396b206e3e15f07c846616f10"
-dependencies = [
- "diff",
- "glob",
- "prettyplease 0.1.25",
- "serde",
- "serde_json",
- "syn 1.0.109",
- "toml 0.5.11",
 ]
 
 [[package]]
@@ -6448,7 +6458,7 @@ source = "git+https://github.com/paritytech/frontier?branch=polkadot-v0.9.43#c26
 dependencies = [
  "ethereum",
  "ethereum-types",
- "evm",
+ "evm 0.39.1 (git+https://github.com/rust-blockchain/evm?rev=b7b82c7e1fc57b7449d6dfa6826600de37cc1e65)",
  "fp-consensus",
  "fp-ethereum",
  "fp-evm",
@@ -6470,7 +6480,7 @@ version = "6.0.0-dev"
 source = "git+https://github.com/paritytech/frontier?branch=polkadot-v0.9.43#c2605558ad7e23362be1f16c7d2ec3e7d2e658ab"
 dependencies = [
  "environmental",
- "evm",
+ "evm 0.39.1 (git+https://github.com/rust-blockchain/evm?rev=b7b82c7e1fc57b7449d6dfa6826600de37cc1e65)",
  "fp-account",
  "fp-evm",
  "frame-benchmarking",
@@ -6509,6 +6519,7 @@ dependencies = [
  "frame-support",
  "frame-system",
  "hex-literal 0.3.4",
+ "num_enum 0.5.11",
  "pallet-balances",
  "pallet-evm",
  "pallet-living-assets-ownership",
@@ -6519,8 +6530,46 @@ dependencies = [
  "scale-info",
  "serde",
  "sp-core",
+ "sp-io",
  "sp-runtime",
  "sp-std",
+]
+
+[[package]]
+name = "pallet-evm-precompile-blake2"
+version = "2.0.0-dev"
+source = "git+https://github.com/paritytech/frontier?branch=polkadot-v0.9.43#c2605558ad7e23362be1f16c7d2ec3e7d2e658ab"
+dependencies = [
+ "fp-evm",
+]
+
+[[package]]
+name = "pallet-evm-precompile-bn128"
+version = "2.0.0-dev"
+source = "git+https://github.com/paritytech/frontier?branch=polkadot-v0.9.43#c2605558ad7e23362be1f16c7d2ec3e7d2e658ab"
+dependencies = [
+ "fp-evm",
+ "sp-core",
+ "substrate-bn",
+]
+
+[[package]]
+name = "pallet-evm-precompile-dispatch"
+version = "2.0.0-dev"
+source = "git+https://github.com/paritytech/frontier?branch=polkadot-v0.9.43#c2605558ad7e23362be1f16c7d2ec3e7d2e658ab"
+dependencies = [
+ "fp-evm",
+ "frame-support",
+ "pallet-evm",
+]
+
+[[package]]
+name = "pallet-evm-precompile-ed25519"
+version = "2.0.0-dev"
+source = "git+https://github.com/paritytech/frontier?branch=polkadot-v0.9.43#c2605558ad7e23362be1f16c7d2ec3e7d2e658ab"
+dependencies = [
+ "ed25519-dalek",
+ "fp-evm",
 ]
 
 [[package]]
@@ -6655,6 +6704,7 @@ dependencies = [
  "parity-scale-codec",
  "scale-info",
  "serde",
+ "sp-arithmetic",
  "sp-core",
  "sp-io",
  "sp-runtime",
@@ -7357,6 +7407,7 @@ dependencies = [
  "frame-try-runtime",
  "hex-literal 0.4.1",
  "log",
+ "num_enum 0.5.11",
  "pallet-aura",
  "pallet-authorship",
  "pallet-balances",
@@ -7366,6 +7417,10 @@ dependencies = [
  "pallet-evm",
  "pallet-evm-chain-id",
  "pallet-evm-living-assets-ownership",
+ "pallet-evm-precompile-blake2",
+ "pallet-evm-precompile-bn128",
+ "pallet-evm-precompile-dispatch",
+ "pallet-evm-precompile-ed25519",
  "pallet-evm-precompile-modexp",
  "pallet-evm-precompile-sha3fips",
  "pallet-evm-precompile-simple",
@@ -7384,6 +7439,7 @@ dependencies = [
  "polkadot-runtime-common",
  "precompile-utils",
  "scale-info",
+ "serde",
  "smallvec",
  "sp-api",
  "sp-block-builder",
@@ -8973,28 +9029,23 @@ checksum = "5b40af805b3121feab8a3c29f04d8ad262fa8e0561883e7653e024ae4479e6de"
 name = "precompile-utils"
 version = "0.1.0"
 dependencies = [
- "affix",
- "derive_more",
- "environmental",
- "evm",
+ "assert_matches",
+ "evm 0.39.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "fp-evm",
  "frame-support",
  "frame-system",
- "hex",
  "hex-literal 0.3.4",
  "impl-trait-for-tuples",
  "log",
  "num_enum 0.5.11",
  "pallet-evm",
  "parity-scale-codec",
- "paste",
  "precompile-utils-macro",
- "scale-info",
- "serde",
  "sha3",
  "similar-asserts",
  "sp-core",
  "sp-io",
+ "sp-runtime",
  "sp-std",
  "xcm",
 ]
@@ -9003,20 +9054,11 @@ dependencies = [
 name = "precompile-utils-macro"
 version = "0.1.0"
 dependencies = [
- "case",
- "fp-evm",
- "frame-support",
- "macrotest",
  "num_enum 0.5.11",
- "precompile-utils",
- "prettyplease 0.1.25",
  "proc-macro2",
  "quote",
  "sha3",
- "sp-core",
- "sp-std",
  "syn 1.0.109",
- "trybuild",
 ]
 
 [[package]]
@@ -12525,6 +12567,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "substrate-bn"
+version = "0.6.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "72b5bbfa79abbae15dd642ea8176a21a635ff3c00059961d1ea27ad04e5b441c"
+dependencies = [
+ "byteorder",
+ "crunchy",
+ "lazy_static",
+ "rand 0.8.5",
+ "rustc-hex",
+]
+
+[[package]]
 name = "substrate-build-script-utils"
 version = "3.0.0"
 source = "git+https://github.com/paritytech/substrate?branch=polkadot-v0.9.43#5e49f6e44820affccaf517fd22af564f4b495d40"
@@ -12690,9 +12745,9 @@ checksum = "55937e1799185b12863d447f42597ed69d9928686b8d88a1df17376a097d8369"
 
 [[package]]
 name = "target-lexicon"
-version = "0.12.9"
+version = "0.12.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "df8e77cb757a61f51b947ec4a7e3646efd825b73561db1c232a8ccb639e611a0"
+checksum = "1d2faeef5759ab89935255b1a4cd98e0baf99d1085e37d36599c625dac49ae8e"
 
 [[package]]
 name = "tempfile"
@@ -13287,21 +13342,6 @@ dependencies = [
  "sp-weights",
  "substrate-rpc-client",
  "zstd 0.12.3+zstd.1.5.2",
-]
-
-[[package]]
-name = "trybuild"
-version = "1.0.81"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "04366e99ff743345622cd00af2af01d711dc2d1ef59250d7347698d21b546729"
-dependencies = [
- "basic-toml",
- "glob",
- "once_cell",
- "serde",
- "serde_derive",
- "serde_json",
- "termcolor",
 ]
 
 [[package]]

@@ -8,12 +8,12 @@ version = "0.1.0"
 [dependencies]
 
 # Substrate
-frame-support = { git = "https://github.com/paritytech/substrate", default-features = false, branch = "polkadot-v0.9.43" }
-frame-system = { git = "https://github.com/paritytech/substrate", default-features = false, branch = "polkadot-v0.9.43" }
+frame-support = { workspace = true, default-features = false }
+frame-system = { workspace = true, default-features = false }
 parity-scale-codec = { workspace = true, features = ["max-encoded-len"] }
-sp-core = { git = "https://github.com/paritytech/substrate", default-features = false, branch = "polkadot-v0.9.43" }
-sp-runtime = { git = "https://github.com/paritytech/substrate", default-features = false, branch = "polkadot-v0.9.43" }
-sp-std = { git = "https://github.com/paritytech/substrate", default-features = false, branch = "polkadot-v0.9.43" }
+sp-core = { workspace = true, default-features = false }
+sp-runtime = { workspace = true, default-features = false }
+sp-std = { workspace = true, default-features = false }
 
 # Frontier
 fp-evm = { workspace = true }
@@ -26,16 +26,21 @@ precompile-utils-macro = { workspace = true }
 # LAOS
 pallet-living-assets-ownership = { path = "../../pallets/living-assets-ownership", default-features = false }
 
+num_enum = { workspace = true }
+
 [dev-dependencies]
 derive_more = { workspace = true }
 hex-literal = { workspace = true }
 serde = { workspace = true }
 
 # Substrate
-pallet-balances = { git = "https://github.com/paritytech/substrate", default-features = false, branch = "polkadot-v0.9.43" }
-pallet-timestamp = { git = "https://github.com/paritytech/substrate", default-features = false, branch = "polkadot-v0.9.43" }
+pallet-balances = { workspace = true, default-features = false }
+pallet-timestamp = { workspace = true, default-features = false }
 scale-info = { workspace = true, features = [ "derive" ] }
-sp-runtime = { git = "https://github.com/paritytech/substrate", default-features = false, branch = "polkadot-v0.9.43" }
+sp-core = { workspace = true, default-features = false }
+sp-io = { workspace = true, default-features = false }
+sp-runtime = { workspace = true, default-features = false }
+frame-support = { workspace = true, default-features = false }
 
 precompile-utils = { workspace = true, features = [ "std", "testing" ] }
 

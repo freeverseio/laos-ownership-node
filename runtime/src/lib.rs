@@ -53,6 +53,7 @@ use frame_system::{
 	EnsureRoot,
 };
 use pallet_balances::NegativeImbalance;
+use pallet_evm::Precompile;
 use pallet_xcm::{EnsureXcm, IsVoiceOfBody};
 pub use sp_consensus_aura::sr25519::AuthorityId as AuraId;
 pub use sp_runtime::{MultiAddress, Perbill, Permill};
@@ -83,11 +84,10 @@ use pallet_evm::{
 };
 
 mod precompiles;
-use precompiles::LaosPrecompiles;
+pub use precompiles::LaosPrecompiles;
 
-/// Explicit precompiles
+/// Explicity precompiles type
 pub type Precompiles = LaosPrecompiles<Runtime>;
-
 
 /// Import the template pallet.
 pub use pallet_living_assets_ownership;
