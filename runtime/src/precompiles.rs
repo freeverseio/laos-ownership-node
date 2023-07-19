@@ -34,8 +34,8 @@ impl<R> LaosPrecompiles<R> {
 
 impl<R> PrecompileSet for LaosPrecompiles<R>
 where
-	LivingAssetsOwnershipPrecompile<R>: Precompile,
 	R: pallet_evm::Config + pallet_living_assets_ownership::Config,
+	LivingAssetsOwnershipPrecompile<R>: Precompile,
 {
 	fn execute(&self, handle: &mut impl PrecompileHandle) -> Option<PrecompileResult> {
 		let address = handle.code_address();

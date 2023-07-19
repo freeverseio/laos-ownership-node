@@ -17,11 +17,10 @@ sp-std = { workspace = true, default-features = false }
 
 # Frontier
 fp-evm = { workspace = true }
-pallet-evm = { workspace = true, features = [ "forbid-evm-reentrancy" ] }
+pallet-evm = { workspace = true }
 
 # precompiles
-precompile-utils = { workspace = true }
-precompile-utils-macro = { workspace = true }
+precompile-utils = { workspace = true, default-features = false }
 
 # LAOS
 pallet-living-assets-ownership = { path = "../../pallets/living-assets-ownership", default-features = false }
@@ -55,4 +54,6 @@ std = [
 	"sp-core/std",
 	"sp-std/std",
     "pallet-living-assets-ownership/std",
+	"num_enum/std",
+	"precompile-utils/std",
 ]

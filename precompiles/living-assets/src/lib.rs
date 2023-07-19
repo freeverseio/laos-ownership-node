@@ -3,12 +3,9 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 #![cfg_attr(test, feature(assert_matches))]
 use fp_evm::{ExitError, ExitSucceed, PrecompileFailure, PrecompileHandle, PrecompileOutput};
-use frame_support::{
-	dispatch::{Dispatchable, GetDispatchInfo, PostDispatchInfo},
-	log,
-};
+use frame_support::log;
 use pallet_evm::Precompile;
-use pallet_living_assets_ownership::{Call as LivingAssetsOwnershipCall, LivingAssetsOwnership};
+use pallet_living_assets_ownership::LivingAssetsOwnership;
 use parity_scale_codec::{Codec, Encode};
 use precompile_utils::{Address, EvmResult, FunctionModifier, PrecompileHandleExt};
 use sp_runtime::SaturatedConversion;
@@ -41,10 +38,7 @@ impl<Runtime> LivingAssetsOwnershipPrecompile<Runtime> {
 
 impl<Runtime> Precompile for LivingAssetsOwnershipPrecompile<Runtime>
 where
-	Runtime: pallet_living_assets_ownership::Config + frame_system::Config + pallet_evm::Config,
-	Runtime::RuntimeCall: Dispatchable<PostInfo = PostDispatchInfo> + GetDispatchInfo,
-	<Runtime::RuntimeCall as Dispatchable>::RuntimeOrigin: From<Option<Runtime::AccountId>>,
-	Runtime::RuntimeCall: From<LivingAssetsOwnershipCall<Runtime>>,
+	Runtime: pallet_evm::Config + pallet_living_assets_ownership::Config,
 	Runtime::Hash: From<U256>,
 	Runtime::AccountId: From<H160> + Codec,
 	<Runtime as pallet_living_assets_ownership::Config>::CollectionId: SaturatedConversion,
