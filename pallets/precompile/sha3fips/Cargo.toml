@@ -4,13 +4,13 @@ version = "2.0.0-dev"
 authors = ["Parity Technologies <admin@parity.io>", "Drew Stone <drew@commonwealth.im>"]
 license = "Apache-2.0"
 description = "SHA3 FIPS202 precompile for EVM pallet."
-edition = { workspace = true }
-repository = { workspace = true }
+repository = "https://github.com/freeverseio/pallet-livingassets-ownership"
+edition = "2021"
 
 [dependencies]
 tiny-keccak = { version = "2.0", features = ["fips202"] }
 # Frontier
-fp-evm = { workspace = true }
+fp-evm = { git = "https://github.com/paritytech/frontier.git", branch = "polkadot-v0.9.43", default-features = false }
 
 [features]
 default = ["std"]
