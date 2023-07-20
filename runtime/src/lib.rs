@@ -12,7 +12,6 @@ pub mod xcm_config;
 use codec::{Decode, Encode};
 use core::marker::PhantomData;
 use cumulus_pallet_parachain_system::RelayNumberStrictlyIncreases;
-use pallet_evm_living_assets_ownership::LivingAssetsOwnershipPrecompile;
 use smallvec::smallvec;
 use sp_api::impl_runtime_apis;
 use sp_core::{
@@ -98,6 +97,9 @@ pub type Signature = MultiSignature;
 /// Some way of identifying an account on the chain. We intentionally make it equivalent
 /// to the public key of our transaction signing scheme.
 pub type AccountId = <<Signature as Verify>::Signer as IdentifyAccount>::AccountId;
+
+/// Collection ID used in `living_assets_ownership` pallet
+pub type CollectionId = u64;
 
 /// Balance of an account.
 pub type Balance = u128;
@@ -507,7 +509,7 @@ impl pallet_collator_selection::Config for Runtime {
 
 impl pallet_living_assets_ownership::Config for Runtime {
 	type RuntimeEvent = RuntimeEvent;
-	type CollectionId = u64;
+	type CollectionId = CollectionId;
 }
 
 impl pallet_sudo::Config for Runtime {

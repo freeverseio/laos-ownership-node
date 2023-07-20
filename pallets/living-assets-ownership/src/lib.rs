@@ -13,15 +13,10 @@ mod mock;
 #[cfg(test)]
 mod tests;
 
-#[cfg(feature = "runtime-benchmarks")]
-mod benchmarking;
-
 #[frame_support::pallet]
 pub mod pallet {
-	use codec::Codec;
 	use frame_support::pallet_prelude::{OptionQuery, *};
 	use frame_system::pallet_prelude::*;
-	use sp_arithmetic::traits::BaseArithmetic;
 
 	#[pallet::pallet]
 	pub struct Pallet<T>(_);
@@ -32,14 +27,7 @@ pub mod pallet {
 		/// Because this pallet emits events, it depends on the runtime's definition of an event.
 		type RuntimeEvent: From<Event<Self>> + IsType<<Self as frame_system::Config>::RuntimeEvent>;
 		/// Collection id type
-		type CollectionId: Member
-			+ Parameter
-			+ MaxEncodedLen
-			+ Copy
-			+ Codec
-			+ Default
-			+ Ord
-			+ BaseArithmetic;
+		type CollectionId: Member + Parameter + MaxEncodedLen + Copy;
 	}
 
 	/// Mapping from collection id to owner
@@ -103,15 +91,15 @@ pub mod pallet {
 	/// - `CollectionAlreadyExists`: This error is returned by the `create_collection` method when a collection
 	/// with the provided `collection_id` already exists.
 	///
-	pub trait LivingAssetsOwnership<T: Config> {
+	pub trait LivingAssetsOwnership<AccountId, CollectionId> {
 		/// Get owner of collection
-		fn owner_of_collection(collection_id: T::CollectionId) -> Option<T::AccountId>;
+		fn owner_of_collection(collection_id: CollectionId) -> Option<AccountId>;
 
 		/// Create collection
-		fn create_collection(collection_id: T::CollectionId, who: T::AccountId) -> DispatchResult;
+		fn create_collection(collection_id: CollectionId, who: AccountId) -> DispatchResult;
 	}
 
-	impl<T: Config> LivingAssetsOwnership<T> for Pallet<T> {
+	impl<T: Config> LivingAssetsOwnership<T::AccountId, T::CollectionId> for Pallet<T> {
 		fn owner_of_collection(collection_id: T::CollectionId) -> Option<T::AccountId> {
 			OwnerOfCollection::<T>::get(collection_id)
 		}

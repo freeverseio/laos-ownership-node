@@ -8,35 +8,43 @@ version = "0.1.0"
 [dependencies]
 
 # Substrate
-frame-support = { workspace = true, default-features = false }
-frame-system = { workspace = true, default-features = false }
-parity-scale-codec = { workspace = true, features = ["max-encoded-len"] }
-sp-core = { workspace = true, default-features = false }
-sp-runtime = { workspace = true, default-features = false }
-sp-std = { workspace = true, default-features = false }
+frame-support = { git = "https://github.com/paritytech/substrate", default-features = false, branch = "polkadot-v0.9.43" }
+frame-system = { git = "https://github.com/paritytech/substrate", default-features = false, branch = "polkadot-v0.9.43" }
+parity-scale-codec = { version = "3.2.2", default-features = false, features = [
+	"derive", "max-encoded-len"
+] }
+sp-arithmetic = { git = "https://github.com/paritytech/substrate", default-features = false, branch = "polkadot-v0.9.43" }
+sp-core = { git = "https://github.com/paritytech/substrate", default-features = false, branch = "polkadot-v0.9.43" }
+sp-runtime = { git = "https://github.com/paritytech/substrate", default-features = false, branch = "polkadot-v0.9.43" }
+sp-std = { git = "https://github.com/paritytech/substrate", default-features = false, branch = "polkadot-v0.9.43" }
+num_enum = { version = "0.5.3", default-features = false }
 
 # Frontier
-fp-evm = { workspace = true }
-pallet-evm = { workspace = true }
+fp-evm = { git = "https://github.com/paritytech/frontier", branch = "polkadot-v0.9.43", default-features = false }
+pallet-evm = { git = "https://github.com/paritytech/frontier", branch = "polkadot-v0.9.43", default-features = false }
 
 # LAOS
 pallet-living-assets-ownership = { path = "../../pallets/living-assets-ownership", default-features = false }
 
-num_enum = { workspace = true }
+# Utils
+precompile-utils = { path = "../utils", default-features = false }
+precompile-utils-macro = { path = "../utils/macro", default-features = false }
 
 [dev-dependencies]
-derive_more = { workspace = true }
-hex-literal = { workspace = true }
-serde = { workspace = true }
+derive_more = "0.99"
+hex-literal = { version = "0.3.4" }
+serde = { version = "1.0.101", default-features = false }
 
 # Substrate
-pallet-balances = { workspace = true, default-features = false }
-pallet-timestamp = { workspace = true, default-features = false }
-scale-info = { workspace = true, features = [ "derive" ] }
-sp-core = { workspace = true, default-features = false }
-sp-io = { workspace = true, default-features = false }
-sp-runtime = { workspace = true, default-features = false }
-frame-support = { workspace = true, default-features = false }
+pallet-balances = { git = "https://github.com/paritytech/substrate", default-features = false, branch = "polkadot-v0.9.43" }
+pallet-timestamp = { git = "https://github.com/paritytech/substrate", default-features = false, branch = "polkadot-v0.9.43" }
+scale-info = { version = "2.0", default-features = false, features = [
+	"derive",
+] }
+sp-core = { git = "https://github.com/paritytech/substrate", default-features = false, branch = "polkadot-v0.9.43" }
+sp-io = { git = "https://github.com/paritytech/substrate", default-features = false, branch = "polkadot-v0.9.43" }
+sp-runtime = { git = "https://github.com/paritytech/substrate", default-features = false, branch = "polkadot-v0.9.43" }
+frame-support = { git = "https://github.com/paritytech/substrate", default-features = false, branch = "polkadot-v0.9.43" }
 
 [features]
 default = [ "std" ]
@@ -46,8 +54,10 @@ std = [
 	"frame-system/std",
 	"pallet-evm/std",
 	"parity-scale-codec/std",
+	"sp-arithmetic/std",
 	"sp-core/std",
 	"sp-std/std",
     "pallet-living-assets-ownership/std",
 	"num_enum/std",
+	"precompile-utils/std",
 ]

@@ -21,6 +21,7 @@
 // along with Utils.  If not, see <http://www.gnu.org/licenses/>.
 
 #![cfg_attr(not(feature = "std"), no_std)]
+#![allow(clippy::all)]
 
 extern crate alloc;
 

@@ -32,10 +32,17 @@ impl<R> LaosPrecompiles<R> {
 	}
 }
 
+// Explicit `LivingAssetsOwnershipPrecompile` type alias.
+type LivingAssetsPrecompile = LivingAssetsOwnershipPrecompile<
+	pallet_evm::HashedAddressMapping<sp_runtime::traits::BlakeTwo256>,
+	crate::AccountId,
+	crate::CollectionId,
+	pallet_living_assets_ownership::Pallet<crate::Runtime>,
+>;
+
 impl<R> PrecompileSet for LaosPrecompiles<R>
 where
 	R: pallet_evm::Config + pallet_living_assets_ownership::Config,
-	LivingAssetsOwnershipPrecompile<R>: Precompile,
 {
 	fn execute(&self, handle: &mut impl PrecompileHandle) -> Option<PrecompileResult> {
 		let address = handle.code_address();
@@ -65,13 +72,13 @@ where
 			a if a == hash(1026) => Some(ECRecoverPublicKey::execute(handle)),
 			a if a == hash(1027) => Some(Ed25519Verify::execute(handle)),
 			// LAOS precompiles
-			a if a == hash(20481) => Some(LivingAssetsOwnershipPrecompile::<R>::execute(handle)),
+			a if a == hash(20481) => Some(LivingAssetsPrecompile::execute(handle)),
 			// Default
 			_ => None,
 		}
 	}
 
-	fn is_precompile(&self, address: H160, remaining_gas: u64) -> IsPrecompileResult {
+	fn is_precompile(&self, address: H160, _remaining_gas: u64) -> IsPrecompileResult {
 		IsPrecompileResult::Answer {
 			is_precompile: Self::used_addresses().any(|x| x == address),
 			extra_cost: 0,

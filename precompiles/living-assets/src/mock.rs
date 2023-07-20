@@ -111,15 +111,21 @@ impl<R> LaosPrecompiles<R> {
 	}
 }
 
+type LivingAssetsPrecompile = LivingAssetsOwnershipPrecompile<
+	pallet_evm::HashedAddressMapping<sp_runtime::traits::BlakeTwo256>,
+	AccountId32,
+	u64,
+	pallet_living_assets_ownership::Pallet<Test>,
+>;
+
 impl<R> PrecompileSet for LaosPrecompiles<R>
 where
 	R: pallet_evm::Config,
-	LivingAssetsOwnershipPrecompile<R>: Precompile,
 {
 	fn execute(&self, handle: &mut impl PrecompileHandle) -> Option<PrecompileResult> {
 		let address = handle.code_address();
 		if address == hash(1) {
-			return Some(<LivingAssetsOwnershipPrecompile<R> as Precompile>::execute(handle))
+			return Some(LivingAssetsPrecompile::execute(handle))
 		}
 		None
 	}
