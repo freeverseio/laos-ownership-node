@@ -8,7 +8,6 @@ repository = "https://github.com/freeverseio/pallet-livingassets-ownership"
 edition = "2021"
 
 [dependencies]
-evm = { git = "https://github.com/rust-blockchain/evm", rev = "b7b82c7e1fc57b7449d6dfa6826600de37cc1e65", default-features = false }
 parity-scale-codec = { version = "3.2.2", default-features = false, features = [
 	"derive",
 ] }
@@ -30,6 +29,10 @@ sp-std = { git = "https://github.com/paritytech/substrate", default-features = f
 # Local pallet
 pallet-living-assets-ownership = { path = "../../pallets/living-assets-ownership", default-features = false }
 
+# Utils
+precompile-utils = { path = "../utils", default-features = false }
+precompile-utils-macro = { path = "../utils/macro", default-features = false }
+
 num_enum = { version = "0.5.3", default-features = false }
 
 [features]
@@ -45,4 +48,7 @@ std = [
 	"num_enum/std",
 	"frame-support/std",
 	"sp-arithmetic/std",
+	"precompile-utils/std",
+	"parity-scale-codec/std",
+	"scale-info/std",
 ]
