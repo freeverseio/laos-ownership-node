@@ -49,8 +49,9 @@ sp-std = { git = "https://github.com/paritytech/substrate", default-features = f
 sp-transaction-pool = { git = "https://github.com/paritytech/substrate", default-features = false, branch = "polkadot-v0.9.43" }
 sp-version = { git = "https://github.com/paritytech/substrate", default-features = false, branch = "polkadot-v0.9.43" }
 
-pallet-living-assets-ownership = { version = "0.0.1", default-features = false, path = "../pallets/livingassets-ownership" }
-pallet-evm-precompile-sha3fips = { default-features = false, path = "../pallets/precompile/sha3fips" }
+pallet-living-assets-ownership = { version = "0.0.1", default-features = false, path = "../pallets/living-assets-ownership" }
+# pallet-evm-precompile-sha3fips = { default-features = false, path = "../pallets/precompile/sha3fips" }
+pallet-evm-living-assets-ownership = { path = "../precompile/living-assets", default-features = false }
 
 # Polkadot
 pallet-xcm = { git = "https://github.com/paritytech/polkadot", default-features = false, branch = "release-v0.9.43" }
@@ -147,12 +148,12 @@ std = [
 	"pallet-evm/std",
 	"pallet-evm-chain-id/std",
 	"pallet-evm-precompile-modexp/std",
-	"pallet-evm-precompile-sha3fips/std",
 	"pallet-evm-precompile-simple/std",
 	"cumulus-pallet-session-benchmarking/std",
 	"frame-benchmarking",
 	"frame-system-benchmarking",
-	"frame-try-runtime"
+	"frame-try-runtime",
+	"pallet-evm-living-assets-ownership/std",
 ]
 
 runtime-benchmarks = [
