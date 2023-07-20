@@ -21,7 +21,6 @@ log = { version = "0.4.17", default-features = false }
 scale-info = { version = "2.7.0", default-features = false, features = ["derive"] }
 smallvec = "1.10.0"
 num_enum = { version = "0.5.3", default-features = false }
-serde = { version = "1.0.163", optional = true, features = ["derive"] }
 
 # Substrate
 frame-benchmarking = { git = "https://github.com/paritytech/substrate", default-features = false, optional = true, branch = "polkadot-v0.9.43" }
@@ -51,7 +50,7 @@ sp-std = { git = "https://github.com/paritytech/substrate", default-features = f
 sp-transaction-pool = { git = "https://github.com/paritytech/substrate", default-features = false, branch = "polkadot-v0.9.43" }
 sp-version = { git = "https://github.com/paritytech/substrate", default-features = false, branch = "polkadot-v0.9.43" }
 
-pallet-living-assets-ownership = { version = "0.0.1", default-features = false, path = "../pallets/living-assets-ownership" }
+pallet-living-assets-ownership = { default-features = false, path = "../pallets/living-assets-ownership" }
 
 # Polkadot
 pallet-xcm = { git = "https://github.com/paritytech/polkadot", default-features = false, branch = "release-v0.9.43" }
@@ -66,7 +65,7 @@ polkadot-primitives = { git = "https://github.com/paritytech/polkadot", default-
 cumulus-pallet-aura-ext = { git = "https://github.com/paritytech/cumulus.git", branch = "polkadot-v0.9.43", default-features = false }
 cumulus-pallet-dmp-queue = { git = "https://github.com/paritytech/cumulus.git", branch = "polkadot-v0.9.43", default-features = false }
 cumulus-pallet-parachain-system = { git = "https://github.com/paritytech/cumulus.git", branch = "polkadot-v0.9.43", default-features = false }
-cumulus-pallet-session-benchmarking = {git = "https://github.com/paritytech/cumulus.git", branch = "polkadot-v0.9.43", default-features = false, version = "3.0.0"}
+cumulus-pallet-session-benchmarking = { git = "https://github.com/paritytech/cumulus.git", branch = "polkadot-v0.9.43", default-features = false, version = "3.0.0"}
 cumulus-pallet-xcm = { git = "https://github.com/paritytech/cumulus.git", branch = "polkadot-v0.9.43", default-features = false }
 cumulus-pallet-xcmp-queue = { git = "https://github.com/paritytech/cumulus.git", branch = "polkadot-v0.9.43", default-features = false }
 cumulus-primitives-core = { git = "https://github.com/paritytech/cumulus.git", branch = "polkadot-v0.9.43", default-features = false }
@@ -163,13 +162,11 @@ std = [
 	"frame-system-benchmarking",
 	"frame-try-runtime",
 	"pallet-living-assets-ownership/std",
-	# "precompile-utils/std",
 	"pallet-evm-living-assets-ownership/std",
 	"pallet-evm-precompile-blake2/std",
 	"pallet-evm-precompile-bn128/std",
 	"pallet-evm-precompile-ed25519/std",
 	"num_enum/std",
-	"serde/std",
 	"precompile-utils/std",
 ]
 

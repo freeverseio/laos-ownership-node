@@ -50,6 +50,5 @@ std = [
 	"sp-std/std",
 	"xcm/std",
 	"num_enum/std",
-	"sha3/std",
 ]
 testing = [ "similar-asserts", "std" ]

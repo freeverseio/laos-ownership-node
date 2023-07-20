@@ -18,3 +18,10 @@ proc-macro2 = "1.0"
 quote = "1.0"
 sha3 = { version = "0.10", default-features = false }
 syn = { version = "1.0", features = ["extra-traits", "fold", "full", "visit"] }
+
+[features]
+default = [ "std" ]
+std = [
+    "num_enum/std",
+    "sha3/std",
+]

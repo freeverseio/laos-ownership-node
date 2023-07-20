@@ -33,7 +33,7 @@ precompile-utils-macro = { path = "../utils/macro", default-features = false }
 [dev-dependencies]
 derive_more = "0.99"
 hex-literal = { version = "0.3.4" }
-serde = { version = "1.0.101", default-features = false }
+serde = { version = "1.0.163", default-features = false }
 
 # Substrate
 pallet-balances = { git = "https://github.com/paritytech/substrate", default-features = false, branch = "polkadot-v0.9.43" }
