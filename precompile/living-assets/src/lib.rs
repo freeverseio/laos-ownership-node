@@ -3,7 +3,6 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 #![cfg_attr(test, feature(assert_matches))]
 use fp_evm::{ExitError, ExitSucceed, PrecompileFailure, PrecompileHandle, PrecompileOutput};
-use frame_support::log;
 use pallet_living_assets_ownership::LivingAssetsOwnership;
 use parity_scale_codec::Encode;
 use precompile_utils::{
