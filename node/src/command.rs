@@ -1,6 +1,6 @@
 use std::net::SocketAddr;
 
-use codec::Encode;
+use parity_scale_codec::Encode;
 use cumulus_client_cli::generate_genesis_block;
 use cumulus_primitives_core::ParaId;
 use frame_benchmarking_cli::{BenchmarkCmd, SUBSTRATE_REFERENCE_HARDWARE};

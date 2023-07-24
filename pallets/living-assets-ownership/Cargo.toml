@@ -16,7 +16,7 @@ parity-scale-codec = { workspace = true, features = ["derive"] }
 scale-info = { workspace = true, features = ["derive"] }
 
 # Substrate
-frame-benchmarking = { workspace = true, default-features = false, optional = true }
+frame-benchmarking = { workspace = true, optional = true }
 frame-support = { workspace = true }
 frame-system = { workspace = true }
 

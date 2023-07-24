@@ -49,5 +49,7 @@ std = [
 	"sp-std/std",
 	"sp-runtime/std",
 	"xcm/std",
+	"sha3/std",
+	"num_enum/std",
 ]
 testing = ["similar-asserts", "std"]
