@@ -217,4 +217,4 @@ precompile-utils = { path = "./precompile/utils", default-features = false }
 precompile-utils-macro = { path = "./precompile/utils/macro", default-features = false }
 
 # runtime
-parachain-template-runtime = { path = "./runtime" }
+laos-runtime = { path = "./runtime" }
