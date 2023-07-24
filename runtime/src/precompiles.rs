@@ -65,3 +65,42 @@ where
 fn hash(a: u64) -> H160 {
 	H160::from_low_u64_be(a)
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use sp_core::H160;
+    use pallet_evm::PrecompileHandle;
+    use sp_std::vec::Vec;
+
+    struct MockPrecompileHandle {
+        code_address: H160,
+        input_data: Vec<u8>,
+        // ... other fields if necessary
+    }
+
+    impl PrecompileHandle for MockPrecompileHandle {
+        fn code_address(&self) -> H160 {
+            self.code_address
+        }
+
+        // ... other required methods
+    }
+
+    #[test]
+    fn test_execute_ecrecover() {
+        let mock_handle = MockPrecompileHandle {
+            code_address: hash(1),
+            input_data: vec![...],  // fill with appropriate data
+        };
+
+        let frontier_precompiles = FrontierPrecompiles::new();
+        let result = frontier_precompiles.execute(&mock_handle);
+
+        assert!(result.is_some());
+        // If you know what the result should be, you can compare it directly.
+        // assert_eq!(result.unwrap(), ...);
+    }
+
+    // Additional tests can be written for other precompiles.
+}
