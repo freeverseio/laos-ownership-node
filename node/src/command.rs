@@ -3,8 +3,8 @@ use std::net::SocketAddr;
 use cumulus_client_cli::generate_genesis_block;
 use cumulus_primitives_core::ParaId;
 use frame_benchmarking_cli::{BenchmarkCmd, SUBSTRATE_REFERENCE_HARDWARE};
+use laos_runtime::Block;
 use log::{info, warn};
-use parachain_template_runtime::Block;
 use parity_scale_codec::Encode;
 use polkadot_service::RococoChainSpec;
 use sc_cli::{
@@ -71,7 +71,7 @@ impl SubstrateCli for Cli {
 	}
 
 	fn native_runtime_version(_: &Box<dyn ChainSpec>) -> &'static RuntimeVersion {
-		&parachain_template_runtime::VERSION
+		&laos_runtime::VERSION
 	}
 }
 
@@ -257,7 +257,7 @@ pub fn run() -> Result<()> {
 		},
 		#[cfg(feature = "try-runtime")]
 		Some(Subcommand::TryRuntime(cmd)) => {
-			use parachain_template_runtime::MILLISECS_PER_BLOCK;
+			use laos_runtime::MILLISECS_PER_BLOCK;
 			use sc_executor::{sp_wasm_interface::ExtendedHostFunctions, NativeExecutionDispatch};
 			use try_runtime_cli::block_building_info::timestamp_with_aura_info;
 
