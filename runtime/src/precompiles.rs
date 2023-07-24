@@ -86,5 +86,6 @@ mod tests {
 		);
 
         let frontier_precompiles = FrontierPrecompiles::new();
+		let result = frontier_precompiles.execute(&mut mock_handle);
     }
 }
