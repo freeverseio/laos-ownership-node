@@ -13,7 +13,7 @@ interface LivingAssets {
     function createCollection(
         uint64 collection_id,
         address who
-    ) external payable;
+    ) external;
 
     /// @dev Get collection owner
     /// @custom:selector 0xfb34ae53
