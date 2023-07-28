@@ -47,6 +47,14 @@ mod test {
 	}
 
 	#[test]
+	fn initially_collection_counter_is_0() {
+		new_test_ext().execute_with(|| {
+			assert_eq!(LivingAssetsModule::collection_counter(), 0);
+		});
+	}
+
+	// Test LivingAssetsOwnership trait
+	#[test]
 	fn living_assets_ownership_trait_create_new_collection_by_living() {
 		new_test_ext().execute_with(|| {
         	let result = <LivingAssetsModule as LivingAssetsOwnership<AccountId, CollectionId>>::create_collection(0, 1);
