@@ -17,7 +17,7 @@ use sp_std::{fmt::Debug, marker::PhantomData};
 #[derive(Debug, PartialEq)]
 pub enum Action {
 	/// Create a new collection
-	CreateCollection = "createCollection(uint64,address)",
+	CreateCollection = "createCollection(address)",
 	/// Get owner of the collection
 	OwnerOfCollection = "ownerOfCollection(uint64)",
 }
@@ -85,12 +85,11 @@ where
 			// write storage
 			Action::CreateCollection => {
 				let mut input = handle.read_input()?;
-				input.expect_arguments(2)?;
+				input.expect_arguments(1)?;
 
-				let collection_id = input.read::<u64>()?.saturated_into();
 				let owner = AddressMapping::into_account_id(input.read::<Address>()?.0);
 
-				if LivingAssets::create_collection(collection_id, owner).is_err() {
+				if LivingAssets::create_collection(owner).is_err() {
 					return Err(PrecompileFailure::Error {
 						exit_status: ExitError::Other(sp_std::borrow::Cow::Borrowed(
 							"Could net create collection",
