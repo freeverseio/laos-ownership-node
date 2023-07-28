@@ -69,12 +69,9 @@ pub mod pallet {
 	impl<T: Config> Pallet<T> {
 		#[pallet::call_index(0)]
 		#[pallet::weight(10_000 + T::DbWeight::get().writes(1).ref_time())] // TODO set proper weight
-		pub fn create_collection(
-			origin: OriginFor<T>,
-			collection_id: T::CollectionId,
-		) -> DispatchResult {
+		pub fn create_collection(origin: OriginFor<T>) -> DispatchResult {
 			let who = ensure_signed(origin)?;
-			Self::do_create_collection(collection_id, who)
+			Self::do_create_collection(who)
 		}
 	}
 
@@ -106,7 +103,7 @@ pub mod pallet {
 		fn owner_of_collection(collection_id: CollectionId) -> Option<AccountId>;
 
 		/// Create collection
-		fn create_collection(collection_id: CollectionId, who: AccountId) -> DispatchResult;
+		fn create_collection(who: AccountId) -> DispatchResult;
 	}
 
 	impl<T: Config> LivingAssetsOwnership<T::AccountId, T::CollectionId> for Pallet<T> {
@@ -114,8 +111,8 @@ pub mod pallet {
 			OwnerOfCollection::<T>::get(collection_id)
 		}
 
-		fn create_collection(collection_id: T::CollectionId, who: T::AccountId) -> DispatchResult {
-			Self::do_create_collection(collection_id, who)
+		fn create_collection(who: T::AccountId) -> DispatchResult {
+			Self::do_create_collection(who)
 		}
 	}
 }
