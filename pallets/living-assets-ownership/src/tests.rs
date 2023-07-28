@@ -56,7 +56,7 @@ mod test {
 	#[test]
 	fn create_collection_and_check_counter() {
 		new_test_ext().execute_with(|| {
-		assert_ok!(LivingAssetsModule::create_collection(RuntimeOrigin::signed(1), 0));
+			assert_ok!(LivingAssetsModule::create_collection(RuntimeOrigin::signed(1), 0));
 			assert_eq!(LivingAssetsModule::collection_counter(), 1);
 		});
 	}

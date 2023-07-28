@@ -15,7 +15,10 @@ mod tests;
 
 #[frame_support::pallet]
 pub mod pallet {
-	use frame_support::pallet_prelude::{OptionQuery, ValueQuery, *};
+	use frame_support::{
+		pallet_prelude::{OptionQuery, ValueQuery, *},
+		sp_runtime::traits::{CheckedAdd, One},
+	};
 	use frame_system::pallet_prelude::*;
 
 	#[pallet::pallet]
@@ -27,7 +30,7 @@ pub mod pallet {
 		/// Because this pallet emits events, it depends on the runtime's definition of an event.
 		type RuntimeEvent: From<Event<Self>> + IsType<<Self as frame_system::Config>::RuntimeEvent>;
 		/// Collection id type
-		type CollectionId: Member + Parameter + MaxEncodedLen + Copy + Default;
+		type CollectionId: Member + Parameter + MaxEncodedLen + Copy + Default + CheckedAdd + One;
 	}
 
 	/// Mapping from collection id to owner
@@ -55,6 +58,8 @@ pub mod pallet {
 	pub enum Error<T> {
 		/// Collection already exists
 		CollectionAlreadyExists,
+		/// Collection id overflow
+		CollectionIdOverflow,
 	}
 
 	// Dispatchable functions allows users to interact with the pallet and invoke state changes.
