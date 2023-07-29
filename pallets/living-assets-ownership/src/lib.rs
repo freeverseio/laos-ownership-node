@@ -17,12 +17,12 @@ mod tests;
 
 #[frame_support::pallet]
 pub mod pallet {
-	use sp_arithmetic::traits::Unsigned;
 	use frame_support::{
 		pallet_prelude::{OptionQuery, ValueQuery, *},
 		sp_runtime::traits::{CheckedAdd, One},
 	};
 	use frame_system::pallet_prelude::*;
+	use sp_arithmetic::traits::Unsigned;
 
 	#[pallet::pallet]
 	pub struct Pallet<T>(_);
@@ -33,7 +33,14 @@ pub mod pallet {
 		/// Because this pallet emits events, it depends on the runtime's definition of an event.
 		type RuntimeEvent: From<Event<Self>> + IsType<<Self as frame_system::Config>::RuntimeEvent>;
 		/// Collection id type
-		type CollectionId: Member + Parameter + MaxEncodedLen + Copy + Default + CheckedAdd + One  + Unsigned;
+		type CollectionId: Member
+			+ Parameter
+			+ MaxEncodedLen
+			+ Copy
+			+ Default
+			+ CheckedAdd
+			+ One
+			+ Unsigned;
 	}
 
 	/// Mapping from collection id to owner
