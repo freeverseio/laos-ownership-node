@@ -3,7 +3,7 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 #![cfg_attr(test, feature(assert_matches))]
 use fp_evm::{ExitError, ExitSucceed, PrecompileFailure, PrecompileHandle, PrecompileOutput};
-use pallet_living_assets_ownership::LivingAssetsOwnership;
+use pallet_living_assets_ownership::traits::CollectionManager;
 use parity_scale_codec::Encode;
 use precompile_utils::{
 	succeed, Address, EvmDataWriter, EvmResult, FunctionModifier, PrecompileHandleExt,
@@ -23,22 +23,22 @@ pub enum Action {
 }
 
 /// Wrapper for the precompile function.
-pub struct LivingAssetsOwnershipPrecompile<AddressMapping, AccountId, CollectionId, LivingAssets>(
+pub struct CollectionManagerPrecompile<AddressMapping, AccountId, CollectionId, LivingAssets>(
 	PhantomData<(AddressMapping, AccountId, CollectionId, LivingAssets)>,
 )
 where
 	AddressMapping: pallet_evm::AddressMapping<AccountId>,
 	AccountId: Encode + Debug,
 	CollectionId: BaseArithmetic + Debug,
-	LivingAssets: LivingAssetsOwnership<AccountId, CollectionId>;
+	LivingAssets: CollectionManager<AccountId, CollectionId>;
 
 impl<AddressMapping, AccountId, CollectionId, LivingAssets>
-	LivingAssetsOwnershipPrecompile<AddressMapping, AccountId, CollectionId, LivingAssets>
+	CollectionManagerPrecompile<AddressMapping, AccountId, CollectionId, LivingAssets>
 where
 	AddressMapping: pallet_evm::AddressMapping<AccountId>,
 	AccountId: Encode + Debug,
 	CollectionId: BaseArithmetic + Debug,
-	LivingAssets: LivingAssetsOwnership<AccountId, CollectionId>,
+	LivingAssets: CollectionManager<AccountId, CollectionId>,
 {
 	#[allow(clippy::new_without_default)]
 	pub fn new() -> Self {
@@ -47,12 +47,12 @@ where
 }
 
 impl<AddressMapping, AccountId, CollectionId, LivingAssets> fp_evm::Precompile
-	for LivingAssetsOwnershipPrecompile<AddressMapping, AccountId, CollectionId, LivingAssets>
+	for CollectionManagerPrecompile<AddressMapping, AccountId, CollectionId, LivingAssets>
 where
 	AddressMapping: pallet_evm::AddressMapping<AccountId>,
 	AccountId: Encode + Debug,
 	CollectionId: BaseArithmetic + Debug,
-	LivingAssets: LivingAssetsOwnership<AccountId, CollectionId>,
+	LivingAssets: CollectionManager<AccountId, CollectionId>,
 {
 	fn execute(handle: &mut impl PrecompileHandle) -> EvmResult<PrecompileOutput> {
 		let selector = handle.read_selector()?;
