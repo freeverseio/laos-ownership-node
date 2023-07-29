@@ -1,10 +1,10 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 
+use frame_support::dispatch::DispatchResult;
 /// Edit this file to define custom logic or remove it if it is not needed.
 /// Learn more about FRAME and the core library of Substrate FRAME pallets:
 /// <https://docs.substrate.io/reference/frame-pallets/>
 pub use pallet::*;
-use frame_support::dispatch::DispatchResult;
 
 mod functions;
 pub mod traits;
@@ -76,16 +76,14 @@ pub mod pallet {
 			Self::do_create_collection(who)
 		}
 	}
-
-
 }
 
-	impl<T: Config> traits::CollectionManager<T::AccountId, T::CollectionId> for Pallet<T> {
-		fn owner_of_collection(collection_id: T::CollectionId) -> Option<T::AccountId> {
-			OwnerOfCollection::<T>::get(collection_id)
-		}
-
-		fn create_collection(who: T::AccountId) -> DispatchResult {
-			Self::do_create_collection(who)
-		}
+impl<T: Config> traits::CollectionManager<T::AccountId, T::CollectionId> for Pallet<T> {
+	fn owner_of_collection(collection_id: T::CollectionId) -> Option<T::AccountId> {
+		OwnerOfCollection::<T>::get(collection_id)
 	}
+
+	fn create_collection(who: T::AccountId) -> DispatchResult {
+		Self::do_create_collection(who)
+	}
+}
