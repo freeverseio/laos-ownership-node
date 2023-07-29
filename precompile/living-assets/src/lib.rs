@@ -23,7 +23,7 @@ pub enum Action {
 }
 
 /// Wrapper for the precompile function.
-pub struct CollectionManagerPrecompile<AddressMapping, AccountId, CollectionId, LivingAssets>(
+pub struct LivingAssetsOwnershipPrecompile<AddressMapping, AccountId, CollectionId, LivingAssets>(
 	PhantomData<(AddressMapping, AccountId, CollectionId, LivingAssets)>,
 )
 where
@@ -33,7 +33,7 @@ where
 	LivingAssets: CollectionManager<AccountId, CollectionId>;
 
 impl<AddressMapping, AccountId, CollectionId, LivingAssets>
-	CollectionManagerPrecompile<AddressMapping, AccountId, CollectionId, LivingAssets>
+	LivingAssetsOwnershipPrecompile<AddressMapping, AccountId, CollectionId, LivingAssets>
 where
 	AddressMapping: pallet_evm::AddressMapping<AccountId>,
 	AccountId: Encode + Debug,
@@ -47,7 +47,7 @@ where
 }
 
 impl<AddressMapping, AccountId, CollectionId, LivingAssets> fp_evm::Precompile
-	for CollectionManagerPrecompile<AddressMapping, AccountId, CollectionId, LivingAssets>
+	for LivingAssetsOwnershipPrecompile<AddressMapping, AccountId, CollectionId, LivingAssets>
 where
 	AddressMapping: pallet_evm::AddressMapping<AccountId>,
 	AccountId: Encode + Debug,
