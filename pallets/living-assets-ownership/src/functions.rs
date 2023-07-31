@@ -1,24 +1,17 @@
 //! Contains helper and utility functions of the pallet
 use super::*;
-use frame_support::sp_runtime::{
-	traits::{CheckedAdd, One},
-	DispatchResult,
+use frame_support::{
+	dispatch::DispatchResult,
+	sp_runtime::traits::{CheckedAdd, One},
 };
 
 impl<T: Config> Pallet<T> {
-	/// Attempts to create a new collection
+	/// Create a new collection
 	///
-	/// This function is intended to be used as the implementation for the
-	/// [Self::create_collection] public interface. It first retrieves the current
-	/// collection count to use as the new collection's ID. It then inserts a new
-	/// entry into the `OwnerOfCollection` map, mapping the new collection's ID to
-	/// the owner's account ID.
-	///
-	/// After this, the function attempts to increment the collection counter by 1.
 	/// If this operation would result in an overflow, the function returns early
 	/// with an [Error::CollectionIdOverflow].
 	///
-	/// Finally, if all operations were successful, the function emits a
+	/// Finally, if it is successful, the function emits a
 	/// [Event::CollectionCreated] event and returns `Ok(())`.
 	///
 	/// # Arguments
