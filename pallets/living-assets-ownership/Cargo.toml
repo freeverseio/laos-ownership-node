@@ -1,11 +1,6 @@
 [package]
 name = "pallet-living-assets-ownership"
-authors = [""]
-description = ""
 version = "0.0.1"
-license = "Unlicense"
-homepage = ""
-repository = "https://github.com/freeverseio/pallet-livingassets-ownership"
 edition = "2021"
 
 [package.metadata.docs.rs]
