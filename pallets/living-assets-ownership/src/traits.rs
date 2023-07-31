@@ -15,14 +15,11 @@ use frame_support::dispatch::DispatchResult;
 /// the method returns `None`.
 ///
 /// - `create_collection(who: AccountId) -> DispatchResult`: This method creates a
-/// new collection with the specified `collection_id` and assigns ownership to the provided `AccountId`.
-/// If a collection already exists with the provided `collection_id`, the method will return an error.
+/// new collection and assigns ownership to the provided `AccountId`.
 ///
 /// # Errors
 ///
-/// - `CollectionAlreadyExists`: This error is returned by the `create_collection` method when a collection
-/// with the provided `collection_id` already exists.
-///
+/// [Error::CollectionIdOverflow]: Thrown if the collection counter overflows when creating a new collection.
 pub trait CollectionManager<AccountId, CollectionId> {
 	/// Get owner of collection
 	fn owner_of_collection(collection_id: CollectionId) -> Option<AccountId>;
