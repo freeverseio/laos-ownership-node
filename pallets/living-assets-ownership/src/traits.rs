@@ -14,7 +14,7 @@ use frame_support::dispatch::DispatchResult;
 /// of a collection given its `collection_id`. If no collection exists with the provided `collection_id`,
 /// the method returns `None`.
 ///
-/// - `create_collection(collection_id: T::CollectionId, who: AccountId) -> DispatchResult`: This method creates a
+/// - `create_collection(who: AccountId) -> DispatchResult`: This method creates a
 /// new collection with the specified `collection_id` and assigns ownership to the provided `AccountId`.
 /// If a collection already exists with the provided `collection_id`, the method will return an error.
 ///

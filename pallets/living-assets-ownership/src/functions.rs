@@ -6,24 +6,24 @@ use frame_support::{
 };
 
 impl<T: Config> Pallet<T> {
-	/// Create a new collection
+	/// Creates a new collection.
 	///
-	/// If this operation would result in an overflow, the function returns early
-	/// with an [Error::CollectionIdOverflow].
+	/// The function first retrieves the current collection count, which will be used as the new collection's ID.
+	/// It then inserts a new entry into the `OwnerOfCollection` map, associating the new collection's ID with the specified owner's account ID.
 	///
-	/// Finally, if it is successful, the function emits a
-	/// [Event::CollectionCreated] event and returns `Ok(())`.
+	/// The collection counter is then incremented by one, using checked addition to prevent overflow. If an overflow would occur, the function returns early with an [Error::CollectionIdOverflow].
+	///
+	/// If successful, the function emits a [Event::CollectionCreated] event, indicating that the new collection was created, and returns `Ok(())`.
 	///
 	/// # Arguments
 	///
-	/// * `who` - The account ID of the new collection's owner.
+	/// * `who` - The account ID of the new collection's owner. This account will be associated with the newly created collection.
 	///
 	/// # Return
 	///
-	/// Returns a [DispatchResult] indicating the outcome of the operation. If the
-	/// operation was successful, the function returns `Ok(())`. If the operation
-	/// was not successful, the function returns `Err(e)`, where `e` is the error
-	/// that occurred.
+	/// Returns a [DispatchResult] that signifies the outcome of the operation:
+	/// - `Ok(())` if the operation was successful, indicating that the new collection was created without issue.
+	/// - `Err(e)` if the operation failed, where `e` is the error that occurred, such as an overflow error.
 	pub fn do_create_collection(who: T::AccountId) -> DispatchResult {
 		// Retrieve the current collection count to use as the new collection's ID
 		let collection_id = Self::collection_counter();
