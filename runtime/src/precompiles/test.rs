@@ -2,26 +2,24 @@ use super::{hash, mock::*, FrontierPrecompiles};
 use pallet_evm::{IsPrecompileResult, PrecompileSet};
 use sp_core::H160;
 
-fn is_precompile(address: H160) -> bool {
+fn is_precompile(address: H160) -> Result<bool, &'static str> {
 	let p = FrontierPrecompiles::<Runtime>::new();
-	let result = p.is_precompile(address, 0);
-	if let IsPrecompileResult::Answer { is_precompile, extra_cost: _ } = result {
-		is_precompile
-	} else {
-		panic!("Unexpected result variant");
+	match p.is_precompile(address, 0) {
+		IsPrecompileResult::Answer { is_precompile, extra_cost: _ } => Ok(is_precompile),
+		_ => Err("Unexpected result variant"),
 	}
 }
 
 #[test]
 fn null_address_is_not_precompile() {
-    assert!(!is_precompile(H160::zero()));
+    assert!(!is_precompile(H160::zero()).unwrap());
 }
 
 #[test]
 fn ethrerum_precompiled_reserved_addresses_are_precompiled() {
-    assert!(is_precompile(hash(1)));
-    assert!(is_precompile(hash(2)));
-    assert!(is_precompile(hash(3)));
-    assert!(is_precompile(hash(4)));
-    assert!(is_precompile(hash(5)));
+    assert!(is_precompile(hash(1)).unwrap());
+    assert!(is_precompile(hash(2)).unwrap());
+    assert!(is_precompile(hash(3)).unwrap());
+    assert!(is_precompile(hash(4)).unwrap());
+    assert!(is_precompile(hash(5)).unwrap());
 }
