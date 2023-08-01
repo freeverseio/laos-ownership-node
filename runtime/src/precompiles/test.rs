@@ -12,14 +12,14 @@ fn is_precompile(address: H160) -> Result<bool, &'static str> {
 
 #[test]
 fn null_address_is_not_precompile() {
-    assert!(!is_precompile(H160::zero()).unwrap());
+	assert!(!is_precompile(H160::zero()).unwrap());
 }
 
 #[test]
 fn ethereum_precompiled_addresses_are_precompile() {
-    assert!(is_precompile(hash(1)).unwrap());
-    assert!(is_precompile(hash(2)).unwrap());
-    assert!(is_precompile(hash(3)).unwrap());
-    assert!(is_precompile(hash(4)).unwrap());
-    assert!(is_precompile(hash(5)).unwrap());
+	assert!(is_precompile(hash(1)).unwrap());
+	assert!(is_precompile(hash(2)).unwrap());
+	assert!(is_precompile(hash(3)).unwrap());
+	assert!(is_precompile(hash(4)).unwrap());
+	assert!(is_precompile(hash(5)).unwrap());
 }
