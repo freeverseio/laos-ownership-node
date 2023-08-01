@@ -1,5 +1,5 @@
 use frame_support::{
-	construct_runtime, parameter_types, sp_io,
+	construct_runtime, parameter_types,
 	traits::{ConstU64, FindAuthor},
 	weights::Weight,
 };
@@ -146,12 +146,4 @@ impl pallet_evm::Config for Runtime {
 	type GasLimitPovSizeRatio = GasLimitPovSizeRatio;
 	type Timestamp = Timestamp;
 	type WeightInfo = ();
-}
-
-// Build genesis storage according to the mock runtime.
-pub fn new_test_ext() -> sp_io::TestExternalities {
-	frame_system::GenesisConfig::default()
-		.build_storage::<Runtime>()
-		.unwrap()
-		.into()
 }
