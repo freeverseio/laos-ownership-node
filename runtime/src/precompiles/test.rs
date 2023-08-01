@@ -5,7 +5,7 @@ use sp_core::H160;
 fn is_precompile(address: H160) -> bool {
 	let p = FrontierPrecompiles::<Runtime>::new();
 	let result = p.is_precompile(address, 0);
-	if let IsPrecompileResult::Answer { is_precompile, extra_cost } = result {
+	if let IsPrecompileResult::Answer { is_precompile, extra_cost: _ } = result {
 		is_precompile
 	} else {
 		panic!("Unexpected result variant");
