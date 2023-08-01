@@ -3,11 +3,15 @@ use frame_support::{
 	traits::{ConstU64, FindAuthor},
 	weights::Weight,
 };
-use pallet_evm::{Config, EnsureAddressNever, EnsureAddressRoot, FeeCalculator, FixedGasWeightMapping, IdentityAddressMapping, SubstrateBlockHashMapping, runner};
+use pallet_evm::{
+	runner, EnsureAddressNever, EnsureAddressRoot, FeeCalculator, FixedGasWeightMapping,
+	IdentityAddressMapping, SubstrateBlockHashMapping,
+};
 use sp_core::{H160, H256, U256};
 use sp_runtime::{
 	testing::Header,
-	traits::{BlakeTwo256, IdentityLookup}, ConsensusEngineId,
+	traits::{BlakeTwo256, IdentityLookup},
+	ConsensusEngineId,
 };
 use sp_std::{boxed::Box, prelude::*, str::FromStr};
 
@@ -26,7 +30,7 @@ construct_runtime!(
 		System: frame_system,
 		Balances: pallet_balances,
 		Timestamp: pallet_timestamp,
-        LivingassetsOwnership: pallet_living_assets_ownership,
+		LivingassetsOwnership: pallet_living_assets_ownership,
 		EVM: pallet_evm,
 	}
 );
@@ -90,8 +94,8 @@ impl pallet_timestamp::Config for Runtime {
 }
 
 impl pallet_living_assets_ownership::Config for Runtime {
-    type RuntimeEvent = RuntimeEvent;
-    type CollectionId = u64;
+	type RuntimeEvent = RuntimeEvent;
+	type CollectionId = u64;
 }
 
 pub struct FixedGasPrice;
