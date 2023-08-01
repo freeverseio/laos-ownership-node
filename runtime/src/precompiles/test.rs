@@ -16,7 +16,7 @@ fn null_address_is_not_precompile() {
 }
 
 #[test]
-fn ethrerum_precompiled_reserved_addresses_are_precompiled() {
+fn ethereum_precompiled_addresses_are_precompile() {
     assert!(is_precompile(hash(1)).unwrap());
     assert!(is_precompile(hash(2)).unwrap());
     assert!(is_precompile(hash(3)).unwrap());
