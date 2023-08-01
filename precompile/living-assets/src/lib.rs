@@ -107,11 +107,13 @@ where
 mod tests {
 	use super::*;
 	use pallet_evm_test_vector_support::test_precompile_test_vectors;
-	use sp_runtime::DispatchResult;
 	use sp_core::H160;
+	use sp_runtime::DispatchResult;
 
 	type AccountId = H160;
 	type CollectionId = u64;
+	type AddressMapping = pallet_evm::IdentityAddressMapping;
+	type LivingAssets = CollectionManagerMock;
 
 	struct CollectionManagerMock;
 
@@ -126,9 +128,6 @@ mod tests {
 			None
 		}
 	}
-
-	type AddressMapping = pallet_evm::IdentityAddressMapping;
-	type LivingAssets = CollectionManagerMock;
 
 	#[test]
 	fn hello_world() -> Result<(), String> {
