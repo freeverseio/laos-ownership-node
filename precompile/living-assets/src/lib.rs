@@ -102,3 +102,39 @@ where
 		}
 	}
 }
+
+#[cfg(test)]
+mod tests {
+	use super::*;
+	use pallet_evm_test_vector_support::test_precompile_test_vectors;
+	use sp_runtime::DispatchResult;
+	use sp_core::H160;
+
+	type AccountId = H160;
+	type CollectionId = u64;
+
+	struct CollectionManagerMock;
+
+	impl pallet_living_assets_ownership::traits::CollectionManager<AccountId, CollectionId>
+		for CollectionManagerMock
+	{
+		fn create_collection(_owner: AccountId) -> DispatchResult {
+			Ok(())
+		}
+
+		fn owner_of_collection(_collection_id: u64) -> Option<AccountId> {
+			None
+		}
+	}
+
+	type AddressMapping = pallet_evm::IdentityAddressMapping;
+	type LivingAssets = CollectionManagerMock;
+
+	#[test]
+	fn hello_world() -> Result<(), String> {
+		test_precompile_test_vectors::<
+			LivingAssetsOwnershipPrecompile<AddressMapping, AccountId, CollectionId, LivingAssets>,
+		>("testdata/hello_world.json")?;
+		Ok(())
+	}
+}
