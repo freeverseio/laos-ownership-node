@@ -76,7 +76,7 @@ parachains-common = { workspace = true }
 
 # Frontier
 fp-rpc = { workspace = true }
-fp-self-contained = { workspace = true }
+fp-self-contained = { workspace = true, features = ["serde"] }
 
 # Frontier FRAME
 pallet-base-fee = { workspace = true }

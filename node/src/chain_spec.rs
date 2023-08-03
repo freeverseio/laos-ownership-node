@@ -195,6 +195,7 @@ fn testnet_genesis(
 			code: laos_runtime::WASM_BINARY
 				.expect("WASM binary was not build, please build it!")
 				.to_vec(),
+			..Default::default()
 		},
 		// Configure additional assets here
 		// For example, this configures asset "ALT1" & "ALT2" with owners, alice and bob, respectively
@@ -222,7 +223,7 @@ fn testnet_genesis(
 		// 		.filter_map(|(idx, acc)| if idx % 2 == 0 { Some(acc.clone()) } else { None })
 		// 		.collect::<Vec<_>>(),
 		// },
-		parachain_info: laos_runtime::ParachainInfoConfig { parachain_id: id },
+		parachain_info: laos_runtime::ParachainInfoConfig { parachain_id: id, ..Default::default() },
 		collator_selection: laos_runtime::CollatorSelectionConfig {
 			invulnerables: invulnerables.iter().cloned().map(|(acc, _)| acc).collect(),
 			candidacy_bond: EXISTENTIAL_DEPOSIT * 16,
@@ -245,11 +246,11 @@ fn testnet_genesis(
 		aura: Default::default(),
 		aura_ext: Default::default(),
 		parachain_system: Default::default(),
-		polkadot_xcm: laos_runtime::PolkadotXcmConfig { safe_xcm_version: Some(SAFE_XCM_VERSION) },
+		polkadot_xcm: laos_runtime::PolkadotXcmConfig { safe_xcm_version: Some(SAFE_XCM_VERSION), ..Default::default() },
 		sudo: laos_runtime::SudoConfig { key: root_key },
 		transaction_payment: Default::default(),
 		// EVM compatibility
-		evm_chain_id: laos_runtime::EVMChainIdConfig { chain_id: 1000 },
+		evm_chain_id: laos_runtime::EVMChainIdConfig { chain_id: 1000, Default::default() },
 		evm: laos_runtime::EVMConfig {
 			accounts: {
 				let mut map = BTreeMap::new();
@@ -307,6 +308,7 @@ fn testnet_genesis(
 				);
 				map
 			},
+			..Default::default()
 		},
 		ethereum: Default::default(),
 		// dynamic_fee: Default::default(),
