@@ -2,9 +2,7 @@
 
 #![cfg_attr(not(feature = "std"), no_std)]
 #![cfg_attr(test, feature(assert_matches))]
-use fp_evm::{
-	Precompile, PrecompileHandle, PrecompileOutput,
-};
+use fp_evm::{Precompile, PrecompileHandle, PrecompileOutput};
 use parity_scale_codec::Encode;
 use precompile_utils::{EvmResult, FunctionModifier, PrecompileHandleExt};
 
@@ -45,5 +43,3 @@ where
 		}
 	}
 }
-
-
