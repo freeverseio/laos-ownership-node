@@ -8915,6 +8915,28 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5b40af805b3121feab8a3c29f04d8ad262fa8e0561883e7653e024ae4479e6de"
 
 [[package]]
+name = "precompile-erc721"
+version = "0.0.1"
+dependencies = [
+ "evm",
+ "fp-evm",
+ "frame-support",
+ "hex",
+ "num_enum 0.5.11",
+ "pallet-evm",
+ "pallet-evm-test-vector-support",
+ "pallet-living-assets-ownership",
+ "parity-scale-codec",
+ "precompile-utils",
+ "precompile-utils-macro",
+ "scale-info",
+ "sp-arithmetic",
+ "sp-core",
+ "sp-runtime",
+ "sp-std",
+]
+
+[[package]]
 name = "precompile-utils"
 version = "0.4.3"
 dependencies = [
