@@ -9406,7 +9406,6 @@ dependencies = [
  "hex",
  "num_enum 0.5.11",
  "pallet-evm",
- "pallet-evm-test-vector-support",
  "pallet-living-assets-ownership",
  "parity-scale-codec",
  "precompile-utils",

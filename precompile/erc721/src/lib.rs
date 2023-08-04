@@ -1,7 +1,6 @@
 //! Living Assets precompile module.
 
 #![cfg_attr(not(feature = "std"), no_std)]
-#![cfg_attr(test, feature(assert_matches))]
 use fp_evm::{Precompile, PrecompileHandle, PrecompileOutput};
 use parity_scale_codec::Encode;
 use precompile_utils::{EvmResult, FunctionModifier, PrecompileHandleExt};
@@ -13,6 +12,8 @@ use sp_std::{fmt::Debug, marker::PhantomData};
 pub enum Action {
 	/// Get tocken URI
 	TockenURI = "tokenURI(uint256)",
+	/// Owner of
+	OwnerOf = "ownerOf(uint256)",
 }
 
 /// Wrapper for the precompile function.
@@ -34,10 +35,14 @@ where
 
 		handle.check_function_modifier(match selector {
 			Action::TockenURI => FunctionModifier::NonPayable,
+			Action::OwnerOf => FunctionModifier::NonPayable,
 		})?;
 
 		match selector {
 			Action::TockenURI => {
+				todo!()
+			},
+			Action::OwnerOf => {
 				todo!()
 			},
 		}
