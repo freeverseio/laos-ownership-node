@@ -1,5 +1,6 @@
 use super::*;
 use helpers::*;
+use pallet_living_assets_ownership::CollectionId;
 use sp_core::{H160, U256};
 
 type AccountId = H160;
@@ -54,8 +55,8 @@ mod helpers {
 			struct Erc721Mock;
 
 			impl pallet_living_assets_ownership::traits::Erc721 for Erc721Mock {
-				fn owner_of(asset_id: U256) -> Option<H160> {
-					($owner_of_collection)(asset_id)
+				fn owner_of(collectio_id: CollectionId, asset_id: U256) -> Option<H160> {
+					($owner_of_collection)(collectio_id, asset_id)
 				}
 			}
 
@@ -82,7 +83,7 @@ mod helpers {
 	#[macro_export]
 	macro_rules! impl_precompile_mock_simple {
 		($name:ident, $owner_of_collection:expr) => {
-			impl_precompile_mock!($name, |_asset_id| { $owner_of_collection });
+			impl_precompile_mock!($name, |_asset_id, _collection_id| { $owner_of_collection });
 		};
 	}
 
