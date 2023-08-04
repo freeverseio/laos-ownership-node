@@ -6,12 +6,16 @@
 #[cfg(feature = "std")]
 include!(concat!(env!("OUT_DIR"), "/wasm_binary.rs"));
 
+pub mod evochain_messages;
 mod weights;
 pub mod xcm_config;
+use parity_scale_codec as codec;
+use xcm_config::*;
 
+use bridge_runtime_common::generate_bridge_reject_obsolete_headers_and_messages;
+use codec::{Decode, Encode};
 use core::marker::PhantomData;
 use cumulus_pallet_parachain_system::RelayNumberStrictlyIncreases;
-use parity_scale_codec::{Decode, Encode};
 use smallvec::smallvec;
 use sp_api::impl_runtime_apis;
 use sp_core::{
@@ -23,10 +27,10 @@ use sp_runtime::{
 	create_runtime_str, generic, impl_opaque_keys,
 	traits::{
 		AccountIdLookup, BlakeTwo256, Block as BlockT, DispatchInfoOf, Dispatchable, Get,
-		IdentifyAccount, PostDispatchInfoOf, UniqueSaturatedInto, Verify,
+		IdentifyAccount, PostDispatchInfoOf, SignedExtension, UniqueSaturatedInto, Verify,
 	},
 	transaction_validity::{TransactionSource, TransactionValidity, TransactionValidityError},
-	ApplyExtrinsicResult, ConsensusEngineId, MultiSignature,
+	ApplyExtrinsicResult, ConsensusEngineId,
 };
 
 use sp_std::prelude::*;
@@ -58,6 +62,10 @@ pub use sp_consensus_aura::sr25519::AuthorityId as AuraId;
 pub use sp_runtime::{MultiAddress, Perbill, Permill};
 use xcm_config::{RelayLocation, XcmConfig, XcmOriginToTransactDispatchOrigin};
 
+pub use pallet_bridge_grandpa::Call as BridgeGrandpaCall;
+pub use pallet_bridge_messages::Call as MessagesCall;
+pub use pallet_xcm::Call as XcmCall;
+
 #[cfg(any(feature = "std", test))]
 pub use sp_runtime::BuildStorage;
 
@@ -81,34 +89,73 @@ use pallet_evm::{
 	Account as EVMAccount, EVMCurrencyAdapter, EnsureAddressTruncated, FeeCalculator,
 	HashedAddressMapping, OnChargeEVMTransaction, Runner,
 };
+use scale_info::TypeInfo;
 
 mod precompiles;
 use precompiles::FrontierPrecompiles;
+
+// generate signed extension that rejects obsolete bridge transactions
+generate_bridge_reject_obsolete_headers_and_messages! {
+	RuntimeCall, AccountId,
+	// Grandpa
+	BridgeEvochainGrandpa,
+	// Messages
+	BridgeEvochainMessages
+}
+
+/// Dummy signed extension that does nothing.
+///
+/// We're using it to have the same set of signed extensions on all parachains with bridge pallets
+/// deployed (bridge hubs and rialto parachain).
+#[derive(Encode, Decode, Debug, PartialEq, Eq, Clone, TypeInfo)]
+pub struct DummyBridgeRefundEvochainMessages;
+
+impl SignedExtension for DummyBridgeRefundEvochainMessages {
+	const IDENTIFIER: &'static str = "DummyBridgeRefundEvochainMessages";
+	type AccountId = AccountId;
+	type Call = RuntimeCall;
+	type AdditionalSigned = ();
+	type Pre = ();
+
+	fn additional_signed(&self) -> Result<Self::AdditionalSigned, TransactionValidityError> {
+		Ok(())
+	}
+
+	fn pre_dispatch(
+		self,
+		_who: &Self::AccountId,
+		_call: &Self::Call,
+		_info: &DispatchInfoOf<Self::Call>,
+		_len: usize,
+	) -> Result<Self::Pre, TransactionValidityError> {
+		Ok(())
+	}
+}
 
 /// Import the living assets ownership pallet.
 pub use pallet_living_assets_ownership;
 
 /// Alias to 512-bit hash when used in the context of a transaction signature on the chain.
-pub type Signature = MultiSignature;
+pub type Signature = bp_ownership_parachain::Signature;
 
 /// Some way of identifying an account on the chain. We intentionally make it equivalent
 /// to the public key of our transaction signing scheme.
 pub type AccountId = <<Signature as Verify>::Signer as IdentifyAccount>::AccountId;
 
 /// Balance of an account.
-pub type Balance = u128;
+pub type Balance = bp_ownership_parachain::Balance;
 
 /// Index of a transaction in the chain.
-pub type Index = u32;
+pub type Index = bp_ownership_parachain::Nonce;
 
 /// A hash of some data used by the chain.
-pub type Hash = sp_core::H256;
+pub type Hash = bp_ownership_parachain::Hash;
 
 /// An index to a block.
-pub type BlockNumber = u32;
+pub type BlockNumber = bp_ownership_parachain::BlockNumber;
 
 /// The type for storing how many extrinsics an account has signed.
-pub type Nonce = u32;
+pub type Nonce = bp_ownership_parachain::Nonce;
 
 /// The address format for describing accounts.
 pub type Address = MultiAddress<AccountId, ()>;
@@ -135,6 +182,8 @@ pub type SignedExtra = (
 	frame_system::CheckNonce<Runtime>,
 	frame_system::CheckWeight<Runtime>,
 	pallet_transaction_payment::ChargeTransactionPayment<Runtime>,
+	BridgeRejectObsoleteHeadersAndMessages,
+	DummyBridgeRefundEvochainMessages,
 );
 
 /// Unchecked extrinsic type as expected by this runtime.
@@ -659,6 +708,47 @@ impl pallet_base_fee::Config for Runtime {
 }
 
 // Bridge pallets
+
+impl pallet_bridge_relayers::Config for Runtime {
+	type RuntimeEvent = RuntimeEvent;
+	type Reward = Balance;
+	type PaymentProcedure =
+		bp_relayers::PayRewardFromAccount<pallet_balances::Pallet<Runtime>, AccountId>;
+	type StakeAndSlash = ();
+	type WeightInfo = ();
+}
+
+pub type EvochainGrandpaInstance = ();
+
+parameter_types! {
+	pub const MaxMessagesToPruneAtOnce: bp_messages::MessageNonce = 8;
+	pub const RootAccountForPayments: Option<AccountId> = None;
+}
+
+/// Instance of the messages pallet used to relay messages to/from Evolution chain.
+pub type WithEvochainMessagesInstance = ();
+
+impl pallet_bridge_messages::Config<WithEvochainMessagesInstance> for Runtime {
+	type RuntimeEvent = RuntimeEvent;
+	type WeightInfo = pallet_bridge_messages::weights::BridgeWeight<Runtime>;
+
+	type ThisChain = bp_ownership_parachain::OwnershipParachain;
+	type BridgedChain = bp_evochain::Evochain;
+	type BridgedHeaderChain = BridgeEvochainGrandpa;
+
+	type OutboundPayload = bridge_runtime_common::messages_xcm_extension::XcmAsPlainPayload;
+	type InboundPayload = bridge_runtime_common::messages_xcm_extension::XcmAsPlainPayload;
+
+	type DeliveryPayments = ();
+	type DeliveryConfirmationPayments = pallet_bridge_relayers::DeliveryConfirmationPaymentsAdapter<
+		Runtime,
+		WithEvochainMessagesInstance,
+		frame_support::traits::ConstU128<100_000>,
+	>;
+
+	type MessageDispatch = crate::evochain_messages::FromEvochainMessageDispatch;
+}
+
 impl pallet_bridge_grandpa::Config for Runtime {
 	type RuntimeEvent = RuntimeEvent;
 	type BridgedChain = bp_evochain::Evochain;
@@ -709,6 +799,8 @@ construct_runtime!(
 
 		// Bridge
 		BridgeEvochainGrandpa: pallet_bridge_grandpa = 60,
+		BridgeEvochainRelayers: pallet_bridge_relayers = 61,
+		BridgeEvochainMessages: pallet_bridge_messages = 62,
 	}
 );
 
@@ -1149,6 +1241,42 @@ impl_runtime_apis! {
 	impl cumulus_primitives_core::CollectCollationInfo<Block> for Runtime {
 		fn collect_collation_info(header: &<Block as BlockT>::Header) -> cumulus_primitives_core::CollationInfo {
 			ParachainSystem::collect_collation_info(header)
+		}
+	}
+
+	impl bp_evochain::EvochainFinalityApi<Block> for Runtime {
+		fn best_finalized() -> Option<bp_runtime::HeaderId<bp_evochain::Hash, bp_evochain::BlockNumber>> {
+			BridgeEvochainGrandpa::best_finalized()
+		}
+
+		fn accepted_grandpa_finality_proofs(
+		) -> Vec<bp_header_chain::justification::GrandpaJustification<bp_evochain::Header>> {
+			BridgeEvochainGrandpa::accepted_finality_proofs()
+		}
+	}
+
+	impl bp_evochain::ToEvochainOutboundLaneApi<Block> for Runtime {
+		fn message_details(
+			lane: bp_messages::LaneId,
+			begin: bp_messages::MessageNonce,
+			end: bp_messages::MessageNonce,
+		) -> Vec<bp_messages::OutboundMessageDetails> {
+			bridge_runtime_common::messages_api::outbound_message_details::<
+				Runtime,
+				WithEvochainMessagesInstance,
+			>(lane, begin, end)
+		}
+	}
+
+	impl bp_evochain::FromEvochainInboundLaneApi<Block> for Runtime {
+		fn message_details(
+			lane: bp_messages::LaneId,
+			messages: Vec<(bp_messages::MessagePayload, bp_messages::OutboundMessageDetails)>,
+		) -> Vec<bp_messages::InboundMessageDetails> {
+			bridge_runtime_common::messages_api::inbound_message_details::<
+				Runtime,
+				WithEvochainMessagesInstance,
+			>(lane, messages)
 		}
 	}
 

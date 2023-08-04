@@ -98,6 +98,10 @@ pallet-bridge-grandpa = { workspace = true }
 pallet-bridge-messages = { workspace = true }
 pallet-bridge-relayers = { workspace = true }
 
+[dev-dependencies]
+bridge-runtime-common = { workspace = true, features = ["integrity-test"] }
+static_assertions = { workspace = true }
+
 [features]
 default = [
 	"std",
