@@ -662,6 +662,15 @@ impl pallet_base_fee::Config for Runtime {
 	type DefaultElasticity = DefaultElasticity;
 }
 
+// Bridge pallets
+impl pallet_bridge_grandpa::Config for Runtime {
+	type RuntimeEvent = RuntimeEvent;
+	type BridgedChain = bp_evochain::Evochain;
+	type MaxFreeMandatoryHeadersPerBlock = ConstU32<4>;
+	type HeadersToKeep = ConstU32<{ bp_evochain::DAYS as u32 }>;
+	type WeightInfo = pallet_bridge_grandpa::weights::BridgeWeight<Runtime>;
+}
+
 // Create the runtime by composing the FRAME pallets that were previously configured.
 construct_runtime!(
 	pub enum Runtime
@@ -701,7 +710,9 @@ construct_runtime!(
 		EVMChainId: pallet_evm_chain_id = 52,
 		// DynamicFee: pallet_dynamic_fee = 43,
 		BaseFee: pallet_base_fee = 54,
-		// HotfixSufficients: pallet_hotfix_sufficients = 45,
+
+		// Bridge
+		BridgeEvochainGrandpa: pallet_bridge_grandpa = 60,
 	}
 );
 

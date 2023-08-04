@@ -86,6 +86,18 @@ pallet-evm-chain-id = { workspace = true }
 pallet-evm-precompile-modexp = { workspace = true }
 pallet-evm-precompile-simple = { workspace = true }
 
+# Bridge dependencies
+bp-header-chain = { workspace = true }
+bp-messages = { workspace = true }
+bp-evochain = { workspace = true }
+bp-relayers = { workspace = true }
+bp-runtime = { workspace = true }
+bp-ownership-parachain = { workspace = true }
+bridge-runtime-common = { workspace = true }
+pallet-bridge-grandpa = { workspace = true }
+pallet-bridge-messages = { workspace = true }
+pallet-bridge-relayers = { workspace = true }
+
 [features]
 default = [
 	"std",
@@ -151,6 +163,17 @@ std = [
 	"frame-system-benchmarking",
 	"frame-try-runtime",
 	"pallet-evm-living-assets-ownership/std",
+	# Bridge deps,
+	"bp-evochain/std",
+	"bp-header-chain/std",
+	"bp-messages/std",
+	"bp-ownership-parachain/std",
+	"bp-relayers/std",
+	"bp-runtime/std",
+	"bridge-runtime-common/std",
+	"pallet-bridge-grandpa/std",
+	"pallet-bridge-messages/std",
+	"pallet-bridge-relayers/std",
 ]
 
 runtime-benchmarks = [
