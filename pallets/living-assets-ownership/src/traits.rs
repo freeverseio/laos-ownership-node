@@ -1,3 +1,5 @@
+use sp_core::{U256, H160};
+
 use crate::CollectionId;
 
 /// The `CollectionManager` trait provides an interface for managing collections in a
@@ -24,4 +26,8 @@ pub trait CollectionManager<AccountId> {
 
 	/// Create collection
 	fn create_collection(owner: AccountId) -> Result<CollectionId, &'static str>;
+}
+
+pub trait Erc721 {
+	fn owner_of(asset_id: U256) -> Option<H160>;
 }
