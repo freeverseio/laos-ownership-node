@@ -199,6 +199,10 @@ runtime-benchmarks = [
 	"polkadot-primitives/runtime-benchmarks",
 	"polkadot-runtime-common/runtime-benchmarks",
 	"xcm-executor/runtime-benchmarks",
+	"bridge-runtime-common/runtime-benchmarks",
+	"pallet-bridge-grandpa/runtime-benchmarks",
+	"pallet-bridge-messages/runtime-benchmarks",
+	"pallet-bridge-relayers/runtime-benchmarks",
 ]
 
 try-runtime = [
@@ -229,4 +233,7 @@ try-runtime = [
 	"frame-support/try-runtime",
 	"polkadot-runtime-common/try-runtime",
 	"sp-runtime/try-runtime",
+	"pallet-bridge-grandpa/try-runtime",
+	"pallet-bridge-messages/try-runtime",
+	"pallet-bridge-relayers/try-runtime",
 ]

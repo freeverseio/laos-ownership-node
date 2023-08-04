@@ -6,7 +6,6 @@ use sp_runtime::{
 	BuildStorage,
 };
 
-type UncheckedExtrinsic = frame_system::mocking::MockUncheckedExtrinsic<Test>;
 type Block = frame_system::mocking::MockBlock<Test>;
 type Nonce = u32;
 
