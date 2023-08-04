@@ -86,9 +86,9 @@ pub mod pallet {
 	}
 
 	impl<T: Config> traits::Erc721 for Pallet<T> {
-		fn owner_of(collection_id: CollectionId, _asset_id: U256) -> Option<H160> {
+		fn owner_of(collection_id: CollectionId, asset_id: U256) -> Option<H160> {
 			match OwnerOfCollection::<T>::get(collection_id) {
-				Some(_) => Some(H160::zero()),
+				Some(_) => Some(functions::convert_u256_to_h160(asset_id)),
 				None => None,
 			}
 		}
