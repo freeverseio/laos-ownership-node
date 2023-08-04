@@ -8,7 +8,7 @@ use sp_runtime::traits::{IdentifyAccount, Verify};
 use std::{collections::BTreeMap, str::FromStr};
 
 /// Specialized `ChainSpec` for the normal parachain runtime.
-pub type ChainSpec = sc_service::GenericChainSpec<laos_runtime::GenesisConfig, Extensions>;
+pub type ChainSpec = sc_service::GenericChainSpec<laos_runtime::RuntimeGenesisConfig, Extensions>;
 
 /// The default XCM version to set in genesis config.
 const SAFE_XCM_VERSION: u32 = xcm::prelude::XCM_VERSION;
@@ -186,11 +186,11 @@ fn testnet_genesis(
 	endowed_accounts: Vec<AccountId>,
 	root_key: Option<AccountId>,
 	id: ParaId,
-) -> laos_runtime::GenesisConfig {
+) -> laos_runtime::RuntimeGenesisConfig {
 	// let alice = get_from_seed::<sr25519::Public>("Alice");
 	// let bob = get_from_seed::<sr25519::Public>("Bob");
 
-	laos_runtime::GenesisConfig {
+	laos_runtime::RuntimeGenesisConfig {
 		system: laos_runtime::SystemConfig {
 			code: laos_runtime::WASM_BINARY
 				.expect("WASM binary was not build, please build it!")
@@ -223,7 +223,10 @@ fn testnet_genesis(
 		// 		.filter_map(|(idx, acc)| if idx % 2 == 0 { Some(acc.clone()) } else { None })
 		// 		.collect::<Vec<_>>(),
 		// },
-		parachain_info: laos_runtime::ParachainInfoConfig { parachain_id: id, ..Default::default() },
+		parachain_info: laos_runtime::ParachainInfoConfig {
+			parachain_id: id,
+			..Default::default()
+		},
 		collator_selection: laos_runtime::CollatorSelectionConfig {
 			invulnerables: invulnerables.iter().cloned().map(|(acc, _)| acc).collect(),
 			candidacy_bond: EXISTENTIAL_DEPOSIT * 16,
@@ -246,11 +249,14 @@ fn testnet_genesis(
 		aura: Default::default(),
 		aura_ext: Default::default(),
 		parachain_system: Default::default(),
-		polkadot_xcm: laos_runtime::PolkadotXcmConfig { safe_xcm_version: Some(SAFE_XCM_VERSION), ..Default::default() },
+		polkadot_xcm: laos_runtime::PolkadotXcmConfig {
+			safe_xcm_version: Some(SAFE_XCM_VERSION),
+			..Default::default()
+		},
 		sudo: laos_runtime::SudoConfig { key: root_key },
 		transaction_payment: Default::default(),
 		// EVM compatibility
-		evm_chain_id: laos_runtime::EVMChainIdConfig { chain_id: 1000, Default::default() },
+		evm_chain_id: laos_runtime::EVMChainIdConfig { chain_id: 1000, ..Default::default() },
 		evm: laos_runtime::EVMConfig {
 			accounts: {
 				let mut map = BTreeMap::new();

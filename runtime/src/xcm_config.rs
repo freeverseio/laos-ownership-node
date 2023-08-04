@@ -120,8 +120,8 @@ impl ShouldExecute for DenyReserveTransferToRelayChain {
 	fn should_execute<RuntimeCall>(
 		origin: &MultiLocation,
 		instructions: &mut [Instruction<RuntimeCall>],
-		max_weight: Weight,
-		properties: &mut Properties,
+		_max_weight: Weight,
+		_properties: &mut Properties,
 	) -> Result<(), ProcessMessageError> {
 		instructions.matcher().match_next_inst_while(
 			|_| true,

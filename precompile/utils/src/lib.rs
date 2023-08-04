@@ -30,13 +30,10 @@ use fp_evm::{
 	Context, ExitError, ExitRevert, ExitSucceed, PrecompileFailure, PrecompileHandle,
 	PrecompileOutput,
 };
-use frame_support::{
-	dispatch::{Dispatchable, GetDispatchInfo, PostDispatchInfo},
-	traits::Get,
-};
-use pallet_evm::{GasWeightMapping, Log};
+
+use pallet_evm::Log;
 use sp_core::{H160, H256, U256};
-use sp_std::{marker::PhantomData, vec, vec::Vec};
+use sp_std::{vec, vec::Vec};
 
 mod data;
 
