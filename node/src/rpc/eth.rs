@@ -150,8 +150,6 @@ where
 		.into_rpc(),
 	)?;
 
-	// let tx_pool = Arc::new(TxPool::new(client.clone(), graph));
-
 	if let Some(filter_pool) = filter_pool {
 		io.merge(
 			EthFilter::new(
