@@ -143,6 +143,7 @@ pallet-evm-precompile-simple = { git = "https://github.com/paritytech/frontier",
 fp-self-contained = { git = "https://github.com/paritytech/frontier", branch = "polkadot-v1.0.0", default-features = false }
 fp-rpc = { git = "https://github.com/paritytech/frontier", branch = "polkadot-v1.0.0", default-features = false }
 fp-evm = { git = "https://github.com/paritytech/frontier", branch = "polkadot-v1.0.0", default-features = false }
+pallet-evm-test-vector-support = { git = "https://github.com/paritytech/frontier", branch = "polkadot-v1.0.0", default-features = false }
 
 # Frontier
 # (native)
@@ -223,7 +224,6 @@ pallet-bridge-relayers = { git = "https://github.com/freeverseio/parity-bridges-
 pallet-living-assets-ownership = { path = "./pallets/living-assets-ownership", default-features = false }
 pallet-evm-living-assets-ownership = { path = "./precompile/living-assets", default-features = false }
 
-# utils
 # Utils
 precompile-utils = { path = "./precompile/utils", default-features = false }
 precompile-utils-macro = { path = "./precompile/utils/macro", default-features = false }
