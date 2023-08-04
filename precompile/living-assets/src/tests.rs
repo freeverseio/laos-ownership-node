@@ -9,7 +9,6 @@ use helpers::*;
 use sp_core::{H160, H256};
 use sp_std::vec::Vec;
 
-type CollectionId = u64;
 type AccountId = H160;
 type AddressMapping = pallet_evm::IdentityAddressMapping;
 

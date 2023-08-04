@@ -2,6 +2,7 @@
 
 #![cfg_attr(not(feature = "std"), no_std)]
 use fp_evm::{Precompile, PrecompileHandle, PrecompileOutput};
+use pallet_living_assets_ownership::traits::Erc721;
 use parity_scale_codec::Encode;
 use precompile_utils::{EvmResult, FunctionModifier, PrecompileHandleExt};
 
@@ -17,15 +18,20 @@ pub enum Action {
 }
 
 /// Wrapper for the precompile function.
-pub struct Erc721Precompile<AddressMapping, AccountId>(PhantomData<(AddressMapping, AccountId)>)
-where
-	AddressMapping: pallet_evm::AddressMapping<AccountId>,
-	AccountId: Encode + Debug;
-
-impl<AddressMapping, AccountId> Precompile for Erc721Precompile<AddressMapping, AccountId>
+pub struct Erc721Precompile<AddressMapping, AccountId, AssetManager>(
+	PhantomData<(AddressMapping, AccountId, AssetManager)>,
+)
 where
 	AddressMapping: pallet_evm::AddressMapping<AccountId>,
 	AccountId: Encode + Debug,
+	AssetManager: Erc721;
+
+impl<AddressMapping, AccountId, AssetManager> Precompile
+	for Erc721Precompile<AddressMapping, AccountId, AssetManager>
+where
+	AddressMapping: pallet_evm::AddressMapping<AccountId>,
+	AccountId: Encode + Debug,
+	AssetManager: Erc721,
 {
 	fn execute(handle: &mut impl PrecompileHandle) -> EvmResult<PrecompileOutput> {
 		let selector = handle.read_selector()?;
