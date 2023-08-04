@@ -1,18 +1,21 @@
 //! Living Assets precompile module.
 
 #![cfg_attr(not(feature = "std"), no_std)]
-#![cfg_attr(test, feature(assert_matches))]
 use fp_evm::{
 	ExitError, ExitSucceed, Precompile, PrecompileFailure, PrecompileHandle, PrecompileOutput,
 };
-use pallet_living_assets_ownership::traits::CollectionManager;
+use pallet_living_assets_ownership::{traits::CollectionManager, CollectionId};
 use parity_scale_codec::Encode;
-use precompile_utils::{EvmResult, FunctionModifier, PrecompileHandleExt};
-use sp_arithmetic::traits::BaseArithmetic;
+use precompile_utils::{
+	keccak256, EvmResult, FunctionModifier, LogExt, LogsBuilder, PrecompileHandleExt,
+};
 use sp_runtime::SaturatedConversion;
 
 use sp_core::H160;
-use sp_std::{fmt::Debug, marker::PhantomData};
+use sp_std::{fmt::Debug, marker::PhantomData, vec::Vec};
+
+/// Solidity selector of the CreateCollection log, which is the Keccak of the Log signature.
+pub const SELECTOR_LOG_CREATE_COLLECTION: [u8; 32] = keccak256!("CreateCollection(address)");
 
 #[precompile_utils_macro::generate_function_selector]
 #[derive(Debug, PartialEq)]
@@ -22,22 +25,20 @@ pub enum Action {
 }
 
 /// Wrapper for the precompile function.
-pub struct CollectionManagerPrecompile<AddressMapping, AccountId, CollectionId, LivingAssets>(
-	PhantomData<(AddressMapping, AccountId, CollectionId, LivingAssets)>,
+pub struct CollectionManagerPrecompile<AddressMapping, AccountId, LivingAssets>(
+	PhantomData<(AddressMapping, AccountId, LivingAssets)>,
 )
 where
 	AddressMapping: pallet_evm::AddressMapping<AccountId>,
 	AccountId: Encode + Debug,
-	CollectionId: BaseArithmetic + Debug,
-	LivingAssets: CollectionManager<AccountId, CollectionId>;
+	LivingAssets: CollectionManager<AccountId>;
 
-impl<AddressMapping, AccountId, CollectionId, LivingAssets> Precompile
-	for CollectionManagerPrecompile<AddressMapping, AccountId, CollectionId, LivingAssets>
+impl<AddressMapping, AccountId, LivingAssets> Precompile
+	for CollectionManagerPrecompile<AddressMapping, AccountId, LivingAssets>
 where
 	AddressMapping: pallet_evm::AddressMapping<AccountId>,
 	AccountId: Encode + Debug,
-	CollectionId: BaseArithmetic + Debug,
-	LivingAssets: CollectionManager<AccountId, CollectionId>,
+	LivingAssets: CollectionManager<AccountId>,
 {
 	fn execute(handle: &mut impl PrecompileHandle) -> EvmResult<PrecompileOutput> {
 		let selector = handle.read_selector()?;
@@ -52,11 +53,20 @@ where
 				let owner = AddressMapping::into_account_id(caller);
 
 				match LivingAssets::create_collection(owner) {
-					Ok(collection_id) => Ok(PrecompileOutput {
-						exit_status: ExitSucceed::Returned,
-						output: collection_id_to_address(collection_id.saturated_into::<u64>())
-							.encode(),
-					}),
+					Ok(collection_id) => {
+						let collection_address = collection_id_to_address(
+							collection_id.saturated_into::<CollectionId>(),
+						);
+
+						LogsBuilder::new(handle.context().address)
+							.log2(SELECTOR_LOG_CREATE_COLLECTION, collection_address, Vec::new())
+							.record(handle)?;
+
+						Ok(PrecompileOutput {
+							exit_status: ExitSucceed::Returned,
+							output: collection_address.encode(),
+						})
+					},
 					Err(err) => Err(PrecompileFailure::Error {
 						exit_status: ExitError::Other(sp_std::borrow::Cow::Borrowed(err)),
 					}),
@@ -72,7 +82,7 @@ where
 /// `from_low_u64_be` method to convert the `u64` value into the lower 64 bits of the `H160`.
 /// Additionally, the function sets the first bit of the resulting `H160` to 1, which can be used to
 /// distinguish addresses created by this function from other addresses.
-pub fn collection_id_to_address(collection_id: u64) -> H160 {
+pub fn collection_id_to_address(collection_id: CollectionId) -> H160 {
 	let mut address = H160::from_low_u64_be(collection_id);
 	address.0[0] |= 0x80; // Set the first bit to 1
 	address

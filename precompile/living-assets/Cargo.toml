@@ -16,7 +16,7 @@ scale-info = { workspace = true, features = [
 ] }
 
 # Frontier
-fp-evm = { workspace = true }
+fp-evm = { workspace = true, features = ["serde"] }
 pallet-evm = { workspace = true }
 
 # Substrate
@@ -36,7 +36,6 @@ precompile-utils-macro = { workspace = true }
 num_enum = { workspace = true }
 
 [dev-dependencies]
-pallet-evm-test-vector-support = { workspace = true }
 evm = { workspace = true }
 hex = { version = "0.4.3" }
 
