@@ -1,4 +1,4 @@
-use sp_core::{U256, H160};
+use sp_core::{H160, U256};
 
 use crate::CollectionId;
 

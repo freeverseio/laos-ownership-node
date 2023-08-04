@@ -13,6 +13,7 @@ pub mod pallet {
 	use super::*;
 	use frame_support::pallet_prelude::{OptionQuery, ValueQuery, *};
 	use frame_system::pallet_prelude::*;
+	use sp_core::{U256, H160};
 
 	/// Collection id type
 	/// TODO: use 256 bits
@@ -81,6 +82,12 @@ pub mod pallet {
 
 		fn create_collection(owner: T::AccountId) -> Result<CollectionId, &'static str> {
 			Self::do_create_collection(owner)
+		}
+	}
+
+	impl<T: Config> traits::Erc721 for Pallet<T> {
+		fn owner_of(_asset_id: U256) -> Option<H160> {
+			Some(H160::zero())
 		}
 	}
 }

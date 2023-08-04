@@ -8,6 +8,7 @@ use sp_core::H160;
 use sp_std::marker::PhantomData;
 
 use pallet_evm_living_assets_ownership::CollectionManagerPrecompile;
+use pallet_evm_erc721::Erc721Precompile;
 use pallet_evm_precompile_modexp::Modexp;
 use pallet_evm_precompile_simple::{ECRecover, ECRecoverPublicKey, Identity, Ripemd160, Sha256};
 
@@ -33,12 +34,28 @@ type LivingAssetsPrecompile = CollectionManagerPrecompile<
 	pallet_living_assets_ownership::Pallet<crate::Runtime>,
 >;
 
+type Erc721 = Erc721Precompile<
+	pallet_evm::HashedAddressMapping<BlakeTwo256>,
+	AccountId,
+	pallet_living_assets_ownership::Pallet<crate::Runtime>,
+>; 
+
 impl<Runtime> PrecompileSet for FrontierPrecompiles<Runtime>
 where
 	Runtime: pallet_evm::Config + pallet_living_assets_ownership::Config,
 {
 	fn execute(&self, handle: &mut impl PrecompileHandle) -> Option<PrecompileResult> {
-		match handle.code_address() {
+		let code_address = handle.code_address();
+
+		// TODO put the following code in the right place, maybe a fuction in the precompile
+		let first_byte = code_address.0[0];
+		// Check if the first bit is set to 1
+		if first_byte & 0x80 == 0x80 {
+			Some(Erc721::execute(handle));
+			()
+		}
+
+		match code_address {
 			// Ethereum precompiles :
 			a if a == hash(1) => Some(ECRecover::execute(handle)),
 			a if a == hash(2) => Some(Sha256::execute(handle)),
