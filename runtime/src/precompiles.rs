@@ -7,8 +7,8 @@ use polkadot_primitives::BlakeTwo256;
 use sp_core::H160;
 use sp_std::marker::PhantomData;
 
-use pallet_evm_living_assets_ownership::CollectionManagerPrecompile;
 use pallet_evm_erc721::Erc721Precompile;
+use pallet_evm_living_assets_ownership::CollectionManagerPrecompile;
 use pallet_evm_precompile_modexp::Modexp;
 use pallet_evm_precompile_simple::{ECRecover, ECRecoverPublicKey, Identity, Ripemd160, Sha256};
 
@@ -38,7 +38,7 @@ type Erc721 = Erc721Precompile<
 	pallet_evm::HashedAddressMapping<BlakeTwo256>,
 	AccountId,
 	pallet_living_assets_ownership::Pallet<crate::Runtime>,
->; 
+>;
 
 impl<Runtime> PrecompileSet for FrontierPrecompiles<Runtime>
 where

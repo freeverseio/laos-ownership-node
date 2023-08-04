@@ -13,7 +13,7 @@ pub mod pallet {
 	use super::*;
 	use frame_support::pallet_prelude::{OptionQuery, ValueQuery, *};
 	use frame_system::pallet_prelude::*;
-	use sp_core::{U256, H160};
+	use sp_core::{H160, U256};
 
 	/// Collection id type
 	/// TODO: use 256 bits
