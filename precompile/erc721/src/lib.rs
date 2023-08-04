@@ -17,15 +17,12 @@ pub enum Action {
 }
 
 /// Wrapper for the precompile function.
-pub struct CollectionManagerPrecompile<AddressMapping, AccountId>(
-	PhantomData<(AddressMapping, AccountId)>,
-)
+pub struct Erc721Precompile<AddressMapping, AccountId>(PhantomData<(AddressMapping, AccountId)>)
 where
 	AddressMapping: pallet_evm::AddressMapping<AccountId>,
 	AccountId: Encode + Debug;
 
-impl<AddressMapping, AccountId> Precompile
-	for CollectionManagerPrecompile<AddressMapping, AccountId>
+impl<AddressMapping, AccountId> Precompile for Erc721Precompile<AddressMapping, AccountId>
 where
 	AddressMapping: pallet_evm::AddressMapping<AccountId>,
 	AccountId: Encode + Debug,
