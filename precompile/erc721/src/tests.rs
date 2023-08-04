@@ -19,6 +19,7 @@ fn create_collection_should_return_address() {
 	let mut handle = create_mock_handle_from_input(owner_of_1234);
 	let result = Mock::execute(&mut handle);
 	assert!(result.is_ok());
+	assert_eq!(result.unwrap().output, H160::zero().encode());
 }
 
 mod helpers {

@@ -4,8 +4,9 @@
 use fp_evm::{Precompile, PrecompileHandle, PrecompileOutput};
 use pallet_living_assets_ownership::traits::Erc721;
 use parity_scale_codec::Encode;
-use precompile_utils::{EvmResult, FunctionModifier, PrecompileHandleExt};
+use precompile_utils::{succeed, EvmResult, FunctionModifier, PrecompileHandleExt};
 
+use sp_core::H160;
 use sp_std::{fmt::Debug, marker::PhantomData};
 
 #[precompile_utils_macro::generate_function_selector]
@@ -45,9 +46,7 @@ where
 			Action::TockenURI => {
 				todo!()
 			},
-			Action::OwnerOf => {
-				todo!()
-			},
+			Action::OwnerOf => Ok(succeed(H160::zero().encode())),
 		}
 	}
 }
