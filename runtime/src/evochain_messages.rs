@@ -117,7 +117,7 @@ mod tests {
 		// all deployments scripts, alerts and so on
 		assert_eq!(
 			*ToEvochainXcmBlobHauler::xcm_lane().as_ref(),
-			hex_literal::hex!("6aa61bff567db6b5d5f0cb815ee6d8f5ac630e222a95700cb3d594134e3805de")
+			hex_literal::hex!("0x8c3ce4218626cc27fdf49e1791a20e8a0970b89f1465a38e8f8787552ddc3a50")
 				.into(),
 		);
 	}

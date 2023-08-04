@@ -101,6 +101,7 @@ pallet-bridge-relayers = { workspace = true }
 [dev-dependencies]
 bridge-runtime-common = { workspace = true, features = ["integrity-test"] }
 static_assertions = { workspace = true }
+hex-literal = { workspace = true }
 
 [features]
 default = [
