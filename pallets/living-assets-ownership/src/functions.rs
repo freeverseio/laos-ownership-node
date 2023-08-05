@@ -1,7 +1,7 @@
 //! Contains helper and utility functions of the pallet
 use super::*;
 use frame_support::sp_runtime::traits::One;
-use sp_core::{Encode, H160, U256};
+use sp_core::{H160, U256};
 
 impl<T: Config> Pallet<T> {
 	/// See [Self::create_collection]
@@ -25,9 +25,11 @@ impl<T: Config> Pallet<T> {
 	}
 }
 
-pub fn convert_u256_to_h160(value: U256) -> H160 {
-	let bytes = value.encode();
-	H160::from_slice(&bytes[12..32])
+pub fn convert_asset_id_to_owner(value: U256) -> H160 {
+	let mut bytes = [0u8; 20];
+	let value_bytes: [u8; 32] = value.into();
+	bytes.copy_from_slice(&value_bytes[value_bytes.len() - 20..]);
+	H160::from(bytes)
 }
 
 #[cfg(test)]
@@ -35,9 +37,9 @@ mod tests {
 	use super::*;
 
 	#[test]
-	fn check_convert_u256_to_h160() {
+	fn check_convert_asset_id_to_owner() {
 		let value = U256::from(5);
 		let expected_address = H160::from_low_u64_be(5);
-		assert_eq!(convert_u256_to_h160(value), expected_address);
+		assert_eq!(convert_asset_id_to_owner(value), expected_address);
 	}
 }

@@ -10,6 +10,8 @@ pub mod traits;
 
 #[frame_support::pallet]
 pub mod pallet {
+	use crate::functions::convert_asset_id_to_owner;
+
 	use super::*;
 	use frame_support::pallet_prelude::{OptionQuery, ValueQuery, *};
 	use frame_system::pallet_prelude::*;
@@ -88,7 +90,7 @@ pub mod pallet {
 	impl<T: Config> traits::Erc721 for Pallet<T> {
 		fn owner_of(collection_id: CollectionId, asset_id: U256) -> Option<H160> {
 			match OwnerOfCollection::<T>::get(collection_id) {
-				Some(_) => Some(functions::convert_u256_to_h160(asset_id)),
+				Some(_) => Some(convert_asset_id_to_owner(asset_id)),
 				None => None,
 			}
 		}
