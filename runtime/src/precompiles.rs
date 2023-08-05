@@ -40,22 +40,20 @@ type Erc721 = Erc721Precompile<
 	pallet_living_assets_ownership::Pallet<crate::Runtime>,
 >;
 
+impl<Runtime> FrontierPrecompiles<Runtime> {
+	fn is_erc721_address(&self, address: H160) -> bool {
+		let first_byte = address.0[0];
+		// Check if the first bit is set to 1
+		first_byte & 0x80 == 0x80
+	}
+}
+
 impl<Runtime> PrecompileSet for FrontierPrecompiles<Runtime>
 where
 	Runtime: pallet_evm::Config + pallet_living_assets_ownership::Config,
 {
 	fn execute(&self, handle: &mut impl PrecompileHandle) -> Option<PrecompileResult> {
-		let code_address = handle.code_address();
-
-		// TODO put the following code in the right place, maybe a fuction in the precompile
-		let first_byte = code_address.0[0];
-		// Check if the first bit is set to 1
-		if first_byte & 0x80 == 0x80 {
-			Some(Erc721::execute(handle));
-			()
-		}
-
-		match code_address {
+		match handle.code_address() {
 			// Ethereum precompiles :
 			a if a == hash(1) => Some(ECRecover::execute(handle)),
 			a if a == hash(2) => Some(Sha256::execute(handle)),
@@ -66,11 +64,16 @@ where
 			// a if a == hash(1024) => Some(Sha3FIPS256::execute(handle)),
 			a if a == hash(1025) => Some(ECRecoverPublicKey::execute(handle)),
 			a if a == hash(1026) => Some(LivingAssetsPrecompile::execute(handle)),
+			a if self.is_erc721_address(a) => Some(Erc721::execute(handle)),
 			_ => None,
 		}
 	}
 
 	fn is_precompile(&self, address: H160, _gas: u64) -> IsPrecompileResult {
+		if self.is_erc721_address(address) {
+			return IsPrecompileResult::Answer { is_precompile: true, extra_cost: 0 };
+		}
+
 		IsPrecompileResult::Answer {
 			is_precompile: Self::used_addresses().contains(&address),
 			extra_cost: 0,
