@@ -6,17 +6,20 @@
 pub use pallet::*;
 
 mod functions;
-
-#[cfg(test)]
-mod mock;
-
-#[cfg(test)]
-mod tests;
+pub mod traits;
 
 #[frame_support::pallet]
 pub mod pallet {
-	use frame_support::pallet_prelude::{OptionQuery, *};
+	use crate::functions::convert_asset_id_to_owner;
+
+	use super::*;
+	use frame_support::pallet_prelude::{OptionQuery, ValueQuery, *};
 	use frame_system::pallet_prelude::*;
+	use sp_core::{H160, U256};
+
+	/// Collection id type
+	/// TODO: use 256 bits
+	pub type CollectionId = u64;
 
 	#[pallet::pallet]
 	pub struct Pallet<T>(_);
@@ -26,15 +29,18 @@ pub mod pallet {
 	pub trait Config: frame_system::Config {
 		/// Because this pallet emits events, it depends on the runtime's definition of an event.
 		type RuntimeEvent: From<Event<Self>> + IsType<<Self as frame_system::Config>::RuntimeEvent>;
-		/// Collection id type
-		type CollectionId: Member + Parameter + MaxEncodedLen + Copy;
 	}
 
 	/// Mapping from collection id to owner
 	#[pallet::storage]
 	#[pallet::getter(fn owner_of_collection)]
 	pub(super) type OwnerOfCollection<T: Config> =
-		StorageMap<_, Blake2_128Concat, T::CollectionId, T::AccountId, OptionQuery>;
+		StorageMap<_, Blake2_128Concat, CollectionId, T::AccountId, OptionQuery>;
+
+	/// Collection counter
+	#[pallet::storage]
+	#[pallet::getter(fn collection_counter)]
+	pub(super) type CollectionCounter<T: Config> = StorageValue<_, CollectionId, ValueQuery>;
 
 	/// Pallet events
 	#[pallet::event]
@@ -42,7 +48,7 @@ pub mod pallet {
 	pub enum Event<T: Config> {
 		/// Collection created
 		/// parameters. [collection_id, who]
-		CollectionCreated { collection_id: T::CollectionId, who: T::AccountId },
+		CollectionCreated { collection_id: CollectionId, who: T::AccountId },
 	}
 
 	// Errors inform users that something went wrong.
@@ -50,6 +56,8 @@ pub mod pallet {
 	pub enum Error<T> {
 		/// Collection already exists
 		CollectionAlreadyExists,
+		/// Collection id overflow
+		CollectionIdOverflow,
 	}
 
 	// Dispatchable functions allows users to interact with the pallet and invoke state changes.
@@ -59,53 +67,38 @@ pub mod pallet {
 	impl<T: Config> Pallet<T> {
 		#[pallet::call_index(0)]
 		#[pallet::weight(10_000 + T::DbWeight::get().writes(1).ref_time())] // TODO set proper weight
-		pub fn create_collection(
-			origin: OriginFor<T>,
-			collection_id: T::CollectionId,
-		) -> DispatchResult {
+		pub fn create_collection(origin: OriginFor<T>) -> DispatchResult {
 			let who = ensure_signed(origin)?;
-			Self::do_create_collection(collection_id, who)
+
+			match Self::do_create_collection(who) {
+				Ok(_) => Ok(()),
+				Err(err) => Err(err.into()),
+			}
 		}
 	}
 
-	/// The `LivingAssetsOwnership` trait provides an interface for managing collections in a
-	/// decentralized and non-fungible asset management system. This system allows for the creation of
-	/// collections, each of which can be owned by a unique `AccountId`.
-	///
-	/// A collection in this context can be thought of as a container for non-fungible assets.
-	/// Each collection has an associated `collection_id` which is a unique identifier for the collection
-	/// and can be used to retrieve the owner of the collection.
-	///
-	/// # Methods
-	///
-	/// - `owner_of_collection(collection_id: T::CollectionId) -> Option<AccountId>`: This method retrieves the owner
-	/// of a collection given its `collection_id`. If no collection exists with the provided `collection_id`,
-	/// the method returns `None`.
-	///
-	/// - `create_collection(collection_id: T::CollectionId, who: AccountId) -> DispatchResult`: This method creates a
-	/// new collection with the specified `collection_id` and assigns ownership to the provided `AccountId`.
-	/// If a collection already exists with the provided `collection_id`, the method will return an error.
-	///
-	/// # Errors
-	///
-	/// - `CollectionAlreadyExists`: This error is returned by the `create_collection` method when a collection
-	/// with the provided `collection_id` already exists.
-	///
-	pub trait LivingAssetsOwnership<AccountId, CollectionId> {
-		/// Get owner of collection
-		fn owner_of_collection(collection_id: CollectionId) -> Option<AccountId>;
-
-		/// Create collection
-		fn create_collection(collection_id: CollectionId, who: AccountId) -> DispatchResult;
-	}
-
-	impl<T: Config> LivingAssetsOwnership<T::AccountId, T::CollectionId> for Pallet<T> {
-		fn owner_of_collection(collection_id: T::CollectionId) -> Option<T::AccountId> {
+	impl<T: Config> traits::CollectionManager<T::AccountId> for Pallet<T> {
+		fn owner_of_collection(collection_id: CollectionId) -> Option<T::AccountId> {
 			OwnerOfCollection::<T>::get(collection_id)
 		}
 
-		fn create_collection(collection_id: T::CollectionId, who: T::AccountId) -> DispatchResult {
-			Self::do_create_collection(collection_id, who)
+		fn create_collection(owner: T::AccountId) -> Result<CollectionId, &'static str> {
+			Self::do_create_collection(owner)
+		}
+	}
+
+	impl<T: Config> traits::Erc721 for Pallet<T> {
+		fn owner_of(collection_id: CollectionId, asset_id: U256) -> Option<H160> {
+			match OwnerOfCollection::<T>::get(collection_id) {
+				Some(_) => Some(convert_asset_id_to_owner(asset_id)),
+				None => None,
+			}
 		}
 	}
 }
+
+#[cfg(test)]
+mod mock;
+
+#[cfg(test)]
+mod tests;
