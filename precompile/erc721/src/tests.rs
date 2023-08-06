@@ -13,16 +13,30 @@ fn check_selectors() {
 }
 
 #[test]
-fn create_collection_should_return_address() {
+fn owner_of_unexistent_should_return_null_address() {
 	impl_precompile_mock_simple!(Mock, None);
 
-	let owner_of_1234 = "6352211e00000000000000000000000000000000000000000000000000000000000004d2";
+	let owner_of_1234 = "6352211e0000000000000000000000000000000000000000000000000000000000000004";
 	let mut handle = create_mock_handle_from_input(owner_of_1234);
 	let result = Mock::execute(&mut handle);
 	assert!(result.is_ok());
-	assert_eq!(result.unwrap().output, H160::zero().encode());
+	assert_eq!(result.unwrap().output, vec![0u8; 32]);
 }
 
+// #[test]
+// fn owner_of() {
+// 	impl_precompile_mock!(Mock, |collection_id, asset_id| {
+// 		assert_eq!(collection_id, 0);
+// 		assert_eq!(asset_id, U256::from("0x1234"));
+// 		Some(H160::from(2))
+// 	});
+
+// 	let owner_of_1234 = "6352211e0000000000000000000000000000000000000000000000000000000000001234";
+// 	let mut handle = create_mock_handle_from_input(owner_of_1234);
+// 	let result = Mock::execute(&mut handle);
+// 	assert!(result.is_ok());
+// 	assert_eq!(result.unwrap().output, H160::zero().encode());
+// }
 mod helpers {
 	use evm::{Context, ExitError, ExitReason, Transfer};
 	use fp_evm::{Log, PrecompileHandle};
