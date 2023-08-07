@@ -1,6 +1,8 @@
 use core::str::FromStr;
 
 use super::*;
+use evm::ExitError;
+use fp_evm::PrecompileFailure;
 use helpers::*;
 use pallet_living_assets_ownership::CollectionId;
 use sp_core::{H160, U256};
@@ -18,7 +20,7 @@ fn check_selectors() {
 fn owner_of_asset_should_return_an_address() {
 	impl_precompile_mock_simple!(
 		Mock,
-		Some(H160::from_str("ff00000000000000000000000000000012345678").unwrap())
+		Ok(H160::from_str("ff00000000000000000000000000000012345678").unwrap())
 	);
 
 	let owner_of_asset_4 =
@@ -29,6 +31,23 @@ fn owner_of_asset_should_return_an_address() {
 	assert_eq!(
 		hex::encode(result.unwrap().output),
 		"000000000000000000000000ff00000000000000000000000000000012345678",
+	);
+}
+
+#[test]
+fn owner_of_if_fails_returns_error() {
+	impl_precompile_mock_simple!(Mock, Err("spaghetti error"));
+
+	let owner_of_asset_4 =
+		"6352211e0000000000000000000000000000000000000000000000000000000000000004";
+	let mut handle = create_mock_handle_from_input(owner_of_asset_4);
+	let result = Mock::execute(&mut handle);
+	assert!(result.is_err());
+	assert_eq!(
+		result.unwrap_err(),
+		PrecompileFailure::Error {
+			exit_status: ExitError::Other(sp_std::borrow::Cow::Borrowed("spaghetti error"))
+		}
 	);
 }
 
@@ -78,7 +97,10 @@ mod helpers {
 			struct Erc721Mock;
 
 			impl pallet_living_assets_ownership::traits::Erc721 for Erc721Mock {
-				fn owner_of(collectio_id: CollectionId, asset_id: U256) -> Option<H160> {
+				fn owner_of(
+					collectio_id: CollectionId,
+					asset_id: U256,
+				) -> Result<AccountId, &'static str> {
 					($owner_of_collection)(collectio_id, asset_id)
 				}
 			}

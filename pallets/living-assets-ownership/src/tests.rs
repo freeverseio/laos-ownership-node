@@ -119,7 +119,10 @@ fn living_assets_ownership_trait_id_of_new_collection_should_be_consecutive() {
 #[test]
 fn erc721_owner_of_asset_of_unexistent_collection() {
 	new_test_ext().execute_with(|| {
-		assert_eq!(<LivingAssetsModule as Erc721>::owner_of(0, 2.into()), None);
+		assert_eq!(
+			<LivingAssetsModule as Erc721>::owner_of(0, 2.into()),
+			Err("Collection does not exist")
+		);
 	});
 }
 

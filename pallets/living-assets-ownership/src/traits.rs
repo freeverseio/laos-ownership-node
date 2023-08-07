@@ -29,5 +29,5 @@ pub trait CollectionManager<AccountId> {
 }
 
 pub trait Erc721 {
-	fn owner_of(collection_id: CollectionId, asset_id: U256) -> Option<H160>;
+	fn owner_of(collection_id: CollectionId, asset_id: U256) -> Result<H160, &'static str>;
 }
