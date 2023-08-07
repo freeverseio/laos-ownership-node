@@ -28,15 +28,6 @@ fn check_log_selectors() {
 }
 
 #[test]
-fn test_collection_id_to_address() {
-	let collection_id: u64 = 5;
-	let hex_value = "8000000000000000000000000000000000000005";
-	let bytes = hex::decode(hex_value).expect("Decoding failed");
-	let expected_address = H160::from_slice(&bytes);
-	assert_eq!(collection_id_to_address(collection_id), expected_address);
-}
-
-#[test]
 fn failing_create_collection_should_return_error() {
 	impl_precompile_mock_simple!(Mock, Err("spaghetti code"), Some(H160::zero()));
 

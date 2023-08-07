@@ -1,4 +1,7 @@
+use core::str::FromStr;
+
 use crate::{
+	address_to_collection_id, collection_id_to_address,
 	mock::*,
 	traits::{CollectionManager, Erc721},
 	Event,
@@ -130,4 +133,18 @@ fn erc721_owner_of_asset_of_collection() {
 			H160::from_low_u64_be(0x0000000000000002)
 		);
 	});
+}
+
+#[test]
+fn test_collection_id_to_address() {
+	let collection_id: u64 = 5;
+	let expected_address = H160::from_str("8000000000000000000000000000000000000005").unwrap();
+	assert_eq!(collection_id_to_address(collection_id), expected_address);
+}
+
+#[test]
+fn test_address_to_collection_id() {
+	let address = H160::from_str("8000000000000000000000000000000000000005").unwrap();
+	let collection_it = address_to_collection_id(address);
+	assert_eq!(collection_it, 5);
 }

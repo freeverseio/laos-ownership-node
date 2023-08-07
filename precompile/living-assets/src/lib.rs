@@ -2,7 +2,9 @@
 
 #![cfg_attr(not(feature = "std"), no_std)]
 use fp_evm::{ExitError, Precompile, PrecompileFailure, PrecompileHandle, PrecompileOutput};
-use pallet_living_assets_ownership::{traits::CollectionManager, CollectionId};
+use pallet_living_assets_ownership::{
+	collection_id_to_address, traits::CollectionManager, CollectionId,
+};
 use parity_scale_codec::Encode;
 use precompile_utils::{
 	keccak256, succeed, Address, EvmDataWriter, EvmResult, FunctionModifier, LogExt, LogsBuilder,
@@ -70,18 +72,6 @@ where
 			},
 		}
 	}
-}
-
-/// Converts a `u64` collection ID to an `H160` address.
-///
-/// This function takes a `u64` collection ID and converts it into an `H160` address by using the
-/// `from_low_u64_be` method to convert the `u64` value into the lower 64 bits of the `H160`.
-/// Additionally, the function sets the first bit of the resulting `H160` to 1, which can be used to
-/// distinguish addresses created by this function from other addresses.
-fn collection_id_to_address(collection_id: CollectionId) -> H160 {
-	let mut address = H160::from_low_u64_be(collection_id);
-	address.0[0] |= 0x80; // Set the first bit to 1
-	address
 }
 
 #[cfg(test)]

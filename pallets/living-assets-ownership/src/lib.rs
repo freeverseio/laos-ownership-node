@@ -4,6 +4,7 @@
 /// Learn more about FRAME and the core library of Substrate FRAME pallets:
 /// <https://docs.substrate.io/reference/frame-pallets/>
 pub use pallet::*;
+use sp_core::H160;
 
 mod functions;
 pub mod traits;
@@ -95,6 +96,18 @@ pub mod pallet {
 			}
 		}
 	}
+}
+
+pub fn collection_id_to_address(collection_id: CollectionId) -> H160 {
+	let mut address = H160::from_low_u64_be(collection_id);
+	address.0[0] |= 0x80; // Set the first bit to 1
+	address
+}
+
+pub fn address_to_collection_id(address: H160) -> CollectionId {
+	let bytes: [u8; 20] = address.into();
+	let id_bytes: [u8; 8] = bytes[12..20].try_into().expect("Slice length doesn't match");
+	CollectionId::from_be_bytes(id_bytes)
 }
 
 #[cfg(test)]
