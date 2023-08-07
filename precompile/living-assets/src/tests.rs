@@ -124,7 +124,7 @@ fn call_unexistent_selector_should_fail() {
 
 mod helpers {
 	use evm::Context;
-	use precompile_utils::mock::MockHandle;
+	use precompile_utils::testing::MockHandle;
 	use sp_core::H160;
 
 	/// Macro to define a precompile mock for testing.

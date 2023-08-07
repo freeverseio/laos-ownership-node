@@ -67,7 +67,7 @@ fn owner_of_if_fails_returns_error() {
 // }
 mod helpers {
 	use evm::Context;
-	use precompile_utils::mock::MockHandle;
+	use precompile_utils::testing::MockHandle;
 	use sp_core::H160;
 
 	/// Macro to define a precompile mock with custom closures for testing.
