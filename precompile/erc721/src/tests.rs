@@ -1,3 +1,5 @@
+use core::str::FromStr;
+
 use super::*;
 use helpers::*;
 use pallet_living_assets_ownership::CollectionId;
@@ -13,16 +15,20 @@ fn check_selectors() {
 }
 
 #[test]
-fn owner_of_unexistent_should_return_null_address() {
-	impl_precompile_mock_simple!(Mock, None);
+fn owner_of_asset_should_return_an_address() {
+	impl_precompile_mock_simple!(
+		Mock,
+		Some(H160::from_str("ff00000000000000000000000000000012345678").unwrap())
+	);
 
-	let owner_of_1234 = "6352211e0000000000000000000000000000000000000000000000000000000000000004";
-	let mut handle = create_mock_handle_from_input(owner_of_1234);
+	let owner_of_asset_4 =
+		"6352211e0000000000000000000000000000000000000000000000000000000000000004";
+	let mut handle = create_mock_handle_from_input(owner_of_asset_4);
 	let result = Mock::execute(&mut handle);
 	assert!(result.is_ok());
 	assert_eq!(
 		hex::encode(result.unwrap().output),
-		"0000000000000000000000000000000000000000000000000000000012345678"
+		"000000000000000000000000ff00000000000000000000000000000012345678",
 	);
 }
 
@@ -154,11 +160,20 @@ mod helpers {
 		pub is_static: bool,
 		pub gas_used: u64,
 		pub logs: Vec<Log>,
+		pub code_address: H160,
 	}
 
 	impl MockHandle {
 		pub fn new(input: Vec<u8>, gas_limit: Option<u64>, context: Context) -> Self {
-			Self { input, gas_limit, context, is_static: false, gas_used: 0, logs: vec![] }
+			Self {
+				input,
+				gas_limit,
+				context,
+				is_static: false,
+				gas_used: 0,
+				logs: vec![],
+				code_address: H160::zero(),
+			}
 		}
 	}
 
@@ -208,7 +223,7 @@ mod helpers {
 		}
 
 		fn code_address(&self) -> H160 {
-			unimplemented!()
+			self.code_address
 		}
 
 		fn input(&self) -> &[u8] {

@@ -1,16 +1,14 @@
 //! Living Assets precompile module.
 
 #![cfg_attr(not(feature = "std"), no_std)]
-use core::str::FromStr;
-
 use fp_evm::{Precompile, PrecompileHandle, PrecompileOutput};
-use pallet_living_assets_ownership::traits::Erc721;
+use pallet_living_assets_ownership::{address_to_collection_id, traits::Erc721};
 use parity_scale_codec::Encode;
 use precompile_utils::{
 	succeed, Address, EvmDataWriter, EvmResult, FunctionModifier, PrecompileHandleExt,
 };
 
-use sp_core::H160;
+use sp_core::U256;
 use sp_std::{fmt::Debug, marker::PhantomData};
 
 #[precompile_utils_macro::generate_function_selector]
@@ -51,8 +49,15 @@ where
 				todo!()
 			},
 			Action::OwnerOf => {
-				let address = H160::from_str("0x0000000000000000000000000000000012345678").unwrap();
-				Ok(succeed(EvmDataWriter::new().write(Address(address)).build()))
+				let mut input = handle.read_input()?;
+				input.expect_arguments(1)?;
+
+				let asset_id: U256 = input.read()?;
+
+				// collection id is encoded into the contract address
+				let collection_id = address_to_collection_id(handle.code_address());
+				let owner = AssetManager::owner_of(collection_id, asset_id).unwrap();
+				Ok(succeed(EvmDataWriter::new().write(Address(owner)).build()))
 			},
 		}
 	}
