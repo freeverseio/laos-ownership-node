@@ -20,7 +20,10 @@ fn owner_of_unexistent_should_return_null_address() {
 	let mut handle = create_mock_handle_from_input(owner_of_1234);
 	let result = Mock::execute(&mut handle);
 	assert!(result.is_ok());
-	assert_eq!(result.unwrap().output, vec![0u8; 32]);
+	assert_eq!(
+		hex::encode(result.unwrap().output),
+		"0000000000000000000000000000000000000000000000000000000012345678"
+	);
 }
 
 // #[test]

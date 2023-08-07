@@ -1,6 +1,8 @@
 //! Living Assets precompile module.
 
 #![cfg_attr(not(feature = "std"), no_std)]
+use core::str::FromStr;
+
 use fp_evm::{Precompile, PrecompileHandle, PrecompileOutput};
 use pallet_living_assets_ownership::traits::Erc721;
 use parity_scale_codec::Encode;
@@ -49,9 +51,8 @@ where
 				todo!()
 			},
 			Action::OwnerOf => {
-				let byte20 = H160::zero();
-				let address = Address::from(byte20);
-				Ok(succeed(EvmDataWriter::new().write(address).build()))
+				let address = H160::from_str("0x0000000000000000000000000000000012345678").unwrap();
+				Ok(succeed(EvmDataWriter::new().write(Address(address)).build()))
 			},
 		}
 	}
