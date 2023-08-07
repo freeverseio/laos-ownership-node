@@ -12,7 +12,6 @@ use precompile_utils::{
 };
 use sp_runtime::SaturatedConversion;
 
-use sp_core::H160;
 use sp_std::{fmt::Debug, marker::PhantomData, vec::Vec};
 
 /// Solidity selector of the CreateCollection log, which is the Keccak of the Log signature.
