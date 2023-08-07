@@ -12,11 +12,11 @@ use sp_std::vec::Vec;
 type AccountId = H160;
 type AddressMapping = pallet_evm::IdentityAddressMapping;
 
-const CREATE_COLLECTION: &str = "647f1a9c";
+const CREATE_COLLECTION: &str = "0x059dfe1300000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000010697066733a2f2f636172626f6e61726100000000000000000000000000000000";
 
 #[test]
 fn check_selectors() {
-	assert_eq!(Action::CreateCollection as u32, 0x647F1A9C);
+	assert_eq!(Action::CreateCollection as u32, 0x059dfe13);
 }
 
 #[test]

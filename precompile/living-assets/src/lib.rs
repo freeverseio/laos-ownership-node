@@ -21,7 +21,7 @@ pub const SELECTOR_LOG_CREATE_COLLECTION: [u8; 32] = keccak256!("CreateCollectio
 #[derive(Debug, PartialEq)]
 pub enum Action {
 	/// Create collection
-	CreateCollection = "createCollection()",
+	CreateCollection = "createCollection(string)",
 }
 
 /// Wrapper for the precompile function.
