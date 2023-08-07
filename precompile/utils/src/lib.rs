@@ -41,6 +41,8 @@ pub use data::{Address, Bytes, EvmData, EvmDataReader, EvmDataWriter};
 pub use precompile_utils_macro::{generate_function_selector, keccak256};
 
 #[cfg(feature = "testing")]
+pub mod mock;
+#[cfg(feature = "testing")]
 pub mod testing;
 #[cfg(test)]
 mod tests;
