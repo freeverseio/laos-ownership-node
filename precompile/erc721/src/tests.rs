@@ -3,8 +3,8 @@ use core::str::FromStr;
 use super::*;
 use evm::ExitError;
 use fp_evm::PrecompileFailure;
-use helpers::*;
 use pallet_living_assets_ownership::CollectionId;
+use precompile_utils::testing::create_mock_handle_from_input;
 use sp_core::{H160, U256};
 
 type AccountId = H160;
@@ -24,7 +24,8 @@ fn owner_of_asset_should_return_an_address() {
 	);
 
 	let owner_of_asset_4 =
-		"6352211e0000000000000000000000000000000000000000000000000000000000000004";
+		hex::decode("6352211e0000000000000000000000000000000000000000000000000000000000000004")
+			.unwrap();
 	let mut handle = create_mock_handle_from_input(owner_of_asset_4);
 	let result = Mock::execute(&mut handle);
 	assert!(result.is_ok());
@@ -39,7 +40,8 @@ fn owner_of_if_fails_returns_error() {
 	impl_precompile_mock_simple!(Mock, Err("spaghetti error"));
 
 	let owner_of_asset_4 =
-		"6352211e0000000000000000000000000000000000000000000000000000000000000004";
+		hex::decode("6352211e0000000000000000000000000000000000000000000000000000000000000004")
+			.unwrap();
 	let mut handle = create_mock_handle_from_input(owner_of_asset_4);
 	let result = Mock::execute(&mut handle);
 	assert!(result.is_err());
@@ -66,10 +68,6 @@ fn owner_of_if_fails_returns_error() {
 // 	assert_eq!(result.unwrap().output, H160::zero().encode());
 // }
 mod helpers {
-	use evm::Context;
-	use precompile_utils::testing::MockHandle;
-	use sp_core::H160;
-
 	/// Macro to define a precompile mock with custom closures for testing.
 	///
 	/// This macro creates mock implementations of the `Erc721` trait,
@@ -130,48 +128,5 @@ mod helpers {
 		($name:ident, $owner_of_collection:expr) => {
 			impl_precompile_mock!($name, |_asset_id, _collection_id| { $owner_of_collection });
 		};
-	}
-
-	/// Create a mock handle for testing precompiled contracts.
-	///
-	/// This function takes an input string representing the data to be sent to the precompiled contract
-	/// and a cost value, returning a `MockHandle` that can be used for testing.
-	///
-	/// # Arguments
-	///
-	/// * `input` - The input data as a hexadecimal string.
-	/// * `cost` - A cost value as u64.
-	/// * `value` - The amount of coins transferred as u64.
-	///
-	/// # Example
-	///
-	/// ```
-	/// let handle = create_mock_handle("68656c6c6f", 0, 0);
-	/// ```
-	pub fn create_mock_handle(input: &str, cost: u64, value: u64, caller: H160) -> MockHandle {
-		let i: Vec<u8> = hex::decode(input).expect("invalid input");
-
-		let context: Context =
-			Context { address: Default::default(), caller, apparent_value: From::from(value) };
-
-		MockHandle::new(i, Some(cost), context)
-	}
-
-	/// Create a mock handle for testing precompiled contracts without a specific cost or value.
-	///
-	/// This function takes an input string representing the data to be sent to the precompiled contract
-	/// and returns a `MockHandle` that can be used for testing.
-	///
-	/// # Arguments
-	///
-	/// * `input` - The input data as a hexadecimal string.
-	///
-	/// # Example
-	///
-	/// ```
-	/// let handle = create_mock_handle_from_input("68656c6c6f");
-	/// ```
-	pub fn create_mock_handle_from_input(input: &str) -> MockHandle {
-		create_mock_handle(input, 0, 0, H160::zero())
 	}
 }

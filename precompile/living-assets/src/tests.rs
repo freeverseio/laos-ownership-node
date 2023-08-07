@@ -5,7 +5,7 @@
 
 use super::*;
 use evm::ExitRevert;
-use helpers::*;
+use precompile_utils::testing::{create_mock_handle, create_mock_handle_from_input};
 use sp_core::H160;
 use sp_std::vec::Vec;
 
@@ -31,7 +31,7 @@ fn check_log_selectors() {
 fn failing_create_collection_should_return_error() {
 	impl_precompile_mock_simple!(Mock, Err("spaghetti code"), Some(H160::zero()));
 
-	let mut handle = create_mock_handle_from_input(CREATE_COLLECTION);
+	let mut handle = create_mock_handle_from_input(hex::decode(CREATE_COLLECTION).unwrap());
 	let result = Mock::execute(&mut handle);
 	assert_eq!(
 		result.unwrap_err(),
@@ -45,7 +45,7 @@ fn failing_create_collection_should_return_error() {
 fn create_collection_should_return_address() {
 	impl_precompile_mock_simple!(Mock, Ok(5), Some(H160::zero()));
 
-	let mut handle = create_mock_handle_from_input(CREATE_COLLECTION);
+	let mut handle = create_mock_handle_from_input(hex::decode(CREATE_COLLECTION).unwrap());
 	let result = Mock::execute(&mut handle);
 	assert!(result.is_ok());
 	assert_eq!(
@@ -58,7 +58,7 @@ fn create_collection_should_return_address() {
 fn create_collection_should_generate_log() {
 	impl_precompile_mock_simple!(Mock, Ok(0xffff), Some(H160::zero()));
 
-	let mut handle = create_mock_handle_from_input(CREATE_COLLECTION);
+	let mut handle = create_mock_handle_from_input(hex::decode(CREATE_COLLECTION).unwrap());
 	let result = Mock::execute(&mut handle);
 	assert!(result.is_ok());
 	let logs = handle.logs;
@@ -76,7 +76,8 @@ fn create_collection_should_generate_log() {
 #[test]
 fn create_collection_on_mock_with_nonzero_value_fails() {
 	impl_precompile_mock_simple!(Mock, Ok(5), Some(H160::zero()));
-	let mut handle = create_mock_handle(CREATE_COLLECTION, 0, 1, H160::zero());
+	let mut handle =
+		create_mock_handle(hex::decode(CREATE_COLLECTION).unwrap(), 0, 1, H160::zero());
 	let result = Mock::execute(&mut handle);
 	assert!(result.is_err());
 	assert_eq!(
@@ -99,7 +100,12 @@ fn create_collection_assign_collection_to_caller() {
 		|_| { Some(H160::zero()) }  // Closure for owner_of_collection result
 	);
 
-	let mut handle = create_mock_handle(CREATE_COLLECTION, 0, 0, H160::from_low_u64_be(0x1234));
+	let mut handle = create_mock_handle(
+		hex::decode(CREATE_COLLECTION).unwrap(),
+		0,
+		0,
+		H160::from_low_u64_be(0x1234),
+	);
 	let result = Mock::execute(&mut handle);
 	assert!(result.is_ok());
 }
@@ -109,7 +115,9 @@ fn call_unexistent_selector_should_fail() {
 	impl_precompile_mock_simple!(Mock, Ok(0), Some(H160::from_low_u64_be(0x1234)));
 
 	// unexistent selector
-	let input = "fb24ae530000000000000000000000000000000000000000000000000000000000000000";
+	let input =
+		hex::decode("fb24ae530000000000000000000000000000000000000000000000000000000000000000")
+			.unwrap();
 	let mut handle = create_mock_handle_from_input(input);
 	let result = Mock::execute(&mut handle);
 	assert_eq!(
@@ -123,10 +131,6 @@ fn call_unexistent_selector_should_fail() {
 }
 
 mod helpers {
-	use evm::Context;
-	use precompile_utils::testing::MockHandle;
-	use sp_core::H160;
-
 	/// Macro to define a precompile mock for testing.
 	///
 	/// This macro creates mock implementations of the `CollectionManager` trait,
@@ -191,48 +195,5 @@ mod helpers {
 				|_collection_id| { $owner_of_collection_result }
 			);
 		};
-	}
-
-	/// Create a mock handle for testing precompiled contracts.
-	///
-	/// This function takes an input string representing the data to be sent to the precompiled contract
-	/// and a cost value, returning a `MockHandle` that can be used for testing.
-	///
-	/// # Arguments
-	///
-	/// * `input` - The input data as a hexadecimal string.
-	/// * `cost` - A cost value as u64.
-	/// * `value` - The amount of coins transferred as u64.
-	///
-	/// # Example
-	///
-	/// ```
-	/// let handle = create_mock_handle("68656c6c6f", 0, 0);
-	/// ```
-	pub fn create_mock_handle(input: &str, cost: u64, value: u64, caller: H160) -> MockHandle {
-		let i: Vec<u8> = hex::decode(input).expect("invalid input");
-
-		let context: Context =
-			Context { address: Default::default(), caller, apparent_value: From::from(value) };
-
-		MockHandle::new(i, Some(cost), context)
-	}
-
-	/// Create a mock handle for testing precompiled contracts without a specific cost or value.
-	///
-	/// This function takes an input string representing the data to be sent to the precompiled contract
-	/// and returns a `MockHandle` that can be used for testing.
-	///
-	/// # Arguments
-	///
-	/// * `input` - The input data as a hexadecimal string.
-	///
-	/// # Example
-	///
-	/// ```
-	/// let handle = create_mock_handle_from_input("68656c6c6f");
-	/// ```
-	pub fn create_mock_handle_from_input(input: &str) -> MockHandle {
-		create_mock_handle(input, 0, 0, H160::zero())
 	}
 }

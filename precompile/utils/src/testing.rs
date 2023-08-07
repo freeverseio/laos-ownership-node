@@ -81,3 +81,44 @@ impl PrecompileHandle for MockHandle {
 		self.gas_limit
 	}
 }
+
+/// Create a mock handle for testing precompiled contracts.
+///
+/// This function takes an input string representing the data to be sent to the precompiled contract
+/// and a cost value, returning a `MockHandle` that can be used for testing.
+///
+/// # Arguments
+///
+/// * `input` - The input data as a hexadecimal string.
+/// * `cost` - A cost value as u64.
+/// * `value` - The amount of coins transferred as u64.
+///
+/// # Example
+///
+/// ```
+/// let handle = create_mock_handle("68656c6c6f", 0, 0);
+/// ```
+pub fn create_mock_handle(input: Vec<u8>, cost: u64, value: u64, caller: H160) -> MockHandle {
+	let context: Context =
+		Context { address: Default::default(), caller, apparent_value: From::from(value) };
+
+	MockHandle::new(input, Some(cost), context)
+}
+
+/// Create a mock handle for testing precompiled contracts without a specific cost or value.
+///
+/// This function takes an input string representing the data to be sent to the precompiled contract
+/// and returns a `MockHandle` that can be used for testing.
+///
+/// # Arguments
+///
+/// * `input` - The input data as a hexadecimal string.
+///
+/// # Example
+///
+/// ```
+/// let handle = create_mock_handle_from_input("68656c6c6f");
+/// ```
+pub fn create_mock_handle_from_input(input: Vec<u8>) -> MockHandle {
+	create_mock_handle(input, 0, 0, H160::zero())
+}
