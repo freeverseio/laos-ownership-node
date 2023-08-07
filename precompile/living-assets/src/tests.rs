@@ -58,7 +58,6 @@ fn create_collection_should_return_address() {
 	let mut handle = create_mock_handle_from_input(CREATE_COLLECTION);
 	let result = Mock::execute(&mut handle);
 	assert!(result.is_ok());
-	// check that the output is the collection id 0
 	assert_eq!(
 		hex::encode(result.unwrap().output),
 		"0000000000000000000000008000000000000000000000000000000000000005"
