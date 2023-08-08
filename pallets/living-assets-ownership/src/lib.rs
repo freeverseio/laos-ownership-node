@@ -108,12 +108,25 @@ pub mod pallet {
 /// collection addresses from other types of addresses in the system.
 pub const ASSET_PRECOMPILE_ADDRESS_PREFIX: &[u8] = &[0xff; 12];
 
+/// Enum representing possible errors related to collections.
 #[derive(Debug, PartialEq)]
 pub enum CollectionError {
+	/// Error indicating that the provided address does not have the correct prefix.
 	InvalidPrefix,
-	SliceLengthMismatch,
 }
 
+/// Converts a `CollectionId` into an `H160` address format.
+///
+/// This function takes the given `CollectionId`, which is assumed to be a `u64`,
+/// and maps it into an `H160` address, prepending it with the `ASSET_PRECOMPILE_ADDRESS_PREFIX`.
+///
+/// # Arguments
+///
+/// * `collection_id`: The ID of the collection to be converted.
+///
+/// # Returns
+///
+/// * An `H160` representation of the collection ID.
 pub fn collection_id_to_address(collection_id: CollectionId) -> H160 {
 	let mut bytes = [0u8; 20];
 	bytes[12..20].copy_from_slice(&collection_id.to_be_bytes());
@@ -123,6 +136,18 @@ pub fn collection_id_to_address(collection_id: CollectionId) -> H160 {
 	H160(bytes)
 }
 
+/// Converts an `H160` address into a `CollectionId` format.
+///
+/// This function takes the given `H160` address, checks for the correct prefix, and extracts
+/// the `CollectionId` from it. If the prefix is incorrect, it returns a `CollectionError::InvalidPrefix` error.
+///
+/// # Arguments
+///
+/// * `address`: The `H160` address to be converted.
+///
+/// # Returns
+///
+/// * A `Result` which is either the `CollectionId` or an error indicating the address is invalid.
 pub fn address_to_collection_id(address: H160) -> Result<CollectionId, CollectionError> {
 	if &address.0[0..12] != ASSET_PRECOMPILE_ADDRESS_PREFIX {
 		return Err(CollectionError::InvalidPrefix);
@@ -131,6 +156,18 @@ pub fn address_to_collection_id(address: H160) -> Result<CollectionId, Collectio
 	Ok(CollectionId::from_be_bytes(id_bytes))
 }
 
+/// Checks if a given `H160` address is a collection address.
+///
+/// This function examines the prefix of the given `H160` address to determine if it is a
+/// collection address, based on the `ASSET_PRECOMPILE_ADDRESS_PREFIX`.
+///
+/// # Arguments
+///
+/// * `address`: The `H160` address to be checked.
+///
+/// # Returns
+///
+/// * A boolean indicating if the address is a collection address.
 pub fn is_collection_address(address: H160) -> bool {
 	&address.to_fixed_bytes()[0..12] == ASSET_PRECOMPILE_ADDRESS_PREFIX
 }
