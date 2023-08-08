@@ -46,7 +46,7 @@ where
 
 		match selector {
 			Action::TockenURI => {
-				todo!()
+				Err(revert("not implemented"))
 			},
 			Action::OwnerOf => {
 				let mut input = handle.read_input()?;
