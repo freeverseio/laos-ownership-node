@@ -139,7 +139,7 @@ fn erc721_owner_of_asset_of_collection() {
 }
 
 #[test]
-fn erc721_owner_of_coincides_for_asset_id_larger_than_160b() {
+fn erc721_owner_of_asset_coincides_for_ids_larger_than_160b() {
 	new_test_ext().execute_with(|| {
 		let collection_id =
 			<LivingAssetsModule as CollectionManager<AccountId>>::create_collection(ALICE).unwrap();
