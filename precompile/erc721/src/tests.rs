@@ -1,8 +1,6 @@
 use core::str::FromStr;
 
 use super::*;
-use evm::{ExitError, ExitRevert};
-use fp_evm::PrecompileFailure;
 use pallet_living_assets_ownership::CollectionId;
 use precompile_utils::testing::create_mock_handle_from_input;
 use sp_core::{H160, U256};
@@ -31,8 +29,11 @@ fn owner_of_asset_should_return_an_address() {
 	let result = Mock::execute(&mut handle);
 	assert!(result.is_ok());
 	assert_eq!(
-		hex::encode(result.unwrap().output),
-		"000000000000000000000000ff00000000000000000000000000000012345678",
+		result.unwrap(),
+		succeed(
+			hex::decode("000000000000000000000000ff00000000000000000000000000000012345678")
+				.unwrap()
+		),
 	);
 }
 
@@ -47,12 +48,7 @@ fn if_mock_fails_should_return_the_error() {
 	handle.code_address = H160::from_str("ffffffffffffffffffffffff0000000000000005").unwrap();
 	let result = Mock::execute(&mut handle);
 	assert!(result.is_err());
-	assert_eq!(
-		result.unwrap_err(),
-		PrecompileFailure::Error {
-			exit_status: ExitError::Other(sp_std::borrow::Cow::Borrowed("spaghetti error"))
-		}
-	);
+	assert_eq!(result.unwrap_err(), revert("spaghetti error"),);
 }
 
 #[test]
@@ -63,33 +59,9 @@ fn invalid_contract_address_should_error() {
 	handle.code_address = H160::zero();
 	let result = Mock::execute(&mut handle);
 	assert!(result.is_err());
-	assert_eq!(
-		result.unwrap_err(),
-		PrecompileFailure::Revert {
-			exit_status: ExitRevert::Reverted,
-			output: vec![
-				116, 114, 105, 101, 100, 32, 116, 111, 32, 112, 97, 114, 115, 101, 32, 115, 101,
-				108, 101, 99, 116, 111, 114, 32, 111, 117, 116, 32, 111, 102, 32, 98, 111, 117,
-				110, 100, 115
-			]
-		}
-	);
+	assert_eq!(result.unwrap_err(), revert("tried to parse selector out of bounds"),);
 }
 
-// #[test]
-// fn owner_of() {
-// 	impl_precompile_mock!(Mock, |collection_id, asset_id| {
-// 		assert_eq!(collection_id, 0);
-// 		assert_eq!(asset_id, U256::from("0x1234"));
-// 		Some(H160::from(2))
-// 	});
-
-// 	let owner_of_1234 = "6352211e0000000000000000000000000000000000000000000000000000000000001234";
-// 	let mut handle = create_mock_handle_from_input(owner_of_1234);
-// 	let result = Mock::execute(&mut handle);
-// 	assert!(result.is_ok());
-// 	assert_eq!(result.unwrap().output, H160::zero().encode());
-// }
 mod helpers {
 	/// Macro to define a precompile mock with custom closures for testing.
 	///
