@@ -98,22 +98,41 @@ pub mod pallet {
 	}
 }
 
-pub fn collection_id_to_address(collection_id: CollectionId) -> H160 {
-	let mut address = H160::from_low_u64_be(collection_id);
-	address.0[0] |= 0x80; // Set the first bit to 1
-	address
+/// `ASSET_PRECOMPILE_ADDRESS_PREFIX` is a predefined prefix used to identify collection addresses.
+///
+/// All addresses that start with this prefix are considered as collection addresses.
+/// Since `CollectionId` is represented as a `u64`, it leaves these bits free to be
+/// utilized for such a prefix.
+///
+/// Usage of this prefix provides a consistent and recognizable pattern for distinguishing
+/// collection addresses from other types of addresses in the system.
+pub const ASSET_PRECOMPILE_ADDRESS_PREFIX: &[u8] = &[0xff; 12];
+
+#[derive(Debug, PartialEq)]
+pub enum CollectionError {
+	InvalidPrefix,
+	SliceLengthMismatch,
 }
 
-pub fn address_to_collection_id(address: H160) -> CollectionId {
-	let bytes: [u8; 20] = address.into();
-	let id_bytes: [u8; 8] = bytes[12..20].try_into().expect("Slice length doesn't match");
-	CollectionId::from_be_bytes(id_bytes)
+pub fn collection_id_to_address(collection_id: CollectionId) -> H160 {
+	let mut bytes = [0u8; 20];
+	bytes[12..20].copy_from_slice(&collection_id.to_be_bytes());
+	for (i, byte) in ASSET_PRECOMPILE_ADDRESS_PREFIX.iter().enumerate() {
+		bytes[i] = *byte;
+	}
+	H160(bytes)
+}
+
+pub fn address_to_collection_id(address: H160) -> Result<CollectionId, CollectionError> {
+	if &address.0[0..12] != ASSET_PRECOMPILE_ADDRESS_PREFIX {
+		return Err(CollectionError::InvalidPrefix);
+	}
+	let id_bytes: [u8; 8] = address.0[12..20].try_into().unwrap();
+	Ok(CollectionId::from_be_bytes(id_bytes))
 }
 
 pub fn is_collection_address(address: H160) -> bool {
-	let first_byte = address.0[0];
-	// Check if the first bit is set to 1
-	first_byte & 0x80 == 0x80
+	&address.to_fixed_bytes()[0..12] == ASSET_PRECOMPILE_ADDRESS_PREFIX
 }
 
 #[cfg(test)]
