@@ -5047,10 +5047,6 @@ dependencies = [
  "pallet-ethereum",
  "pallet-evm",
  "pallet-evm-chain-id",
- "pallet-evm-erc721",
- "pallet-evm-living-assets-ownership",
- "pallet-evm-precompile-modexp",
- "pallet-evm-precompile-simple",
  "pallet-living-assets-ownership",
  "pallet-session",
  "pallet-sudo",
@@ -7074,6 +7070,26 @@ dependencies = [
  "fp-evm",
  "ripemd",
  "sp-io",
+]
+
+[[package]]
+name = "pallet-evm-precompileset"
+version = "0.1.0"
+dependencies = [
+ "frame-support",
+ "frame-system",
+ "pallet-balances",
+ "pallet-evm",
+ "pallet-evm-erc721",
+ "pallet-evm-living-assets-ownership",
+ "pallet-evm-precompile-modexp",
+ "pallet-evm-precompile-simple",
+ "pallet-living-assets-ownership",
+ "pallet-timestamp",
+ "polkadot-primitives",
+ "sp-core",
+ "sp-runtime",
+ "sp-std",
 ]
 
 [[package]]

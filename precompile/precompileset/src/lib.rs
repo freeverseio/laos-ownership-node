@@ -28,16 +28,16 @@ where
 	}
 }
 
-type LivingAssetsPrecompile = CollectionManagerPrecompile<
+type LivingAssetsPrecompile<Runtime> = CollectionManagerPrecompile<
 	pallet_evm::HashedAddressMapping<BlakeTwo256>,
 	AccountId,
-	pallet_living_assets_ownership::Pallet<crate::Runtime>,
+	pallet_living_assets_ownership::Pallet<Runtime>,
 >;
 
-type Erc721 = Erc721Precompile<
+type Erc721<Runtime> = Erc721Precompile<
 	pallet_evm::HashedAddressMapping<BlakeTwo256>,
 	AccountId,
-	pallet_living_assets_ownership::Pallet<crate::Runtime>,
+	pallet_living_assets_ownership::Pallet<Runtime>,
 >;
 
 impl<Runtime> PrecompileSet for FrontierPrecompiles<Runtime>

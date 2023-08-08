@@ -49,8 +49,6 @@ sp-transaction-pool = { workspace = true }
 sp-version = { workspace = true }
 
 pallet-living-assets-ownership = { workspace = true }
-pallet-evm-living-assets-ownership = { workspace = true }
-pallet-evm-erc721 = { workspace = true }
 
 # Polkadot
 pallet-xcm = { workspace = true }
@@ -84,8 +82,6 @@ pallet-base-fee = { workspace = true }
 pallet-evm = { workspace = true }
 pallet-ethereum = { workspace = true }
 pallet-evm-chain-id = { workspace = true }
-pallet-evm-precompile-modexp = { workspace = true }
-pallet-evm-precompile-simple = { workspace = true }
 
 # Bridge dependencies
 bp-header-chain = { workspace = true }
@@ -157,13 +153,10 @@ std = [
 	"pallet-ethereum/std",
 	"pallet-evm/std",
 	"pallet-evm-chain-id/std",
-	"pallet-evm-precompile-modexp/std",
-	"pallet-evm-precompile-simple/std",
 	"cumulus-pallet-session-benchmarking/std",
 	"frame-benchmarking",
 	"frame-system-benchmarking",
 	"frame-try-runtime",
-	"pallet-evm-living-assets-ownership/std",
 	# Bridge deps,
 	"bp-evochain/std",
 	"bp-header-chain/std",
