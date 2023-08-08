@@ -1,8 +1,6 @@
 use core::str::FromStr;
 
 use super::*;
-use evm::ExitError;
-use fp_evm::PrecompileFailure;
 use pallet_living_assets_ownership::CollectionId;
 use precompile_utils::testing::create_mock_handle_from_input;
 use sp_core::{H160, U256};
@@ -27,66 +25,61 @@ fn owner_of_asset_should_return_an_address() {
 		hex::decode("6352211e0000000000000000000000000000000000000000000000000000000000000004")
 			.unwrap();
 	let mut handle = create_mock_handle_from_input(owner_of_asset_4);
+	handle.code_address = H160::from_str("ffffffffffffffffffffffff0000000000000005").unwrap();
 	let result = Mock::execute(&mut handle);
 	assert!(result.is_ok());
 	assert_eq!(
-		hex::encode(result.unwrap().output),
-		"000000000000000000000000ff00000000000000000000000000000012345678",
+		result.unwrap(),
+		succeed(
+			hex::decode("000000000000000000000000ff00000000000000000000000000000012345678")
+				.unwrap()
+		),
 	);
 }
 
 #[test]
-fn owner_of_if_fails_returns_error() {
+fn if_mock_fails_should_return_the_error() {
 	impl_precompile_mock_simple!(Mock, Err("spaghetti error"));
 
 	let owner_of_asset_4 =
 		hex::decode("6352211e0000000000000000000000000000000000000000000000000000000000000004")
 			.unwrap();
 	let mut handle = create_mock_handle_from_input(owner_of_asset_4);
+	handle.code_address = H160::from_str("ffffffffffffffffffffffff0000000000000005").unwrap();
 	let result = Mock::execute(&mut handle);
 	assert!(result.is_err());
-	assert_eq!(
-		result.unwrap_err(),
-		PrecompileFailure::Error {
-			exit_status: ExitError::Other(sp_std::borrow::Cow::Borrowed("spaghetti error"))
-		}
-	);
+	assert_eq!(result.unwrap_err(), revert("spaghetti error"),);
 }
 
-// #[test]
-// fn owner_of() {
-// 	impl_precompile_mock!(Mock, |collection_id, asset_id| {
-// 		assert_eq!(collection_id, 0);
-// 		assert_eq!(asset_id, U256::from("0x1234"));
-// 		Some(H160::from(2))
-// 	});
+#[test]
+fn invalid_contract_address_should_error() {
+	impl_precompile_mock_simple!(Mock, Ok(H160::zero()));
 
-// 	let owner_of_1234 = "6352211e0000000000000000000000000000000000000000000000000000000000001234";
-// 	let mut handle = create_mock_handle_from_input(owner_of_1234);
-// 	let result = Mock::execute(&mut handle);
-// 	assert!(result.is_ok());
-// 	assert_eq!(result.unwrap().output, H160::zero().encode());
-// }
+	let mut handle = create_mock_handle_from_input(Vec::new());
+	handle.code_address = H160::zero();
+	let result = Mock::execute(&mut handle);
+	assert!(result.is_err());
+	assert_eq!(result.unwrap_err(), revert("tried to parse selector out of bounds"),);
+}
+
 mod helpers {
 	/// Macro to define a precompile mock with custom closures for testing.
 	///
 	/// This macro creates mock implementations of the `Erc721` trait,
 	/// allowing you to test how your code interacts with the precompiled contracts.
-	/// You can define custom closures for the create_collection and owner_of_collection functions.
+	/// You can define a custom closure for the owner_of function.
 	///
 	/// # Arguments
 	///
 	/// * `$name`: An identifier to name the precompile mock type.
-	/// * `$create_collection_result`: A closure that takes `collection_id` and `who` and returns a `DispatchResult`.
-	/// * `$owner_of_collection_result`: A closure that takes `collection_id` and returns an `Option<AccountId>`.
+	/// * `$owner_of_collection`: A closure that takes `collection_id` and `asset_id` and returns a `Result<AccountId, &'static str>`.
 	///
 	/// # Example
 	///
 	/// ```
 	/// impl_precompile_mock!(
 	///     MyMock,
-	///     |who| { Ok(0) },
-	///     |collection_id| { Some(H160::zero()) }
+	///     |collection_id, asset_id| { Ok(AccountId::default()) }
 	/// );
 	/// ```
 	#[macro_export]
@@ -111,17 +104,17 @@ mod helpers {
 	///
 	/// This macro creates mock implementations of the `Erc721` trait,
 	/// allowing you to test how your code interacts with the precompiled contracts.
-	/// The mock type is named `Mock`, and the implementation uses the provided expressions.
+	/// The mock type is named based on the provided identifier, and the implementation uses the provided expression.
 	///
 	/// # Arguments
 	///
-	/// * `$create_collection_result`: An expression that evaluates to a `DispatchResult`.
-	/// * `$owner_of_collection_result`: An expression that evaluates to an `Option<AccountId>`.
+	/// * `$name`: An identifier to name the precompile mock type.
+	/// * `$owner_of_collection`: An expression that evaluates to a `Result<AccountId, &'static str>`.
 	///
 	/// # Example
 	///
 	/// ```
-	/// impl_precompile_mock_simple!(Mock, Ok(0), Some(H160::zero()));
+	/// impl_precompile_mock_simple!(Mock, Ok(AccountId::default()));
 	/// ```
 	#[macro_export]
 	macro_rules! impl_precompile_mock_simple {

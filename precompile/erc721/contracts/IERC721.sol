@@ -6,7 +6,7 @@ interface IERC721 {
     /**
      * @dev See {IERC721Metadata-tokenURI}.
      */
-    function tokenURI(uint256 tokenId) external view returns (string memory);
+    function tokenURI(uint256 _tokenId) external view returns (string memory);
 
     function ownerOf(uint256 _tokenId) external view returns (address);
 }

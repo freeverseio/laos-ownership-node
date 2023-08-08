@@ -4,7 +4,7 @@ use crate::{
 	address_to_collection_id, collection_id_to_address, is_collection_address,
 	mock::*,
 	traits::{CollectionManager, Erc721},
-	Event,
+	CollectionError, Event,
 };
 use frame_support::assert_ok;
 use sp_core::{H160, U256};
@@ -161,42 +161,36 @@ fn erc721_owner_of_asset_coincides_for_ids_larger_than_160b() {
 
 #[test]
 fn test_collection_id_to_address() {
-	let collection_id: u64 = 5;
-	let expected_address = H160::from_str("8000000000000000000000000000000000000005").unwrap();
+	let collection_id = 5;
+	let expected_address = H160::from_str("ffffffffffffffffffffffff0000000000000005").unwrap();
 	assert_eq!(collection_id_to_address(collection_id), expected_address);
 }
 
 #[test]
-fn test_address_to_collection_id() {
+fn invalid_collection_address_should_error() {
 	let address = H160::from_str("8000000000000000000000000000000000000005").unwrap();
-	let collection_it = address_to_collection_id(address);
-	assert_eq!(collection_it, 5);
+	let error = address_to_collection_id(address).unwrap_err();
+	assert_eq!(error, CollectionError::InvalidPrefix);
 }
 
 #[test]
-fn check_for_erc721_addresses() {
-	assert!(!is_collection_address(
-		H160::from_str("0x1000000000000000000000000000000000000001").unwrap()
-	));
-	assert!(is_collection_address(
-		H160::from_str("0x8000000000000000000000000000000000000000").unwrap()
-	));
-	assert!(is_collection_address(
-		H160::from_str("0x8000000000000000000000000000000000000001").unwrap()
-	));
-	assert!(is_collection_address(
-		H160::from_str("0x8000000000000000000000000000000000000002").unwrap()
-	));
-	assert!(is_collection_address(
-		H160::from_str("0x8000000000000000000000000000000000000003").unwrap()
-	));
-	assert!(is_collection_address(
-		H160::from_str("0x80000000000000000000000000000000ffffffff").unwrap()
-	));
-	assert!(!is_collection_address(
-		H160::from_str("0x7fffffffffffffffffffffffffffffffffffffff").unwrap()
-	));
-	assert!(is_collection_address(
-		H160::from_str("0xffffffffffffffffffffffffffffffffffffffff").unwrap()
-	));
+fn valid_collection_address_should_return_collection_id() {
+	let address = H160::from_str("ffffffffffffffffffffffff0000000000000005").unwrap();
+	let collection_id = address_to_collection_id(address).unwrap();
+	assert_eq!(collection_id, 5);
+}
+
+#[test]
+fn test_is_collection_address_valid() {
+	let collection_id = 1234567890;
+	let address = collection_id_to_address(collection_id);
+
+	assert!(is_collection_address(address));
+}
+
+#[test]
+fn test_is_collection_address_invalid() {
+	let invalid_address = H160([0u8; 20]);
+
+	assert!(!is_collection_address(invalid_address));
 }

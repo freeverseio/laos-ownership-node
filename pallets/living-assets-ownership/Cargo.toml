@@ -45,7 +45,8 @@ std = [
 	"frame-benchmarking/std",
 	"frame-support/std",
 	"frame-system/std",
-	"sp-arithmetic/std"
+	"sp-arithmetic/std",
+	"sp-core/std",
 ]
 try-runtime = [
 	"frame-system/try-runtime",
