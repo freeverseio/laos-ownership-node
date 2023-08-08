@@ -152,7 +152,7 @@ pub fn address_to_collection_id(address: H160) -> Result<CollectionId, Collectio
 	if &address.0[0..12] != ASSET_PRECOMPILE_ADDRESS_PREFIX {
 		return Err(CollectionError::InvalidPrefix);
 	}
-	let id_bytes: [u8; 8] = address.0[12..20].try_into().unwrap();
+	let id_bytes: [u8; 8] = address.0[12..].try_into().unwrap();
 	Ok(CollectionId::from_be_bytes(id_bytes))
 }
 
