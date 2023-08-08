@@ -110,6 +110,12 @@ pub fn address_to_collection_id(address: H160) -> CollectionId {
 	CollectionId::from_be_bytes(id_bytes)
 }
 
+pub fn is_collection_address(address: H160) -> bool {
+	let first_byte = address.0[0];
+	// Check if the first bit is set to 1
+	first_byte & 0x80 == 0x80
+}
+
 #[cfg(test)]
 mod mock;
 

@@ -92,12 +92,6 @@ impl PrecompileHandle for MockHandle {
 /// * `input` - The input data as a hexadecimal string.
 /// * `cost` - A cost value as u64.
 /// * `value` - The amount of coins transferred as u64.
-///
-/// # Example
-///
-/// ```
-/// let handle = create_mock_handle("68656c6c6f", 0, 0);
-/// ```
 pub fn create_mock_handle(input: Vec<u8>, cost: u64, value: u64, caller: H160) -> MockHandle {
 	let context: Context =
 		Context { address: Default::default(), caller, apparent_value: From::from(value) };
@@ -113,12 +107,6 @@ pub fn create_mock_handle(input: Vec<u8>, cost: u64, value: u64, caller: H160) -
 /// # Arguments
 ///
 /// * `input` - The input data as a hexadecimal string.
-///
-/// # Example
-///
-/// ```
-/// let handle = create_mock_handle_from_input("68656c6c6f");
-/// ```
 pub fn create_mock_handle_from_input(input: Vec<u8>) -> MockHandle {
 	create_mock_handle(input, 0, 0, H160::zero())
 }

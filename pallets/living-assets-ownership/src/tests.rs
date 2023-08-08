@@ -1,7 +1,7 @@
 use core::str::FromStr;
 
 use crate::{
-	address_to_collection_id, collection_id_to_address,
+	address_to_collection_id, collection_id_to_address, is_collection_address,
 	mock::*,
 	traits::{CollectionManager, Erc721},
 	Event,
@@ -150,4 +150,32 @@ fn test_address_to_collection_id() {
 	let address = H160::from_str("8000000000000000000000000000000000000005").unwrap();
 	let collection_it = address_to_collection_id(address);
 	assert_eq!(collection_it, 5);
+}
+
+#[test]
+fn check_for_erc721_addresses() {
+	assert!(!is_collection_address(
+		H160::from_str("0x1000000000000000000000000000000000000001").unwrap()
+	));
+	assert!(is_collection_address(
+		H160::from_str("0x8000000000000000000000000000000000000000").unwrap()
+	));
+	assert!(is_collection_address(
+		H160::from_str("0x8000000000000000000000000000000000000001").unwrap()
+	));
+	assert!(is_collection_address(
+		H160::from_str("0x8000000000000000000000000000000000000002").unwrap()
+	));
+	assert!(is_collection_address(
+		H160::from_str("0x8000000000000000000000000000000000000003").unwrap()
+	));
+	assert!(is_collection_address(
+		H160::from_str("0x80000000000000000000000000000000ffffffff").unwrap()
+	));
+	assert!(!is_collection_address(
+		H160::from_str("0x7fffffffffffffffffffffffffffffffffffffff").unwrap()
+	));
+	assert!(is_collection_address(
+		H160::from_str("0xffffffffffffffffffffffffffffffffffffffff").unwrap()
+	));
 }

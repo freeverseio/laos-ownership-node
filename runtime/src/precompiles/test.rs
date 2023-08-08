@@ -1,4 +1,4 @@
-use super::{hash, is_erc721_address, mock::*, FrontierPrecompiles};
+use super::{hash, mock::*, FrontierPrecompiles};
 use core::str::FromStr;
 use pallet_evm::{IsPrecompileResult, PrecompileSet};
 use sp_core::H160;
@@ -26,32 +26,4 @@ fn ethereum_precompiled_addresses_are_precompile() {
 	assert!(is_precompile(hash(1026)).unwrap());
 	assert!(is_precompile(H160::from_str("0x8000000000000000000000000000000000000001").unwrap())
 		.unwrap());
-}
-
-#[test]
-fn check_for_erc721_addresses() {
-	assert!(!is_erc721_address(
-		H160::from_str("0x1000000000000000000000000000000000000001").unwrap()
-	));
-	assert!(is_erc721_address(
-		H160::from_str("0x8000000000000000000000000000000000000000").unwrap()
-	));
-	assert!(is_erc721_address(
-		H160::from_str("0x8000000000000000000000000000000000000001").unwrap()
-	));
-	assert!(is_erc721_address(
-		H160::from_str("0x8000000000000000000000000000000000000002").unwrap()
-	));
-	assert!(is_erc721_address(
-		H160::from_str("0x8000000000000000000000000000000000000003").unwrap()
-	));
-	assert!(is_erc721_address(
-		H160::from_str("0x80000000000000000000000000000000ffffffff").unwrap()
-	));
-	assert!(!is_erc721_address(
-		H160::from_str("0x7fffffffffffffffffffffffffffffffffffffff").unwrap()
-	));
-	assert!(is_erc721_address(
-		H160::from_str("0xffffffffffffffffffffffffffffffffffffffff").unwrap()
-	));
 }
