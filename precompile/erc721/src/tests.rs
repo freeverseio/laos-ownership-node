@@ -1,7 +1,7 @@
 use core::str::FromStr;
 
 use super::*;
-use evm::ExitError;
+use evm::{ExitError, ExitRevert};
 use fp_evm::PrecompileFailure;
 use pallet_living_assets_ownership::CollectionId;
 use precompile_utils::testing::create_mock_handle_from_input;
@@ -27,6 +27,7 @@ fn owner_of_asset_should_return_an_address() {
 		hex::decode("6352211e0000000000000000000000000000000000000000000000000000000000000004")
 			.unwrap();
 	let mut handle = create_mock_handle_from_input(owner_of_asset_4);
+	handle.code_address = H160::from_str("ffffffffffffffffffffffff0000000000000005").unwrap();
 	let result = Mock::execute(&mut handle);
 	assert!(result.is_ok());
 	assert_eq!(
@@ -36,19 +37,41 @@ fn owner_of_asset_should_return_an_address() {
 }
 
 #[test]
-fn owner_of_if_fails_returns_error() {
+fn if_mock_fails_should_return_the_error() {
 	impl_precompile_mock_simple!(Mock, Err("spaghetti error"));
 
 	let owner_of_asset_4 =
 		hex::decode("6352211e0000000000000000000000000000000000000000000000000000000000000004")
 			.unwrap();
 	let mut handle = create_mock_handle_from_input(owner_of_asset_4);
+	handle.code_address = H160::from_str("ffffffffffffffffffffffff0000000000000005").unwrap();
 	let result = Mock::execute(&mut handle);
 	assert!(result.is_err());
 	assert_eq!(
 		result.unwrap_err(),
 		PrecompileFailure::Error {
 			exit_status: ExitError::Other(sp_std::borrow::Cow::Borrowed("spaghetti error"))
+		}
+	);
+}
+
+#[test]
+fn invalid_contract_address_should_error() {
+	impl_precompile_mock_simple!(Mock, Ok(H160::zero()));
+
+	let mut handle = create_mock_handle_from_input(Vec::new());
+	handle.code_address = H160::zero();
+	let result = Mock::execute(&mut handle);
+	assert!(result.is_err());
+	assert_eq!(
+		result.unwrap_err(),
+		PrecompileFailure::Revert {
+			exit_status: ExitRevert::Reverted,
+			output: vec![
+				116, 114, 105, 101, 100, 32, 116, 111, 32, 112, 97, 114, 115, 101, 32, 115, 101,
+				108, 101, 99, 116, 111, 114, 32, 111, 117, 116, 32, 111, 102, 32, 98, 111, 117,
+				110, 100, 115
+			]
 		}
 	);
 }

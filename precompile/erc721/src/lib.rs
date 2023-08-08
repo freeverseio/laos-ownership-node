@@ -55,7 +55,16 @@ where
 				let asset_id: U256 = input.read()?;
 
 				// collection id is encoded into the contract address
-				let collection_id = address_to_collection_id(handle.code_address());
+				let collection_id = match address_to_collection_id(handle.code_address()) {
+					Ok(collection_id) => collection_id,
+					Err(_) => {
+						return Err(PrecompileFailure::Error {
+							exit_status: ExitError::Other(sp_std::borrow::Cow::Borrowed(
+								"invalid collection address",
+							)),
+						})
+					},
+				};
 				match AssetManager::owner_of(collection_id, asset_id) {
 					Ok(owner) => Ok(succeed(EvmDataWriter::new().write(Address(owner)).build())),
 					Err(err) => Err(PrecompileFailure::Error {
