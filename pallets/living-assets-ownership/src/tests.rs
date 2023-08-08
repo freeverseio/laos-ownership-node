@@ -7,7 +7,7 @@ use crate::{
 	Event,
 };
 use frame_support::assert_ok;
-use sp_core::H160;
+use sp_core::{H160, U256};
 
 type AccountId = <Test as frame_system::Config>::AccountId;
 
@@ -134,6 +134,20 @@ fn erc721_owner_of_asset_of_collection() {
 		assert_eq!(
 			<LivingAssetsModule as Erc721>::owner_of(collection_id, 2.into()).unwrap(),
 			H160::from_low_u64_be(0x0000000000000002)
+		);
+	});
+}
+
+#[test]
+fn erc721_owner_of_asset_with_id_larger_than_160b() {
+	new_test_ext().execute_with(|| {
+		let collection_id =
+			<LivingAssetsModule as CollectionManager<AccountId>>::create_collection(ALICE).unwrap();
+		let asset_id = U256::from_dec_str("3762876558431388433191006608015597966131839023179").expect("Failed to parse number");
+
+		assert_eq!(
+			<LivingAssetsModule as Erc721>::owner_of(collection_id, asset_id).unwrap(),
+			H160::from_str("931D387731bBbC988B312206c74F77D004D6B84b").unwrap()
 		);
 	});
 }
