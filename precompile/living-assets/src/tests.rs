@@ -108,11 +108,10 @@ fn create_collection_assign_collection_to_caller() {
 fn call_unexistent_selector_should_fail() {
 	impl_precompile_mock_simple!(Mock, Ok(0), Some(H160::from_low_u64_be(0x1234)));
 
-	// unexistent selector
-	let input =
+	let unexistent_selector =
 		hex::decode("fb24ae530000000000000000000000000000000000000000000000000000000000000000")
 			.unwrap();
-	let mut handle = create_mock_handle_from_input(input);
+	let mut handle = create_mock_handle_from_input(unexistent_selector);
 	let result = Mock::execute(&mut handle);
 	assert_eq!(result.unwrap_err(), revert("unknown selector"));
 }
