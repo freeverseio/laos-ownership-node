@@ -4,8 +4,10 @@
 #![allow(clippy::redundant_closure_call)]
 
 use super::*;
-use evm::ExitRevert;
-use precompile_utils::testing::{create_mock_handle, create_mock_handle_from_input};
+use precompile_utils::{
+	revert, succeed,
+	testing::{create_mock_handle, create_mock_handle_from_input},
+};
 use sp_core::H160;
 use sp_std::vec::Vec;
 
@@ -33,12 +35,7 @@ fn failing_create_collection_should_return_error() {
 
 	let mut handle = create_mock_handle_from_input(hex::decode(CREATE_COLLECTION).unwrap());
 	let result = Mock::execute(&mut handle);
-	assert_eq!(
-		result.unwrap_err(),
-		PrecompileFailure::Error {
-			exit_status: ExitError::Other(sp_std::borrow::Cow::Borrowed("spaghetti code"))
-		}
-	);
+	assert_eq!(result.unwrap_err(), revert("spaghetti code"));
 }
 
 #[test]
@@ -49,8 +46,11 @@ fn create_collection_should_return_address() {
 	let result = Mock::execute(&mut handle);
 	assert!(result.is_ok());
 	assert_eq!(
-		hex::encode(result.unwrap().output),
-		"0000000000000000000000008000000000000000000000000000000000000005"
+		result.unwrap(),
+		succeed(
+			hex::decode("000000000000000000000000ffffffffffffffffffffffff0000000000000005")
+				.unwrap()
+		)
 	);
 }
 
@@ -68,7 +68,7 @@ fn create_collection_should_generate_log() {
 	assert_eq!(logs[0].topics[0], SELECTOR_LOG_CREATE_COLLECTION.into());
 	assert_eq!(
 		hex::encode(logs[0].topics[1]),
-		"000000000000000000000000800000000000000000000000000000000000ffff"
+		"000000000000000000000000ffffffffffffffffffffffff000000000000ffff"
 	);
 	assert_eq!(logs[0].data, Vec::<u8>::new());
 }
@@ -80,13 +80,7 @@ fn create_collection_on_mock_with_nonzero_value_fails() {
 		create_mock_handle(hex::decode(CREATE_COLLECTION).unwrap(), 0, 1, H160::zero());
 	let result = Mock::execute(&mut handle);
 	assert!(result.is_err());
-	assert_eq!(
-		result.unwrap_err(),
-		PrecompileFailure::Revert {
-			exit_status: ExitRevert::Reverted,
-			output: "function is not payable".to_string().into_bytes()
-		}
-	);
+	assert_eq!(result.unwrap_err(), revert("function is not payable"));
 }
 
 #[test]
@@ -120,14 +114,7 @@ fn call_unexistent_selector_should_fail() {
 			.unwrap();
 	let mut handle = create_mock_handle_from_input(input);
 	let result = Mock::execute(&mut handle);
-	assert_eq!(
-		result.unwrap_err(),
-		PrecompileFailure::Revert {
-			exit_status: ExitRevert::Reverted,
-			output: [117, 110, 107, 110, 111, 119, 110, 32, 115, 101, 108, 101, 99, 116, 111, 114]
-				.to_vec()
-		}
-	);
+	assert_eq!(result.unwrap_err(), revert("unknown selector"));
 }
 
 mod helpers {
