@@ -67,21 +67,19 @@ mod helpers {
 	///
 	/// This macro creates mock implementations of the `Erc721` trait,
 	/// allowing you to test how your code interacts with the precompiled contracts.
-	/// You can define custom closures for the create_collection and owner_of_collection functions.
+	/// You can define a custom closure for the owner_of function.
 	///
 	/// # Arguments
 	///
 	/// * `$name`: An identifier to name the precompile mock type.
-	/// * `$create_collection_result`: A closure that takes `collection_id` and `who` and returns a `DispatchResult`.
-	/// * `$owner_of_collection_result`: A closure that takes `collection_id` and returns an `Option<AccountId>`.
+	/// * `$owner_of_collection`: A closure that takes `collection_id` and `asset_id` and returns a `Result<AccountId, &'static str>`.
 	///
 	/// # Example
 	///
 	/// ```
 	/// impl_precompile_mock!(
 	///     MyMock,
-	///     |who| { Ok(0) },
-	///     |collection_id| { Some(H160::zero()) }
+	///     |collection_id, asset_id| { Ok(AccountId::default()) }
 	/// );
 	/// ```
 	#[macro_export]
@@ -106,17 +104,17 @@ mod helpers {
 	///
 	/// This macro creates mock implementations of the `Erc721` trait,
 	/// allowing you to test how your code interacts with the precompiled contracts.
-	/// The mock type is named `Mock`, and the implementation uses the provided expressions.
+	/// The mock type is named based on the provided identifier, and the implementation uses the provided expression.
 	///
 	/// # Arguments
 	///
-	/// * `$create_collection_result`: An expression that evaluates to a `DispatchResult`.
-	/// * `$owner_of_collection_result`: An expression that evaluates to an `Option<AccountId>`.
+	/// * `$name`: An identifier to name the precompile mock type.
+	/// * `$owner_of_collection`: An expression that evaluates to a `Result<AccountId, &'static str>`.
 	///
 	/// # Example
 	///
 	/// ```
-	/// impl_precompile_mock_simple!(Mock, Ok(0), Some(H160::zero()));
+	/// impl_precompile_mock_simple!(Mock, Ok(AccountId::default()));
 	/// ```
 	#[macro_export]
 	macro_rules! impl_precompile_mock_simple {
