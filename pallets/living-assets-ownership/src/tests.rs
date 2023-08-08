@@ -4,7 +4,7 @@ use crate::{
 	address_to_collection_id, collection_id_to_address, is_collection_address,
 	mock::*,
 	traits::{CollectionManager, Erc721},
-	CollectionError, CollectionId, Event,
+	CollectionError, Event,
 };
 use frame_support::assert_ok;
 use sp_core::H160;
@@ -140,7 +140,7 @@ fn erc721_owner_of_asset_of_collection() {
 
 #[test]
 fn test_collection_id_to_address() {
-	let collection_id: u64 = 5;
+	let collection_id = 5;
 	let expected_address = H160::from_str("ffffffffffffffffffffffff0000000000000005").unwrap();
 	assert_eq!(collection_id_to_address(collection_id), expected_address);
 }
@@ -161,7 +161,7 @@ fn valid_collection_address_should_return_collection_id() {
 
 #[test]
 fn test_is_collection_address_valid() {
-	let collection_id: CollectionId = 1234567890;
+	let collection_id = 1234567890;
 	let address = collection_id_to_address(collection_id);
 
 	assert!(is_collection_address(address));
