@@ -45,9 +45,7 @@ where
 		})?;
 
 		match selector {
-			Action::TockenURI => {
-				Err(revert("not implemented"))
-			},
+			Action::TockenURI => Err(revert("not implemented")),
 			Action::OwnerOf => {
 				let mut input = handle.read_input()?;
 				input.expect_arguments(1)?;
