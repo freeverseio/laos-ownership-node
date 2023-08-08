@@ -139,15 +139,22 @@ fn erc721_owner_of_asset_of_collection() {
 }
 
 #[test]
-fn erc721_owner_of_asset_with_id_larger_than_160b() {
+fn erc721_owner_of_coincides_for_asset_id_larger_than_160b() {
 	new_test_ext().execute_with(|| {
 		let collection_id =
 			<LivingAssetsModule as CollectionManager<AccountId>>::create_collection(ALICE).unwrap();
-		let asset_id = U256::from_dec_str("3762876558431388433191006608015597966131839023179").expect("Failed to parse number");
+		let expected_owner = H160::from_str("931D387731BBBC988B312206C74F77D004D6B84B");
+		// build two asset ids by prepending "0x1" and "0x2" to the same owner:
+		let asset_id_1 = U256::from("0x1931D387731BBBC988B312206C74F77D004D6B84B");
+		let asset_id_2 = U256::from("0x2931D387731BBBC988B312206C74F77D004D6B84B");
 
 		assert_eq!(
-			<LivingAssetsModule as Erc721>::owner_of(collection_id, asset_id).unwrap(),
-			H160::from_str("931D387731bBbC988B312206c74F77D004D6B84b").unwrap()
+			<LivingAssetsModule as Erc721>::owner_of(collection_id, asset_id_1).unwrap(),
+			expected_owner.unwrap()
+		);
+		assert_eq!(
+			<LivingAssetsModule as Erc721>::owner_of(collection_id, asset_id_2).unwrap(),
+			expected_owner.unwrap()
 		);
 	});
 }
