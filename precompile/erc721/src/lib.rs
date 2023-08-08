@@ -40,8 +40,8 @@ where
 		let selector = handle.read_selector()?;
 
 		handle.check_function_modifier(match selector {
-			Action::TockenURI => FunctionModifier::NonPayable,
-			Action::OwnerOf => FunctionModifier::NonPayable,
+			Action::TockenURI => FunctionModifier::View,
+			Action::OwnerOf => FunctionModifier::View,
 		})?;
 
 		match selector {
