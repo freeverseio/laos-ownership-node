@@ -698,7 +698,7 @@ construct_runtime!(
 		Sudo: pallet_sudo = 40,
 
 		// Local pallets
-		CollectionManager: pallet_living_assets_ownership = 41,
+		LivingAssetsOwnership: pallet_living_assets_ownership = 41,
 
 		// Frontier
 		Ethereum: pallet_ethereum = 50,
