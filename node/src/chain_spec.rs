@@ -189,6 +189,7 @@ fn testnet_genesis(
 ) -> laos_runtime::RuntimeGenesisConfig {
 	// let alice = get_from_seed::<sr25519::Public>("Alice");
 	// let bob = get_from_seed::<sr25519::Public>("Bob");
+	let revert_bytecode = vec![0x60, 0x00, 0x60, 0x00, 0xFD];
 
 	laos_runtime::RuntimeGenesisConfig {
 		system: laos_runtime::SystemConfig {
@@ -284,6 +285,17 @@ fn testnet_genesis(
 						balance: U256::from_str("0xffffffffffffffffffffffffffffffff")
 							.expect("internal U256 is valid; qed"),
 						code: Default::default(),
+						nonce: Default::default(),
+						storage: Default::default(),
+					},
+				);
+				map.insert(
+					// H160 address of createCollection precompile
+					H160::from_str("0x0000000000000000000000000000000000000402")
+						.expect("internal H160 is valid; qed"),
+					fp_evm::GenesisAccount {
+						balance: Default::default(),
+						code: revert_bytecode.clone(),
 						nonce: Default::default(),
 						storage: Default::default(),
 					},
