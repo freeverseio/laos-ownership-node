@@ -84,7 +84,10 @@ pub mod pallet {
 		}
 
 		fn create_collection(owner: T::AccountId) -> Result<CollectionId, &'static str> {
-			Self::do_create_collection(owner)
+			match Self::do_create_collection(owner) {
+				Ok(collection_id) => Ok(collection_id),
+				Err(err) => Err(err.into()),
+			}
 		}
 	}
 
