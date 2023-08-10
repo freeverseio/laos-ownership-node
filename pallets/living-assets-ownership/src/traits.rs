@@ -1,5 +1,5 @@
-use sp_core::{H160, U256};
 use crate::CollectionId;
+use sp_core::{H160, U256};
 
 /// The `CollectionManager` trait provides an interface for managing collections in a decentralized system.
 ///
