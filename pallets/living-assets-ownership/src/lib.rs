@@ -83,10 +83,20 @@ pub mod pallet {
 			OwnerOfCollection::<T>::get(collection_id)
 		}
 
-		fn create_collection(owner: T::AccountId) -> Result<CollectionId, &'static str> {
+		fn create_collection(
+			owner: T::AccountId,
+		) -> Result<CollectionId, traits::CollectionManagerError> {
 			match Self::do_create_collection(owner) {
 				Ok(collection_id) => Ok(collection_id),
-				Err(err) => Err(err.into()),
+				Err(err) => match err {
+					Error::CollectionAlreadyExists => {
+						Err(traits::CollectionManagerError::CollectionAlreadyExists)
+					},
+					Error::CollectionIdOverflow => {
+						Err(traits::CollectionManagerError::CollectionIdOverflow)
+					},
+					_ => Err(traits::CollectionManagerError::UnknownError),
+				},
 			}
 		}
 	}

@@ -25,9 +25,25 @@ pub trait CollectionManager<AccountId> {
 	fn owner_of_collection(collection_id: CollectionId) -> Option<AccountId>;
 
 	/// Create collection
-	fn create_collection(owner: AccountId) -> Result<CollectionId, &'static str>;
+	fn create_collection(owner: AccountId) -> Result<CollectionId, CollectionManagerError>;
 }
 
+#[derive(Debug, PartialEq)]
+pub enum CollectionManagerError {
+	CollectionAlreadyExists,
+	CollectionIdOverflow,
+	UnknownError,
+}
+
+impl AsRef<[u8]> for CollectionManagerError {
+	fn as_ref(&self) -> &[u8] {
+		match self {
+			CollectionManagerError::CollectionAlreadyExists => b"CollectionAlreadyExists",
+			CollectionManagerError::CollectionIdOverflow => b"CollectionIdOverflow",
+			CollectionManagerError::UnknownError => b"UnknownError",
+		}
+	}
+}
 /// `Erc721` Trait
 ///
 /// This trait provides an interface for handling ERC721 tokens, a standard for non-fungible tokens on the blockchain.
