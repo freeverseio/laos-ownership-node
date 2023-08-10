@@ -15,7 +15,7 @@ use sp_std::vec::Vec;
 type AccountId = H160;
 type AddressMapping = pallet_evm::IdentityAddressMapping;
 
-const CREATE_COLLECTION: &str = "0x059dfe1300000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000010697066733a2f2f636172626f6e61726100000000000000000000000000000000";
+const CREATE_COLLECTION_WITH_URI: &str = "0x059dfe1300000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000010697066733a2f2f636172626f6e61726100000000000000000000000000000000";
 
 #[test]
 fn check_selectors() {
@@ -38,7 +38,7 @@ fn failing_create_collection_should_return_error() {
 		Some(H160::zero())
 	);
 
-	let mut handle = create_mock_handle_from_input(hex::decode(CREATE_COLLECTION).unwrap());
+	let mut handle = create_mock_handle_from_input(hex::decode(CREATE_COLLECTION_WITH_URI).unwrap());
 	let result = Mock::execute(&mut handle);
 	assert_eq!(result.unwrap_err(), revert(CollectionManagerError::CollectionAlreadyExists));
 }
@@ -47,7 +47,7 @@ fn failing_create_collection_should_return_error() {
 fn create_collection_should_return_address() {
 	impl_precompile_mock_simple!(Mock, Ok(5), Some(H160::zero()));
 
-	let mut handle = create_mock_handle_from_input(hex::decode(CREATE_COLLECTION).unwrap());
+	let mut handle = create_mock_handle_from_input(hex::decode(CREATE_COLLECTION_WITH_URI).unwrap());
 	let result = Mock::execute(&mut handle);
 	assert!(result.is_ok());
 	assert_eq!(
@@ -63,7 +63,7 @@ fn create_collection_should_return_address() {
 fn create_collection_should_generate_log() {
 	impl_precompile_mock_simple!(Mock, Ok(0xffff), Some(H160::zero()));
 
-	let mut handle = create_mock_handle_from_input(hex::decode(CREATE_COLLECTION).unwrap());
+	let mut handle = create_mock_handle_from_input(hex::decode(CREATE_COLLECTION_WITH_URI).unwrap());
 	let result = Mock::execute(&mut handle);
 	assert!(result.is_ok());
 	let logs = handle.logs;
@@ -82,7 +82,7 @@ fn create_collection_should_generate_log() {
 fn create_collection_on_mock_with_nonzero_value_fails() {
 	impl_precompile_mock_simple!(Mock, Ok(5), Some(H160::zero()));
 	let mut handle =
-		create_mock_handle(hex::decode(CREATE_COLLECTION).unwrap(), 0, 1, H160::zero());
+		create_mock_handle(hex::decode(CREATE_COLLECTION_WITH_URI).unwrap(), 0, 1, H160::zero());
 	let result = Mock::execute(&mut handle);
 	assert!(result.is_err());
 	assert_eq!(result.unwrap_err(), revert("function is not payable"));
@@ -100,7 +100,7 @@ fn create_collection_assign_collection_to_caller() {
 	);
 
 	let mut handle = create_mock_handle(
-		hex::decode(CREATE_COLLECTION).unwrap(),
+		hex::decode(CREATE_COLLECTION_WITH_URI).unwrap(),
 		0,
 		0,
 		H160::from_low_u64_be(0x1234),
