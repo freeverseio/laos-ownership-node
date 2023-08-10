@@ -50,5 +50,12 @@ pub trait Erc721 {
 #[derive(Debug, PartialEq)]
 pub enum Erc721Error {
 	UnexistentCollection,
-	Unknown,
+}
+
+impl AsRef<[u8]> for Erc721Error {
+	fn as_ref(&self) -> &[u8] {
+		match self {
+			Erc721Error::UnexistentCollection => b"UnexistentCollection",
+		}
+	}
 }
