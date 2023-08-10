@@ -1,12 +1,12 @@
 use core::str::FromStr;
 
 use crate::{
-	address_to_collection_id, collection_id_to_address,
+	address_to_collection_id, collection_id_to_address, is_collection_address,
 	mock::*,
-	traits::{CollectionManager, Erc721},
-	Event,
+	traits::{self, CollectionManager, Erc721},
+	CollectionError, Event,
 };
-use frame_support::assert_ok;
+use frame_support::{assert_err, assert_ok};
 use sp_core::H160;
 
 type AccountId = <Test as frame_system::Config>::AccountId;
@@ -119,10 +119,8 @@ fn living_assets_ownership_trait_id_of_new_collection_should_be_consecutive() {
 #[test]
 fn erc721_owner_of_asset_of_unexistent_collection() {
 	new_test_ext().execute_with(|| {
-		assert_eq!(
-			<LivingAssetsModule as Erc721>::owner_of(0, 2.into()),
-			Err("Collection does not exist")
-		);
+		let result = <LivingAssetsModule as Erc721>::owner_of(0, 2.into());
+		assert_err!(result, traits::Erc721Error::UnexistentCollection);
 	});
 }
 
@@ -140,14 +138,36 @@ fn erc721_owner_of_asset_of_collection() {
 
 #[test]
 fn test_collection_id_to_address() {
-	let collection_id: u64 = 5;
-	let expected_address = H160::from_str("8000000000000000000000000000000000000005").unwrap();
+	let collection_id = 5;
+	let expected_address = H160::from_str("ffffffffffffffffffffffff0000000000000005").unwrap();
 	assert_eq!(collection_id_to_address(collection_id), expected_address);
 }
 
 #[test]
-fn test_address_to_collection_id() {
+fn invalid_collection_address_should_error() {
 	let address = H160::from_str("8000000000000000000000000000000000000005").unwrap();
-	let collection_it = address_to_collection_id(address);
-	assert_eq!(collection_it, 5);
+	let error = address_to_collection_id(address).unwrap_err();
+	assert_eq!(error, CollectionError::InvalidPrefix);
+}
+
+#[test]
+fn valid_collection_address_should_return_collection_id() {
+	let address = H160::from_str("ffffffffffffffffffffffff0000000000000005").unwrap();
+	let collection_id = address_to_collection_id(address).unwrap();
+	assert_eq!(collection_id, 5);
+}
+
+#[test]
+fn test_is_collection_address_valid() {
+	let collection_id = 1234567890;
+	let address = collection_id_to_address(collection_id);
+
+	assert!(is_collection_address(address));
+}
+
+#[test]
+fn test_is_collection_address_invalid() {
+	let invalid_address = H160([0u8; 20]);
+
+	assert!(!is_collection_address(invalid_address));
 }

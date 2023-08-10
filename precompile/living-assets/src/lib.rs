@@ -1,14 +1,14 @@
 //! Living Assets precompile module.
 
 #![cfg_attr(not(feature = "std"), no_std)]
-use fp_evm::{ExitError, Precompile, PrecompileFailure, PrecompileHandle, PrecompileOutput};
+use fp_evm::{Precompile, PrecompileHandle, PrecompileOutput};
 use pallet_living_assets_ownership::{
 	collection_id_to_address, traits::CollectionManager, CollectionId,
 };
 use parity_scale_codec::Encode;
 use precompile_utils::{
-	keccak256, succeed, Address, EvmDataWriter, EvmResult, FunctionModifier, LogExt, LogsBuilder,
-	PrecompileHandleExt,
+	keccak256, revert, succeed, Address, EvmDataWriter, EvmResult, FunctionModifier, LogExt,
+	LogsBuilder, PrecompileHandleExt,
 };
 use sp_runtime::SaturatedConversion;
 
@@ -64,9 +64,7 @@ where
 
 						Ok(succeed(EvmDataWriter::new().write(Address(collection_address)).build()))
 					},
-					Err(err) => Err(PrecompileFailure::Error {
-						exit_status: ExitError::Other(sp_std::borrow::Cow::Borrowed(err)),
-					}),
+					Err(err) => Err(revert(err)),
 				}
 			},
 		}

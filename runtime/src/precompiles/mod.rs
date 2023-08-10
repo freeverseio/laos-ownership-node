@@ -11,6 +11,7 @@ use pallet_evm_erc721::Erc721Precompile;
 use pallet_evm_living_assets_ownership::CollectionManagerPrecompile;
 use pallet_evm_precompile_modexp::Modexp;
 use pallet_evm_precompile_simple::{ECRecover, ECRecoverPublicKey, Identity, Ripemd160, Sha256};
+use pallet_living_assets_ownership::is_collection_address;
 
 use crate::AccountId;
 
@@ -56,13 +57,13 @@ where
 			// a if a == hash(1024) => Some(Sha3FIPS256::execute(handle)),
 			a if a == hash(1025) => Some(ECRecoverPublicKey::execute(handle)),
 			a if a == hash(1026) => Some(LivingAssetsPrecompile::execute(handle)),
-			a if is_erc721_address(a) => Some(Erc721::execute(handle)),
+			a if is_collection_address(a) => Some(Erc721::execute(handle)),
 			_ => None,
 		}
 	}
 
 	fn is_precompile(&self, address: H160, _gas: u64) -> IsPrecompileResult {
-		if is_erc721_address(address) {
+		if is_collection_address(address) {
 			return IsPrecompileResult::Answer { is_precompile: true, extra_cost: 0 };
 		}
 
@@ -75,12 +76,6 @@ where
 
 fn hash(a: u64) -> H160 {
 	H160::from_low_u64_be(a)
-}
-
-fn is_erc721_address(address: H160) -> bool {
-	let first_byte = address.0[0];
-	// Check if the first bit is set to 1
-	first_byte & 0x80 == 0x80
 }
 
 #[cfg(test)]
