@@ -68,7 +68,7 @@ pub mod pallet {
 	impl<T: Config> Pallet<T> {
 		#[pallet::call_index(0)]
 		#[pallet::weight(10_000 + T::DbWeight::get().writes(1).ref_time())] // TODO set proper weight
-		pub fn create_collection(origin: OriginFor<T>) -> DispatchResult {
+		pub fn create_collection(origin: OriginFor<T>, _base_uri: Vec<u8>) -> DispatchResult {
 			let who = ensure_signed(origin)?;
 
 			match Self::do_create_collection(who) {

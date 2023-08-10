@@ -26,11 +26,20 @@ fn create_new_collection() {
 	new_test_ext().execute_with(|| {
 		assert_eq!(LivingAssetsModule::owner_of_collection(0), None);
 
-		assert_ok!(LivingAssetsModule::create_collection(RuntimeOrigin::signed(ALICE)));
+		assert_ok!(LivingAssetsModule::create_collection(
+			RuntimeOrigin::signed(ALICE),
+			"ciao".into()
+		));
 		assert_eq!(LivingAssetsModule::owner_of_collection(0).unwrap(), ALICE);
-		assert_ok!(LivingAssetsModule::create_collection(RuntimeOrigin::signed(ALICE)));
+		assert_ok!(LivingAssetsModule::create_collection(
+			RuntimeOrigin::signed(ALICE),
+			"ciao".into()
+		));
 		assert_eq!(LivingAssetsModule::owner_of_collection(1).unwrap(), ALICE);
-		assert_ok!(LivingAssetsModule::create_collection(RuntimeOrigin::signed(ALICE)));
+		assert_ok!(LivingAssetsModule::create_collection(
+			RuntimeOrigin::signed(ALICE),
+			"ciao".into()
+		));
 		assert_eq!(LivingAssetsModule::owner_of_collection(2).unwrap(), ALICE);
 	});
 }
@@ -41,13 +50,25 @@ fn create_new_collections_should_emit_events_with_collection_id_consecutive() {
 		// Go past genesis block so events get deposited
 		System::set_block_number(1);
 
-		assert_ok!(LivingAssetsModule::create_collection(RuntimeOrigin::signed(ALICE)));
+		assert_ok!(LivingAssetsModule::create_collection(
+			RuntimeOrigin::signed(ALICE),
+			"ciao".into()
+		));
 		System::assert_last_event(Event::CollectionCreated { collection_id: 0, who: ALICE }.into());
-		assert_ok!(LivingAssetsModule::create_collection(RuntimeOrigin::signed(ALICE)));
+		assert_ok!(LivingAssetsModule::create_collection(
+			RuntimeOrigin::signed(ALICE),
+			"ciao".into()
+		));
 		System::assert_last_event(Event::CollectionCreated { collection_id: 1, who: ALICE }.into());
-		assert_ok!(LivingAssetsModule::create_collection(RuntimeOrigin::signed(ALICE)));
+		assert_ok!(LivingAssetsModule::create_collection(
+			RuntimeOrigin::signed(ALICE),
+			"ciao".into()
+		));
 		System::assert_last_event(Event::CollectionCreated { collection_id: 2, who: ALICE }.into());
-		assert_ok!(LivingAssetsModule::create_collection(RuntimeOrigin::signed(ALICE)));
+		assert_ok!(LivingAssetsModule::create_collection(
+			RuntimeOrigin::signed(ALICE),
+			"ciao".into()
+		));
 		System::assert_last_event(Event::CollectionCreated { collection_id: 3, who: ALICE }.into());
 	});
 }
