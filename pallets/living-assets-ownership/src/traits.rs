@@ -44,5 +44,11 @@ pub trait Erc721 {
 	/// * A `Result` which is:
 	///   - `Ok(H160)`: Returns the Ethereum address (`H160`) of the owner of the asset.
 	///   - `Err(&'static str)`: Returns an error message if the asset owner could not be determined.
-	fn owner_of(collection_id: CollectionId, asset_id: U256) -> Result<H160, &'static str>;
+	fn owner_of(collection_id: CollectionId, asset_id: U256) -> Result<H160, Erc721Error>;
+}
+
+#[derive(Debug, PartialEq)]
+pub enum Erc721Error {
+	UnexistentCollection,
+	Unknown,
 }

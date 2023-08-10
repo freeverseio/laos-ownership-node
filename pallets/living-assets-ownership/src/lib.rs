@@ -92,10 +92,13 @@ pub mod pallet {
 	}
 
 	impl<T: Config> traits::Erc721 for Pallet<T> {
-		fn owner_of(collection_id: CollectionId, asset_id: U256) -> Result<H160, &'static str> {
+		fn owner_of(
+			collection_id: CollectionId,
+			asset_id: U256,
+		) -> Result<H160, traits::Erc721Error> {
 			match OwnerOfCollection::<T>::get(collection_id) {
 				Some(_) => Ok(convert_asset_id_to_owner(asset_id)),
-				None => Err("Collection does not exist"),
+				None => Err(traits::Erc721Error::UnexistentCollection),
 			}
 		}
 	}
