@@ -88,7 +88,10 @@ fn create_new_collections_should_emit_events_with_collection_id_consecutive() {
 #[test]
 fn living_assets_ownership_trait_create_new_collection() {
 	new_test_ext().execute_with(|| {
-		let result = <LivingAssetsModule as CollectionManager<AccountId>>::create_collection(ALICE);
+		let result = <LivingAssetsModule as CollectionManager<AccountId>>::create_collection(
+			ALICE,
+			Vec::new(),
+		);
 		assert_ok!(result);
 		assert_eq!(LivingAssetsModule::owner_of_collection(0).unwrap(), ALICE);
 	});
@@ -114,7 +117,10 @@ fn living_assets_ownership_trait_create_new_collection_should_emit_an_event() {
 		// Go past genesis block so events get deposited
 		System::set_block_number(1);
 
-		assert_ok!(<LivingAssetsModule as CollectionManager<AccountId>>::create_collection(ALICE));
+		assert_ok!(<LivingAssetsModule as CollectionManager<AccountId>>::create_collection(
+			ALICE,
+			Vec::new()
+		));
 		System::assert_last_event(Event::CollectionCreated { collection_id: 0, who: ALICE }.into());
 	});
 }
@@ -123,29 +129,65 @@ fn living_assets_ownership_trait_create_new_collection_should_emit_an_event() {
 fn living_assets_ownership_trait_id_of_new_collection_should_be_consecutive() {
 	new_test_ext().execute_with(|| {
 		assert_eq!(
-			<LivingAssetsModule as CollectionManager<AccountId>>::create_collection(ALICE).unwrap(),
+			<LivingAssetsModule as CollectionManager<AccountId>>::create_collection(
+				ALICE,
+				Vec::new()
+			)
+			.unwrap(),
 			0
 		);
 		assert_eq!(
-			<LivingAssetsModule as CollectionManager<AccountId>>::create_collection(ALICE).unwrap(),
+			<LivingAssetsModule as CollectionManager<AccountId>>::create_collection(
+				ALICE,
+				Vec::new()
+			)
+			.unwrap(),
 			1
 		);
 		assert_eq!(
-			<LivingAssetsModule as CollectionManager<AccountId>>::create_collection(ALICE).unwrap(),
+			<LivingAssetsModule as CollectionManager<AccountId>>::create_collection(
+				ALICE,
+				Vec::new()
+			)
+			.unwrap(),
 			2
 		);
 		assert_eq!(
-			<LivingAssetsModule as CollectionManager<AccountId>>::create_collection(ALICE).unwrap(),
+			<LivingAssetsModule as CollectionManager<AccountId>>::create_collection(
+				ALICE,
+				Vec::new()
+			)
+			.unwrap(),
 			3
 		);
 		assert_eq!(
-			<LivingAssetsModule as CollectionManager<AccountId>>::create_collection(ALICE).unwrap(),
+			<LivingAssetsModule as CollectionManager<AccountId>>::create_collection(
+				ALICE,
+				Vec::new()
+			)
+			.unwrap(),
 			4
 		);
 		assert_eq!(
-			<LivingAssetsModule as CollectionManager<AccountId>>::create_collection(ALICE).unwrap(),
+			<LivingAssetsModule as CollectionManager<AccountId>>::create_collection(
+				ALICE,
+				Vec::new()
+			)
+			.unwrap(),
 			5
 		);
+	});
+}
+
+#[test]
+fn living_assets_ownership_trait_should_set_base_uri_when_creating_new_collection() {
+	let base_uri: Vec<u8> = "https://example.com/".into();
+	new_test_ext().execute_with(|| {
+		assert_ok!(<LivingAssetsModule as CollectionManager<AccountId>>::create_collection(
+			ALICE,
+			base_uri.clone()
+		));
+		assert_eq!(LivingAssetsModule::collection_base_uri(0).unwrap(), base_uri);
 	});
 }
 
@@ -161,7 +203,11 @@ fn erc721_owner_of_asset_of_unexistent_collection() {
 fn erc721_owner_of_asset_of_collection() {
 	new_test_ext().execute_with(|| {
 		let collection_id =
-			<LivingAssetsModule as CollectionManager<AccountId>>::create_collection(ALICE).unwrap();
+			<LivingAssetsModule as CollectionManager<AccountId>>::create_collection(
+				ALICE,
+				Vec::new(),
+			)
+			.unwrap();
 		assert_eq!(
 			<LivingAssetsModule as Erc721>::owner_of(collection_id, 2.into()).unwrap(),
 			H160::from_low_u64_be(0x0000000000000002)

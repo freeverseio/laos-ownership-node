@@ -31,7 +31,10 @@ pub trait CollectionManager<AccountId> {
 	/// # Returns
 	///
 	/// A result containing the `collection_id` of the newly created collection or an error.
-	fn create_collection(owner: AccountId) -> Result<CollectionId, CollectionManagerError>;
+	fn create_collection(
+		owner: AccountId,
+		base_uri: Vec<u8>,
+	) -> Result<CollectionId, CollectionManagerError>;
 }
 
 /// Errors that can occur when managing collections.

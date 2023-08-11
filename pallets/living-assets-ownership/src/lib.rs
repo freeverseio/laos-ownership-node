@@ -101,8 +101,9 @@ pub mod pallet {
 
 		fn create_collection(
 			owner: T::AccountId,
+			base_uri: Vec<u8>,
 		) -> Result<CollectionId, traits::CollectionManagerError> {
-			match Self::do_create_collection(owner, Vec::new()) {
+			match Self::do_create_collection(owner, base_uri) {
 				Ok(collection_id) => Ok(collection_id),
 				Err(err) => match err {
 					Error::CollectionIdOverflow => {
