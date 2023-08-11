@@ -45,14 +45,14 @@ fn create_new_collection() {
 }
 
 #[test]
-fn create_new_collection_shoud_set_the_base_uri() {
-	let base_uri = "https://example.com/";
+fn should_set_base_uri_when_creating_new_collection() {
+	let base_uri: Vec<u8> = "https://example.com/".into();
 	new_test_ext().execute_with(|| {
-		assert_ok!(LivingAssetsModule::create_collection(RuntimeOrigin::signed(ALICE), base_uri.into()));
-		assert_eq!(
-			LivingAssetsModule::collection_base_uri(0).unwrap(),
-			base_uri.as_bytes().to_vec()
-		);
+		assert_ok!(LivingAssetsModule::create_collection(
+			RuntimeOrigin::signed(ALICE),
+			base_uri.clone()
+		));
+		assert_eq!(LivingAssetsModule::collection_base_uri(0).unwrap(), base_uri);
 	});
 }
 
