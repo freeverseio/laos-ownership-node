@@ -2,10 +2,10 @@ use core::str::FromStr;
 
 use crate::{
 	address_to_collection_id, collection_id_to_address, is_collection_address, mock::*,
-	BaseURILimit, CollectionError, Error, Event,
+	CollectionError, Event,
 };
 use frame_support::assert_ok;
-use sp_core::{Get, H160};
+use sp_core::H160;
 use sp_runtime::{DispatchError, ModuleError};
 
 type AccountId = <Test as frame_system::Config>::AccountId;
@@ -86,7 +86,7 @@ fn create_new_collections_should_emit_events_with_collection_id_consecutive() {
 #[test]
 fn create_collection_with_base_uri_greater_than_limit() {
 	new_test_ext().execute_with(|| {
-		let base_uri: Vec<u8> = vec![0; 255 + 1];
+		let base_uri: Vec<u8> = vec![0; 255 + 1]; // TODO: use BaseURILimit::get() + 1
 		assert_eq!(
 			LivingAssetsModule::create_collection(RuntimeOrigin::signed(ALICE), base_uri)
 				.unwrap_err(),
