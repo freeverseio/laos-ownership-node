@@ -1,5 +1,5 @@
 use crate as pallet_livingassets_ownership;
-use frame_support::traits::{ConstU16, ConstU64};
+use frame_support::traits::{ConstU16, ConstU32, ConstU64};
 use sp_core::H256;
 use sp_runtime::{
 	traits::{BlakeTwo256, IdentityLookup},
@@ -46,6 +46,7 @@ impl frame_system::Config for Test {
 
 impl pallet_livingassets_ownership::Config for Test {
 	type RuntimeEvent = RuntimeEvent;
+	type BaseURILimit = ConstU32<255>;
 }
 
 // Build genesis storage according to the mock runtime.

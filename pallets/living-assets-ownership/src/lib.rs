@@ -15,7 +15,10 @@ pub mod pallet {
 	use crate::functions::convert_asset_id_to_owner;
 
 	use super::*;
-	use frame_support::pallet_prelude::{OptionQuery, ValueQuery, *};
+	use frame_support::{
+		pallet_prelude::{OptionQuery, ValueQuery, *},
+		BoundedVec,
+	};
 	use frame_system::pallet_prelude::*;
 	use sp_core::{H160, U256};
 
@@ -31,6 +34,10 @@ pub mod pallet {
 	pub trait Config: frame_system::Config {
 		/// Because this pallet emits events, it depends on the runtime's definition of an event.
 		type RuntimeEvent: From<Event<Self>> + IsType<<Self as frame_system::Config>::RuntimeEvent>;
+
+		/// The maximum length of a base URI
+		#[pallet::constant]
+		type BaseURILimit: Get<u32>;
 	}
 
 	/// Mapping from collection id to owner
@@ -43,6 +50,12 @@ pub mod pallet {
 	#[pallet::storage]
 	#[pallet::getter(fn collection_counter)]
 	pub(super) type CollectionCounter<T: Config> = StorageValue<_, CollectionId, ValueQuery>;
+
+	/// Collection base URI
+	#[pallet::storage]
+	#[pallet::getter(fn collection_base_uri)]
+	pub(super) type CollectionBaseURI<T: Config> =
+		StorageMap<_, Blake2_128Concat, CollectionId, BoundedVec<u8, T::BaseURILimit>, OptionQuery>;
 
 	/// Pallet events
 	#[pallet::event]
