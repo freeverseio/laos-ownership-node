@@ -1,4 +1,4 @@
-use crate::CollectionId;
+use crate::{BaseURI, CollectionId};
 use sp_core::{H160, U256};
 
 /// The `CollectionManager` trait provides an interface for managing collections in a decentralized system.
@@ -11,7 +11,7 @@ use sp_core::{H160, U256};
 /// - `owner_of_collection`: Retrieve the owner of a specified collection.
 /// - `create_collection`: Create a new collection and assign it to an owner.
 pub trait CollectionManager<AccountId> {
-	/// Retrieves the owner of the specified collection.
+	/// Retrieves the base uri of the specified collection.
 	///
 	/// # Arguments
 	///
@@ -19,8 +19,8 @@ pub trait CollectionManager<AccountId> {
 	///
 	/// # Returns
 	///
-	/// The account ID of the collection's owner or `None` if the collection doesn't exist.
-	fn owner_of_collection(collection_id: CollectionId) -> Option<AccountId>;
+	/// The base URI associated with the specified collection or `None` if the collection doesn't exist.
+	fn base_uri(collection_id: CollectionId) -> Option<BaseURI>;
 
 	/// Creates a new collection and assigns it to the specified owner.
 	///
@@ -91,5 +91,130 @@ impl AsRef<[u8]> for Erc721Error {
 		match self {
 			Erc721Error::UnexistentCollection => b"UnexistentCollection",
 		}
+	}
+}
+
+#[cfg(test)]
+mod tests {
+	use frame_support::{assert_err, assert_ok};
+
+	use super::*;
+	use crate::{mock::*, Event};
+
+	type AccountId = <Test as frame_system::Config>::AccountId;
+	const ALICE: AccountId = 0x1234;
+
+	#[test]
+	fn base_uri_of_unexistent_collection_is_none() {
+		new_test_ext().execute_with(|| {
+			assert_eq!(<LivingAssetsModule as CollectionManager<AccountId>>::base_uri(0), None);
+			assert_eq!(<LivingAssetsModule as CollectionManager<AccountId>>::base_uri(1), None);
+		});
+	}
+
+	#[test]
+	fn create_new_collection_should_emit_an_event() {
+		new_test_ext().execute_with(|| {
+			// Go past genesis block so events get deposited
+			System::set_block_number(1);
+
+			assert_ok!(<LivingAssetsModule as CollectionManager<AccountId>>::create_collection(
+				ALICE,
+				Vec::new()
+			));
+			System::assert_last_event(
+				Event::CollectionCreated { collection_id: 0, who: ALICE }.into(),
+			);
+		});
+	}
+
+	#[test]
+	fn living_assets_ownership_trait_id_of_new_collection_should_be_consecutive() {
+		new_test_ext().execute_with(|| {
+			assert_eq!(
+				<LivingAssetsModule as CollectionManager<AccountId>>::create_collection(
+					ALICE,
+					Vec::new()
+				)
+				.unwrap(),
+				0
+			);
+			assert_eq!(
+				<LivingAssetsModule as CollectionManager<AccountId>>::create_collection(
+					ALICE,
+					Vec::new()
+				)
+				.unwrap(),
+				1
+			);
+			assert_eq!(
+				<LivingAssetsModule as CollectionManager<AccountId>>::create_collection(
+					ALICE,
+					Vec::new()
+				)
+				.unwrap(),
+				2
+			);
+			assert_eq!(
+				<LivingAssetsModule as CollectionManager<AccountId>>::create_collection(
+					ALICE,
+					Vec::new()
+				)
+				.unwrap(),
+				3
+			);
+			assert_eq!(
+				<LivingAssetsModule as CollectionManager<AccountId>>::create_collection(
+					ALICE,
+					Vec::new()
+				)
+				.unwrap(),
+				4
+			);
+			assert_eq!(
+				<LivingAssetsModule as CollectionManager<AccountId>>::create_collection(
+					ALICE,
+					Vec::new()
+				)
+				.unwrap(),
+				5
+			);
+		});
+	}
+
+	#[test]
+	fn living_assets_ownership_trait_should_set_base_uri_when_creating_new_collection() {
+		let base_uri: Vec<u8> = "https://example.com/".into();
+		new_test_ext().execute_with(|| {
+			assert_ok!(<LivingAssetsModule as CollectionManager<AccountId>>::create_collection(
+				ALICE,
+				base_uri.clone()
+			));
+			assert_eq!(LivingAssetsModule::collection_base_uri(0).unwrap(), base_uri);
+		});
+	}
+
+	#[test]
+	fn owner_of_asset_of_unexistent_collection_should_error() {
+		new_test_ext().execute_with(|| {
+			let result = <LivingAssetsModule as Erc721>::owner_of(0, 2.into());
+			assert_err!(result, Erc721Error::UnexistentCollection);
+		});
+	}
+
+	#[test]
+	fn erc721_owner_of_asset_of_collection() {
+		new_test_ext().execute_with(|| {
+			let collection_id =
+				<LivingAssetsModule as CollectionManager<AccountId>>::create_collection(
+					ALICE,
+					Vec::new(),
+				)
+				.unwrap();
+			assert_eq!(
+				<LivingAssetsModule as Erc721>::owner_of(collection_id, 2.into()).unwrap(),
+				H160::from_low_u64_be(0x0000000000000002)
+			);
+		});
 	}
 }

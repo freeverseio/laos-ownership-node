@@ -12,10 +12,6 @@ impl<T: Config> Pallet<T> {
 		// Retrieve the current collection count to use as the new collection's ID
 		let collection_id = Self::collection_counter();
 
-		// Insert a new entry into the OwnerOfCollection map, mapping the new
-		// collection's ID to the owner's account ID
-		OwnerOfCollection::<T>::insert(collection_id, &who);
-
 		let bounded_base_uri: BoundedVec<_, _> =
 			base_uri.try_into().map_err(|_| Error::<T>::TooLong)?;
 

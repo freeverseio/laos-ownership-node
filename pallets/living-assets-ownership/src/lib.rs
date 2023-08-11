@@ -25,8 +25,11 @@ pub mod pallet {
 	/// Collection id type
 	pub type CollectionId = u64;
 
-	/// Base URI limit
+	/// Base URI limit type
 	type BaseURILimit = ConstU32<255>;
+
+	/// Base URI type
+	pub type BaseURI = BoundedVec<u8, BaseURILimit>;
 
 	#[pallet::pallet]
 	pub struct Pallet<T>(_);
@@ -36,17 +39,7 @@ pub mod pallet {
 	pub trait Config: frame_system::Config {
 		/// Because this pallet emits events, it depends on the runtime's definition of an event.
 		type RuntimeEvent: From<Event<Self>> + IsType<<Self as frame_system::Config>::RuntimeEvent>;
-
-		// /// The maximum length of a base URI
-		// #[pallet::constant]
-		// type BaseURILimit: Get<u32>;
 	}
-
-	/// Mapping from collection id to owner
-	#[pallet::storage]
-	#[pallet::getter(fn owner_of_collection)]
-	pub(super) type OwnerOfCollection<T: Config> =
-		StorageMap<_, Blake2_128Concat, CollectionId, T::AccountId, OptionQuery>;
 
 	/// Collection counter
 	#[pallet::storage]
@@ -57,7 +50,7 @@ pub mod pallet {
 	#[pallet::storage]
 	#[pallet::getter(fn collection_base_uri)]
 	pub(super) type CollectionBaseURI<T: Config> =
-		StorageMap<_, Blake2_128Concat, CollectionId, BoundedVec<u8, BaseURILimit>, OptionQuery>;
+		StorageMap<_, Blake2_128Concat, CollectionId, BaseURI, OptionQuery>;
 
 	/// Pallet events
 	#[pallet::event]
@@ -95,8 +88,8 @@ pub mod pallet {
 	}
 
 	impl<T: Config> traits::CollectionManager<T::AccountId> for Pallet<T> {
-		fn owner_of_collection(collection_id: CollectionId) -> Option<T::AccountId> {
-			OwnerOfCollection::<T>::get(collection_id)
+		fn base_uri(collection_id: CollectionId) -> Option<BaseURI> {
+			CollectionBaseURI::<T>::get(collection_id)
 		}
 
 		fn create_collection(
@@ -120,7 +113,7 @@ pub mod pallet {
 			collection_id: CollectionId,
 			asset_id: U256,
 		) -> Result<H160, traits::Erc721Error> {
-			match OwnerOfCollection::<T>::get(collection_id) {
+			match CollectionBaseURI::<T>::get(collection_id) {
 				Some(_) => Ok(convert_asset_id_to_owner(asset_id)),
 				None => Err(traits::Erc721Error::UnexistentCollection),
 			}
