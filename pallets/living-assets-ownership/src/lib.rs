@@ -25,6 +25,7 @@ pub mod pallet {
 	/// Collection id type
 	/// TODO: use 256 bits
 	pub type CollectionId = u64;
+		type BaseURILimit: Get<u32>;
 
 	#[pallet::pallet]
 	pub struct Pallet<T>(_);
@@ -35,9 +36,9 @@ pub mod pallet {
 		/// Because this pallet emits events, it depends on the runtime's definition of an event.
 		type RuntimeEvent: From<Event<Self>> + IsType<<Self as frame_system::Config>::RuntimeEvent>;
 
-		/// The maximum length of a base URI
-		#[pallet::constant]
-		type BaseURILimit: Get<u32>;
+		// /// The maximum length of a base URI
+		// #[pallet::constant]
+		// type BaseURILimit: Get<u32>;
 	}
 
 	/// Mapping from collection id to owner
