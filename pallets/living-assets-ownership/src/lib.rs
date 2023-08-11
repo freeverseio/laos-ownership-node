@@ -5,6 +5,7 @@
 /// <https://docs.substrate.io/reference/frame-pallets/>
 pub use pallet::*;
 use sp_core::H160;
+use sp_std::vec::Vec;
 
 mod functions;
 pub mod traits;
