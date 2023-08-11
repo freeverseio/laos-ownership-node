@@ -34,20 +34,22 @@ fn check_log_selectors() {
 fn failing_create_collection_should_return_error() {
 	impl_precompile_mock_simple!(
 		Mock,
-		Err(CollectionManagerError::CollectionAlreadyExists),
+		Err(CollectionManagerError::UnknownError),
 		Some(H160::zero())
 	);
 
-	let mut handle = create_mock_handle_from_input(hex::decode(CREATE_COLLECTION_WITH_URI).unwrap());
+	let mut handle =
+		create_mock_handle_from_input(hex::decode(CREATE_COLLECTION_WITH_URI).unwrap());
 	let result = Mock::execute(&mut handle);
-	assert_eq!(result.unwrap_err(), revert(CollectionManagerError::CollectionAlreadyExists));
+	assert_eq!(result.unwrap_err(), revert(CollectionManagerError::UnknownError));
 }
 
 #[test]
 fn create_collection_should_return_address() {
 	impl_precompile_mock_simple!(Mock, Ok(5), Some(H160::zero()));
 
-	let mut handle = create_mock_handle_from_input(hex::decode(CREATE_COLLECTION_WITH_URI).unwrap());
+	let mut handle =
+		create_mock_handle_from_input(hex::decode(CREATE_COLLECTION_WITH_URI).unwrap());
 	let result = Mock::execute(&mut handle);
 	assert!(result.is_ok());
 	assert_eq!(
@@ -63,7 +65,8 @@ fn create_collection_should_return_address() {
 fn create_collection_should_generate_log() {
 	impl_precompile_mock_simple!(Mock, Ok(0xffff), Some(H160::zero()));
 
-	let mut handle = create_mock_handle_from_input(hex::decode(CREATE_COLLECTION_WITH_URI).unwrap());
+	let mut handle =
+		create_mock_handle_from_input(hex::decode(CREATE_COLLECTION_WITH_URI).unwrap());
 	let result = Mock::execute(&mut handle);
 	assert!(result.is_ok());
 	let logs = handle.logs;

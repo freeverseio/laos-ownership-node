@@ -41,7 +41,6 @@ pub trait CollectionManager<AccountId> {
 /// - `UnknownError`: An unspecified error occurred.
 #[derive(Debug, PartialEq)]
 pub enum CollectionManagerError {
-	CollectionAlreadyExists,
 	CollectionIdOverflow,
 	UnknownError,
 }
@@ -49,7 +48,6 @@ pub enum CollectionManagerError {
 impl AsRef<[u8]> for CollectionManagerError {
 	fn as_ref(&self) -> &[u8] {
 		match self {
-			CollectionManagerError::CollectionAlreadyExists => b"CollectionAlreadyExists",
 			CollectionManagerError::CollectionIdOverflow => b"CollectionIdOverflow",
 			CollectionManagerError::UnknownError => b"UnknownError",
 		}
