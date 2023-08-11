@@ -1,5 +1,6 @@
 use crate::{BaseURI, CollectionId};
 use sp_core::{H160, U256};
+use sp_std::vec::Vec;
 
 /// The `CollectionManager` trait provides an interface for managing collections in a decentralized system.
 ///
