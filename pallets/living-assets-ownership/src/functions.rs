@@ -1,17 +1,25 @@
 //! Contains helper and utility functions of the pallet
 use super::*;
-use frame_support::sp_runtime::traits::One;
+use frame_support::{sp_runtime::traits::One, BoundedVec};
 use sp_core::{H160, U256};
 
 impl<T: Config> Pallet<T> {
 	/// See [Self::create_collection]
-	pub fn do_create_collection(who: T::AccountId) -> Result<CollectionId, Error<T>> {
+	pub fn do_create_collection(
+		who: T::AccountId,
+		base_uri: Vec<u8>,
+	) -> Result<CollectionId, Error<T>> {
 		// Retrieve the current collection count to use as the new collection's ID
 		let collection_id = Self::collection_counter();
 
 		// Insert a new entry into the OwnerOfCollection map, mapping the new
 		// collection's ID to the owner's account ID
 		OwnerOfCollection::<T>::insert(collection_id, &who);
+
+		let bounded_base_uri: BoundedVec<_, _> =
+			base_uri.try_into().map_err(|_| Error::<T>::TooLong)?;
+
+		CollectionBaseURI::<T>::insert(collection_id, bounded_base_uri);
 
 		// Attempt to increment the collection counter by 1. If this operation
 		// would result in an overflow, return early with an error

@@ -73,6 +73,8 @@ pub mod pallet {
 	pub enum Error<T> {
 		/// Collection id overflow
 		CollectionIdOverflow,
+		/// value is too long
+		TooLong,
 	}
 
 	// Dispatchable functions allows users to interact with the pallet and invoke state changes.
@@ -82,10 +84,10 @@ pub mod pallet {
 	impl<T: Config> Pallet<T> {
 		#[pallet::call_index(0)]
 		#[pallet::weight(10_000 + T::DbWeight::get().writes(1).ref_time())] // TODO set proper weight
-		pub fn create_collection(origin: OriginFor<T>, _base_uri: Vec<u8>) -> DispatchResult {
+		pub fn create_collection(origin: OriginFor<T>, base_uri: Vec<u8>) -> DispatchResult {
 			let who = ensure_signed(origin)?;
 
-			match Self::do_create_collection(who) {
+			match Self::do_create_collection(who, base_uri) {
 				Ok(_) => Ok(()),
 				Err(err) => Err(err.into()),
 			}
@@ -100,7 +102,7 @@ pub mod pallet {
 		fn create_collection(
 			owner: T::AccountId,
 		) -> Result<CollectionId, traits::CollectionManagerError> {
-			match Self::do_create_collection(owner) {
+			match Self::do_create_collection(owner, Vec::new()) {
 				Ok(collection_id) => Ok(collection_id),
 				Err(err) => match err {
 					Error::CollectionIdOverflow => {
