@@ -55,8 +55,6 @@ pub mod pallet {
 	// Errors inform users that something went wrong.
 	#[pallet::error]
 	pub enum Error<T> {
-		/// Collection already exists
-		CollectionAlreadyExists,
 		/// Collection id overflow
 		CollectionIdOverflow,
 	}
@@ -89,9 +87,6 @@ pub mod pallet {
 			match Self::do_create_collection(owner) {
 				Ok(collection_id) => Ok(collection_id),
 				Err(err) => match err {
-					Error::CollectionAlreadyExists => {
-						Err(traits::CollectionManagerError::CollectionAlreadyExists)
-					},
 					Error::CollectionIdOverflow => {
 						Err(traits::CollectionManagerError::CollectionIdOverflow)
 					},
