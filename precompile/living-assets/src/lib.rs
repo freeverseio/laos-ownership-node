@@ -7,7 +7,7 @@ use pallet_living_assets_ownership::{
 };
 use parity_scale_codec::Encode;
 use precompile_utils::{
-	keccak256, revert, succeed, Address, EvmDataWriter, EvmResult, FunctionModifier, LogExt,
+	keccak256, revert, succeed, Address, Bytes, EvmDataWriter, EvmResult, FunctionModifier, LogExt,
 	LogsBuilder, PrecompileHandleExt,
 };
 use sp_runtime::SaturatedConversion;
@@ -49,10 +49,18 @@ where
 
 		match selector {
 			Action::CreateCollection => {
+				let mut input = handle.read_input()?;
+				input.expect_arguments(1)?;
+
+				let base_uri: Vec<u8> = match input.read::<Bytes>() {
+					Ok(bytes) => bytes.into(),
+					Err(e) => return Err(e),
+				};
+
 				let caller = handle.context().caller;
 				let owner = AddressMapping::into_account_id(caller);
 
-				match LivingAssets::create_collection(owner) {
+				match LivingAssets::create_collection(owner, base_uri) {
 					Ok(collection_id) => {
 						let collection_address = collection_id_to_address(
 							collection_id.saturated_into::<CollectionId>(),

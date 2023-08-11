@@ -4,7 +4,7 @@
 #![allow(clippy::redundant_closure_call)]
 
 use super::*;
-use pallet_living_assets_ownership::traits::CollectionManagerError;
+use pallet_living_assets_ownership::{traits::CollectionManagerError, BaseURI};
 use precompile_utils::{
 	revert, succeed,
 	testing::{create_mock_handle, create_mock_handle_from_input},
@@ -15,7 +15,7 @@ use sp_std::vec::Vec;
 type AccountId = H160;
 type AddressMapping = pallet_evm::IdentityAddressMapping;
 
-const CREATE_COLLECTION_WITH_URI: &str = "0x059dfe1300000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000010697066733a2f2f636172626f6e61726100000000000000000000000000000000";
+const CREATE_COLLECTION_WITH_URI: &str = "059dfe1300000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000010697066733a2f2f636172626f6e61726100000000000000000000000000000000";
 
 #[test]
 fn check_selectors() {
@@ -35,7 +35,7 @@ fn failing_create_collection_should_return_error() {
 	impl_precompile_mock_simple!(
 		Mock,
 		Err(CollectionManagerError::UnknownError),
-		Some(H160::zero())
+		Some(BaseURI::new())
 	);
 
 	let mut handle =
@@ -46,7 +46,7 @@ fn failing_create_collection_should_return_error() {
 
 #[test]
 fn create_collection_should_return_address() {
-	impl_precompile_mock_simple!(Mock, Ok(5), Some(H160::zero()));
+	impl_precompile_mock_simple!(Mock, Ok(5), Some(BaseURI::new()));
 
 	let mut handle =
 		create_mock_handle_from_input(hex::decode(CREATE_COLLECTION_WITH_URI).unwrap());
@@ -63,7 +63,7 @@ fn create_collection_should_return_address() {
 
 #[test]
 fn create_collection_should_generate_log() {
-	impl_precompile_mock_simple!(Mock, Ok(0xffff), Some(H160::zero()));
+	impl_precompile_mock_simple!(Mock, Ok(0xffff), Some(BaseURI::new()));
 
 	let mut handle =
 		create_mock_handle_from_input(hex::decode(CREATE_COLLECTION_WITH_URI).unwrap());
@@ -83,7 +83,7 @@ fn create_collection_should_generate_log() {
 
 #[test]
 fn create_collection_on_mock_with_nonzero_value_fails() {
-	impl_precompile_mock_simple!(Mock, Ok(5), Some(H160::zero()));
+	impl_precompile_mock_simple!(Mock, Ok(5), Some(BaseURI::new()));
 	let mut handle =
 		create_mock_handle(hex::decode(CREATE_COLLECTION_WITH_URI).unwrap(), 0, 1, H160::zero());
 	let result = Mock::execute(&mut handle);
@@ -95,11 +95,15 @@ fn create_collection_on_mock_with_nonzero_value_fails() {
 fn create_collection_assign_collection_to_caller() {
 	impl_precompile_mock!(
 		Mock, // name of the defined precompile
-		|owner| {
+		|owner, base_uri| {
 			assert_eq!(owner, H160::from_low_u64_be(0x1234));
+			assert_eq!(
+				base_uri,
+				vec![105, 112, 102, 115, 58, 47, 47, 99, 97, 114, 98, 111, 110, 97, 114, 97]
+			);
 			Ok(0)
 		}, // Closure for create_collection result
-		|_| { Some(H160::zero()) }  // Closure for owner_of_collection result
+		|_| { Some(BaseURI::new()) }  // Closure for owner_of_collection result
 	);
 
 	let mut handle = create_mock_handle(
@@ -114,7 +118,7 @@ fn create_collection_assign_collection_to_caller() {
 
 #[test]
 fn call_unexistent_selector_should_fail() {
-	impl_precompile_mock_simple!(Mock, Ok(0), Some(H160::from_low_u64_be(0x1234)));
+	impl_precompile_mock_simple!(Mock, Ok(0), Some(BaseURI::new()));
 
 	let unexistent_selector =
 		hex::decode("fb24ae530000000000000000000000000000000000000000000000000000000000000000")
@@ -140,11 +144,11 @@ mod helpers {
 	/// # Example
 	///
 	/// ```
-	/// impl_precompile_mock_simple!(Mock, Ok(0), Some(H160::zero()));
+	/// impl_precompile_mock_simple!(Mock, Ok(0), Some(BaseURI::new());
 	/// ```
 	#[macro_export]
 	macro_rules! impl_precompile_mock {
-		($name:ident, $create_collection_result:expr, $owner_of_collection_result:expr) => {
+		($name:ident, $create_collection_result:expr, $base_uri_result:expr) => {
 			struct CollectionManagerMock;
 
 			impl pallet_living_assets_ownership::traits::CollectionManager<AccountId>
@@ -152,12 +156,13 @@ mod helpers {
 			{
 				fn create_collection(
 					owner: AccountId,
+					base_uri: Vec<u8>,
 				) -> Result<CollectionId, CollectionManagerError> {
-					($create_collection_result)(owner)
+					($create_collection_result)(owner, base_uri)
 				}
 
-				fn owner_of_collection(collection_id: CollectionId) -> Option<AccountId> {
-					($owner_of_collection_result)(collection_id)
+				fn base_uri(collection_id: CollectionId) -> Option<BaseURI> {
+					($base_uri_result)(collection_id)
 				}
 			}
 
@@ -180,15 +185,15 @@ mod helpers {
 	/// # Example
 	///
 	/// ```
-	/// impl_precompile_mock_simple!(Mock, Ok(0), Some(H160::zero()));
+	/// impl_precompile_mock_simple!(Mock, Ok(0), Some(BaseURI::new());
 	/// ```
 	#[macro_export]
 	macro_rules! impl_precompile_mock_simple {
-		($name:ident, $create_collection_result:expr, $owner_of_collection_result:expr) => {
+		($name:ident, $create_collection_result:expr, $base_uri_result:expr) => {
 			impl_precompile_mock!(
 				$name,
-				|_owner| { $create_collection_result },
-				|_collection_id| { $owner_of_collection_result }
+				|_owner, _base_uri| { $create_collection_result },
+				|_collection_id| { $base_uri_result }
 			);
 		};
 	}
