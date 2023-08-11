@@ -26,7 +26,7 @@ pub mod pallet {
 	pub type CollectionId = u64;
 
 	/// Base URI limit type
-	type BaseURILimit = ConstU32<255>;
+	pub type BaseURILimit = ConstU32<255>;
 
 	/// Base URI type
 	pub type BaseURI = BoundedVec<u8, BaseURILimit>;
