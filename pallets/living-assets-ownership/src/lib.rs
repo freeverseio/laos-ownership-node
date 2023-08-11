@@ -23,9 +23,10 @@ pub mod pallet {
 	use sp_core::{H160, U256};
 
 	/// Collection id type
-	/// TODO: use 256 bits
 	pub type CollectionId = u64;
-		type BaseURILimit: Get<u32>;
+
+	/// Base URI limit
+	type BaseURILimit = ConstU32<255>;
 
 	#[pallet::pallet]
 	pub struct Pallet<T>(_);
@@ -56,7 +57,7 @@ pub mod pallet {
 	#[pallet::storage]
 	#[pallet::getter(fn collection_base_uri)]
 	pub(super) type CollectionBaseURI<T: Config> =
-		StorageMap<_, Blake2_128Concat, CollectionId, BoundedVec<u8, T::BaseURILimit>, OptionQuery>;
+		StorageMap<_, Blake2_128Concat, CollectionId, BoundedVec<u8, BaseURILimit>, OptionQuery>;
 
 	/// Pallet events
 	#[pallet::event]
