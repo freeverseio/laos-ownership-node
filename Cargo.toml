@@ -6,7 +6,8 @@ members = [
 	"node",
 	"runtime",
 	"precompile/*",
-	"pallets/*"
+	"pallets/*",
+	"bridge/*"
 ]
 
 
