@@ -126,6 +126,7 @@ mod traits {
 		Erc721Error, Event,
 	};
 	use frame_support::{assert_err, assert_ok};
+	use sp_core::U256;
 
 	#[test]
 	fn base_uri_of_unexistent_collection_is_none() {
@@ -238,6 +239,20 @@ mod traits {
 			assert_eq!(
 				<LivingAssetsModule as Erc721>::owner_of(collection_id, 2.into()).unwrap(),
 				H160::from_low_u64_be(0x0000000000000002)
+			);
+		});
+	}
+
+	#[test]
+	fn token_uri_of_unexistent_collection_should_fail() {
+		new_test_ext().execute_with(|| {
+			assert_eq!(
+				<LivingAssetsModule as Erc721>::token_uri(0, U256::from_str("0x01").unwrap()),
+				Err(Erc721Error::UnexistentCollection)
+			);
+			assert_eq!(
+				<LivingAssetsModule as Erc721>::token_uri(0, U256::from_str("0x01").unwrap()),
+				Err(Erc721Error::UnexistentCollection)
 			);
 		});
 	}

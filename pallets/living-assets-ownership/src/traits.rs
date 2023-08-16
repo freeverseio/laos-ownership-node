@@ -57,4 +57,6 @@ pub trait Erc721 {
 	///
 	/// The Ethereum address (`H160`) of the asset's owner or an error.
 	fn owner_of(collection_id: CollectionId, asset_id: U256) -> Result<H160, Self::Error>;
+
+	fn token_uri(collection_id: CollectionId, asset_id: U256) -> Result<Vec<u8>, Self::Error>;
 }

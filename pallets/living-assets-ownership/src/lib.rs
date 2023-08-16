@@ -152,6 +152,10 @@ pub mod pallet {
 				None => Err(Erc721Error::UnexistentCollection),
 			}
 		}
+
+		fn token_uri(collection_id: CollectionId, asset_id: U256) -> Result<Vec<u8>, Self::Error> {
+			todo!()
+		}
 	}
 }
 
