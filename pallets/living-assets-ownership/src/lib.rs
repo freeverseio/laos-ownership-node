@@ -65,8 +65,6 @@ pub mod pallet {
 	pub enum Error<T> {
 		/// Collection id overflow
 		CollectionIdOverflow,
-		/// value is too long
-		TooLong,
 	}
 
 	// Dispatchable functions allows users to interact with the pallet and invoke state changes.

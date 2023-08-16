@@ -1,6 +1,6 @@
 //! Contains helper and utility functions of the pallet
 use super::*;
-use frame_support::{sp_runtime::traits::One, BoundedVec};
+use frame_support::sp_runtime::traits::One;
 use sp_core::{H160, U256};
 
 impl<T: Config> Pallet<T> {
@@ -12,10 +12,7 @@ impl<T: Config> Pallet<T> {
 		// Retrieve the current collection count to use as the new collection's ID
 		let collection_id = Self::collection_counter();
 
-		let bounded_base_uri: BoundedVec<_, _> =
-			base_uri.try_into().map_err(|_| Error::<T>::TooLong)?;
-
-		CollectionBaseURI::<T>::insert(collection_id, bounded_base_uri);
+		CollectionBaseURI::<T>::insert(collection_id, base_uri);
 
 		// Attempt to increment the collection counter by 1. If this operation
 		// would result in an overflow, return early with an error
