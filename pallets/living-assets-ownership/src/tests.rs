@@ -256,4 +256,20 @@ mod traits {
 			);
 		});
 	}
+
+	#[test]
+	fn token_uri_should_return_base_uri_plus_asset_id() {
+		new_test_ext().execute_with(|| {
+			let collection_id =
+				<LivingAssetsModule as CollectionManager<AccountId>>::create_collection(
+					ALICE,
+					BaseURI::try_from("https://example.com/".as_bytes().to_vec()).unwrap(),
+				)
+				.unwrap();
+			assert_eq!(
+				<LivingAssetsModule as Erc721>::token_uri(collection_id, 2.into()).unwrap(),
+				"https://example.com/2".as_bytes().to_vec()
+			);
+		});
+	}
 }

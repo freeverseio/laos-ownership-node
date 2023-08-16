@@ -154,7 +154,14 @@ pub mod pallet {
 		}
 
 		fn token_uri(collection_id: CollectionId, asset_id: U256) -> Result<Vec<u8>, Self::Error> {
-			todo!()
+			match CollectionBaseURI::<T>::get(collection_id) {
+				Some(base_uri) => {
+					let mut uri = base_uri.to_vec();
+					uri.extend_from_slice(&asset_id.to_string().as_bytes());
+					Ok(uri)
+				},
+				None => Err(Erc721Error::UnexistentCollection),
+			}
 		}
 	}
 }
