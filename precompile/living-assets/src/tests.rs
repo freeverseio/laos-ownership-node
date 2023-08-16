@@ -156,7 +156,7 @@ mod helpers {
 			{
 				fn create_collection(
 					owner: AccountId,
-					base_uri: Vec<u8>,
+					base_uri: BaseURI,
 				) -> Result<CollectionId, CollectionManagerError> {
 					($create_collection_result)(owner, base_uri)
 				}
