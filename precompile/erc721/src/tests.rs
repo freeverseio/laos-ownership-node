@@ -59,7 +59,26 @@ fn invalid_contract_address_should_error() {
 	handle.code_address = H160::zero();
 	let result = Mock::execute(&mut handle);
 	assert!(result.is_err());
-	assert_eq!(result.unwrap_err(), revert("tried to parse selector out of bounds"),);
+	assert_eq!(result.unwrap_err(), revert("tried to parse selector out of bounds"));
+}
+
+#[test]
+fn token_owners_should_have_at_least_token_id_as_argument() {
+	impl_precompile_mock_simple!(Mock, Ok(H160::zero()));
+
+	let owner_of_with_2_arguments: Vec<u8> =
+		hex::decode("6352211e00000000000000000000000000000000000000000000000000000000000000040000000000000000000000000000000000000000000000000000000000000004")
+			.unwrap();
+	let mut handle = create_mock_handle_from_input(owner_of_with_2_arguments);
+	handle.code_address = H160::from_str("ffffffffffffffffffffffff0000000000000005").unwrap();
+	let result = Mock::execute(&mut handle);
+	assert!(result.is_ok());
+
+	let owner_of_with_0_arguments: Vec<u8> = hex::decode("6352211e").unwrap();
+	let mut handle = create_mock_handle_from_input(owner_of_with_0_arguments);
+	let result = Mock::execute(&mut handle);
+	assert!(result.is_err());
+	assert_eq!(result.unwrap_err(), revert("input doesn't match expected length"));
 }
 
 mod helpers {
