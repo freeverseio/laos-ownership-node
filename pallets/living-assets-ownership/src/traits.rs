@@ -39,7 +39,6 @@ pub trait CollectionManager<AccountId> {
 
 /// Errors that can occur when managing collections.
 ///
-/// - `CollectionAlreadyExists`: A collection with the same ID already exists.
 /// - `CollectionIdOverflow`: The ID for the new collection would overflow.
 /// - `UnknownError`: An unspecified error occurred.
 #[derive(Debug, PartialEq)]
