@@ -5,7 +5,6 @@
 /// <https://docs.substrate.io/reference/frame-pallets/>
 pub use pallet::*;
 use sp_core::H160;
-use sp_std::vec::Vec;
 
 mod functions;
 pub mod traits;
@@ -77,7 +76,7 @@ pub mod pallet {
 	impl<T: Config> Pallet<T> {
 		#[pallet::call_index(0)]
 		#[pallet::weight(10_000 + T::DbWeight::get().writes(1).ref_time())] // TODO set proper weight
-		pub fn create_collection(origin: OriginFor<T>, base_uri: Vec<u8>) -> DispatchResult {
+		pub fn create_collection(origin: OriginFor<T>, base_uri: BaseURI) -> DispatchResult {
 			let who = ensure_signed(origin)?;
 
 			match Self::do_create_collection(who, base_uri) {
@@ -94,7 +93,7 @@ pub mod pallet {
 
 		fn create_collection(
 			owner: T::AccountId,
-			base_uri: Vec<u8>,
+			base_uri: BaseURI,
 		) -> Result<CollectionId, traits::CollectionManagerError> {
 			match Self::do_create_collection(owner, base_uri) {
 				Ok(collection_id) => Ok(collection_id),

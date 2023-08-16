@@ -1,6 +1,5 @@
 use crate::{BaseURI, CollectionId};
 use sp_core::{H160, U256};
-use sp_std::vec::Vec;
 
 /// The `CollectionManager` trait provides an interface for managing collections in a decentralized system.
 ///
@@ -34,7 +33,7 @@ pub trait CollectionManager<AccountId> {
 	/// A result containing the `collection_id` of the newly created collection or an error.
 	fn create_collection(
 		owner: AccountId,
-		base_uri: Vec<u8>,
+		base_uri: BaseURI,
 	) -> Result<CollectionId, CollectionManagerError>;
 }
 
@@ -121,7 +120,7 @@ mod tests {
 
 			assert_ok!(<LivingAssetsModule as CollectionManager<AccountId>>::create_collection(
 				ALICE,
-				Vec::new()
+				BaseURI::default(),
 			));
 			System::assert_last_event(
 				Event::CollectionCreated { collection_id: 0, who: ALICE }.into(),
@@ -135,7 +134,7 @@ mod tests {
 			assert_eq!(
 				<LivingAssetsModule as CollectionManager<AccountId>>::create_collection(
 					ALICE,
-					Vec::new()
+					BaseURI::default()
 				)
 				.unwrap(),
 				0
@@ -143,7 +142,7 @@ mod tests {
 			assert_eq!(
 				<LivingAssetsModule as CollectionManager<AccountId>>::create_collection(
 					ALICE,
-					Vec::new()
+					BaseURI::default()
 				)
 				.unwrap(),
 				1
@@ -151,7 +150,7 @@ mod tests {
 			assert_eq!(
 				<LivingAssetsModule as CollectionManager<AccountId>>::create_collection(
 					ALICE,
-					Vec::new()
+					BaseURI::default()
 				)
 				.unwrap(),
 				2
@@ -159,7 +158,7 @@ mod tests {
 			assert_eq!(
 				<LivingAssetsModule as CollectionManager<AccountId>>::create_collection(
 					ALICE,
-					Vec::new()
+					BaseURI::default()
 				)
 				.unwrap(),
 				3
@@ -167,7 +166,7 @@ mod tests {
 			assert_eq!(
 				<LivingAssetsModule as CollectionManager<AccountId>>::create_collection(
 					ALICE,
-					Vec::new()
+					BaseURI::default()
 				)
 				.unwrap(),
 				4
@@ -175,7 +174,7 @@ mod tests {
 			assert_eq!(
 				<LivingAssetsModule as CollectionManager<AccountId>>::create_collection(
 					ALICE,
-					Vec::new()
+					BaseURI::default()
 				)
 				.unwrap(),
 				5
@@ -185,7 +184,8 @@ mod tests {
 
 	#[test]
 	fn living_assets_ownership_trait_should_set_base_uri_when_creating_new_collection() {
-		let base_uri: Vec<u8> = "https://example.com/".into();
+		let base_uri = base_uri_from_string("https://example.com/");
+
 		new_test_ext().execute_with(|| {
 			assert_ok!(<LivingAssetsModule as CollectionManager<AccountId>>::create_collection(
 				ALICE,
@@ -209,7 +209,7 @@ mod tests {
 			let collection_id =
 				<LivingAssetsModule as CollectionManager<AccountId>>::create_collection(
 					ALICE,
-					Vec::new(),
+					BaseURI::default(),
 				)
 				.unwrap();
 			assert_eq!(
@@ -217,5 +217,11 @@ mod tests {
 				H160::from_low_u64_be(0x0000000000000002)
 			);
 		});
+	}
+
+	fn base_uri_from_string(url: &str) -> BaseURI {
+		let mut base_uri = BaseURI::new();
+		base_uri.try_append(&mut url.to_string().into_bytes()).unwrap();
+		base_uri
 	}
 }

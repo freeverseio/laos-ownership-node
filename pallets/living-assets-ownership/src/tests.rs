@@ -1,12 +1,11 @@
 use core::str::FromStr;
 
 use crate::{
-	address_to_collection_id, collection_id_to_address, is_collection_address, mock::*,
+	address_to_collection_id, collection_id_to_address, is_collection_address, mock::*, BaseURI,
 	CollectionError, Event,
 };
 use frame_support::assert_ok;
 use sp_core::H160;
-use sp_runtime::{DispatchError, ModuleError};
 
 type AccountId = <Test as frame_system::Config>::AccountId;
 
@@ -26,10 +25,10 @@ fn create_new_collection_should_create_sequential_collections() {
 		// Check initial condition
 		assert_eq!(LivingAssetsModule::collection_base_uri(0), None);
 
+		let base_uri = base_uri_from_string("https://example.com/");
+
 		// Iterate through the collections to be created
 		for i in 0..3 {
-			let base_uri: Vec<u8> = format!("https://example.com/{}", i).into();
-
 			// Create the collection
 			assert_ok!(LivingAssetsModule::create_collection(
 				RuntimeOrigin::signed(ALICE),
@@ -44,7 +43,7 @@ fn create_new_collection_should_create_sequential_collections() {
 
 #[test]
 fn should_set_base_uri_when_creating_new_collection() {
-	let base_uri: Vec<u8> = "https://example.com/".into();
+	let base_uri = base_uri_from_string("https://example.com/");
 	new_test_ext().execute_with(|| {
 		assert_ok!(LivingAssetsModule::create_collection(
 			RuntimeOrigin::signed(ALICE),
@@ -62,40 +61,24 @@ fn create_new_collections_should_emit_events_with_collection_id_consecutive() {
 
 		assert_ok!(LivingAssetsModule::create_collection(
 			RuntimeOrigin::signed(ALICE),
-			"ciao".into()
+			base_uri_from_string("ciao")
 		));
 		System::assert_last_event(Event::CollectionCreated { collection_id: 0, who: ALICE }.into());
 		assert_ok!(LivingAssetsModule::create_collection(
 			RuntimeOrigin::signed(ALICE),
-			"ciao".into()
+			base_uri_from_string("ciao")
 		));
 		System::assert_last_event(Event::CollectionCreated { collection_id: 1, who: ALICE }.into());
 		assert_ok!(LivingAssetsModule::create_collection(
 			RuntimeOrigin::signed(ALICE),
-			"ciao".into()
+			base_uri_from_string("ciao")
 		));
 		System::assert_last_event(Event::CollectionCreated { collection_id: 2, who: ALICE }.into());
 		assert_ok!(LivingAssetsModule::create_collection(
 			RuntimeOrigin::signed(ALICE),
-			"ciao".into()
+			base_uri_from_string("ciao")
 		));
 		System::assert_last_event(Event::CollectionCreated { collection_id: 3, who: ALICE }.into());
-	});
-}
-
-#[test]
-fn create_collection_with_base_uri_greater_than_limit() {
-	new_test_ext().execute_with(|| {
-		let base_uri: Vec<u8> = vec![0; 255 + 1]; // TODO: use BaseURILimit::get() + 1
-		assert_eq!(
-			LivingAssetsModule::create_collection(RuntimeOrigin::signed(ALICE), base_uri)
-				.unwrap_err(),
-			DispatchError::Module(ModuleError {
-				index: 1,
-				error: [1, 0, 0, 0],
-				message: Some("TooLong".into()),
-			})
-		);
 	});
 }
 
@@ -133,4 +116,10 @@ fn test_is_collection_address_invalid() {
 	let invalid_address = H160([0u8; 20]);
 
 	assert!(!is_collection_address(invalid_address));
+}
+
+fn base_uri_from_string(url: &str) -> BaseURI {
+	let mut base_uri = BaseURI::new();
+	base_uri.try_append(&mut url.to_string().into_bytes()).unwrap();
+	base_uri
 }

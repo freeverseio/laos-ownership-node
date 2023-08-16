@@ -7,7 +7,7 @@ impl<T: Config> Pallet<T> {
 	/// See [Self::create_collection]
 	pub fn do_create_collection(
 		who: T::AccountId,
-		base_uri: Vec<u8>,
+		base_uri: BaseURI,
 	) -> Result<CollectionId, Error<T>> {
 		// Retrieve the current collection count to use as the new collection's ID
 		let collection_id = Self::collection_counter();
