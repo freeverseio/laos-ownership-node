@@ -7,9 +7,9 @@ use sp_std::vec::Vec;
 /// A collection is a container for non-fungible assets, uniquely identified by a `collection_id`. The system allows
 /// for the creation and ownership management of these collections.
 ///
-/// # Methods
+/// # Methods // TODO missing base_uri description
 ///
-/// - `owner_of_collection`: Retrieve the owner of a specified collection.
+/// - `owner_of_collection`: Retrieve the owner of a specified collection. // TODO unexistent function
 /// - `create_collection`: Create a new collection and assign it to an owner.
 pub trait CollectionManager<AccountId> {
 	/// Retrieves the base uri of the specified collection.
@@ -27,20 +27,20 @@ pub trait CollectionManager<AccountId> {
 	///
 	/// # Arguments
 	///
-	/// * `owner` - The account ID of the new collection's owner.
+	/// * `owner` - The account ID of the new collection's owner. // TODO missing base_uri arg
 	///
 	/// # Returns
 	///
 	/// A result containing the `collection_id` of the newly created collection or an error.
 	fn create_collection(
-		owner: AccountId,
+		owner: AccountId, // TODO!!! test creating millions of collections + to owner 0x
 		base_uri: Vec<u8>,
 	) -> Result<CollectionId, CollectionManagerError>;
 }
 
 /// Errors that can occur when managing collections.
 ///
-/// - `CollectionAlreadyExists`: A collection with the same ID already exists.
+/// - `CollectionAlreadyExists`: A collection with the same ID already exists. // TODO unused error?
 /// - `CollectionIdOverflow`: The ID for the new collection would overflow.
 /// - `UnknownError`: An unspecified error occurred.
 #[derive(Debug, PartialEq)]

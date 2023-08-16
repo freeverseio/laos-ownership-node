@@ -139,7 +139,7 @@ mod helpers {
 	///
 	/// * `$name`: An identifier to name the precompile mock type.
 	/// * `$create_collection_result`: An expression that evaluates to a `Result<CollectionId, &'static str>`.
-	/// * `$owner_of_collection_result`: An expression that evaluates to an `Option<AccountId>`.
+	/// * `$owner_of_collection_result`: An expression that evaluates to an `Option<AccountId>`. // TODO check this definition, it might refer to base uri
 	///
 	/// # Example
 	///
@@ -180,7 +180,7 @@ mod helpers {
 	/// # Arguments
 	///
 	/// * `$create_collection_result`: An expression that evaluates to a `Result`.
-	/// * `$owner_of_collection_result`: An expression that evaluates to an `Option<AccountId>`.
+	/// * `$owner_of_collection_result`: An expression that evaluates to an `Option<AccountId>`. // TODO same as above
 	///
 	/// # Example
 	///

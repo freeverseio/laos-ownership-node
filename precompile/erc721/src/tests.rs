@@ -89,7 +89,7 @@ mod helpers {
 
 			impl pallet_living_assets_ownership::traits::Erc721 for Erc721Mock {
 				fn owner_of(
-					collectio_id: CollectionId,
+					collectio_id: CollectionId, // TODO typo
 					asset_id: U256,
 				) -> Result<AccountId, Erc721Error> {
 					($owner_of_collection)(collectio_id, asset_id)

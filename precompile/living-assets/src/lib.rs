@@ -41,6 +41,8 @@ where
 	LivingAssets: CollectionManager<AccountId>,
 {
 	fn execute(handle: &mut impl PrecompileHandle) -> EvmResult<PrecompileOutput> {
+		// duda feees?
+		// TODO!!! test replay attack
 		let selector = handle.read_selector()?;
 
 		handle.check_function_modifier(match selector {
@@ -48,6 +50,7 @@ where
 		})?;
 
 		match selector {
+			// TODO!!! check how is paying? can i call this undefefined times?
 			Action::CreateCollection => {
 				let mut input = handle.read_input()?;
 				input.expect_arguments(1)?;
@@ -74,7 +77,9 @@ where
 					},
 					Err(err) => Err(revert(err)),
 				}
+				// duda no else? what if i include million of tx? could it lead to DoS
 			},
+			// duda no else?
 		}
 	}
 }

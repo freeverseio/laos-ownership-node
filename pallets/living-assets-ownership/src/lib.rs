@@ -10,13 +10,15 @@ use sp_std::vec::Vec;
 mod functions;
 pub mod traits;
 
+use frame_support::pallet_prelude::*;
+
 #[frame_support::pallet]
 pub mod pallet {
 	use crate::functions::convert_asset_id_to_owner;
 
 	use super::*;
 	use frame_support::{
-		pallet_prelude::{OptionQuery, ValueQuery, *},
+		pallet_prelude::{OptionQuery, ValueQuery},
 		BoundedVec,
 	};
 	use frame_system::pallet_prelude::*;
@@ -49,6 +51,8 @@ pub mod pallet {
 	/// Collection base URI
 	#[pallet::storage]
 	#[pallet::getter(fn collection_base_uri)]
+	// duda!!! does it make sense I can create collection with same base uri? (same storage address??)
+	// duda!!! does it make sense I can create collection collection with empty base uri? how about derive the origin so the baeuri is given by the protocol?
 	pub(super) type CollectionBaseURI<T: Config> =
 		StorageMap<_, Blake2_128Concat, CollectionId, BaseURI, OptionQuery>;
 
@@ -87,6 +91,7 @@ pub mod pallet {
 		}
 	}
 
+	// duda are those funcs accesible from pallet?
 	impl<T: Config> traits::CollectionManager<T::AccountId> for Pallet<T> {
 		fn base_uri(collection_id: CollectionId) -> Option<BaseURI> {
 			CollectionBaseURI::<T>::get(collection_id)
@@ -172,10 +177,8 @@ pub fn collection_id_to_address(collection_id: CollectionId) -> H160 {
 ///
 /// * A `Result` which is either the `CollectionId` or an error indicating the address is invalid.
 pub fn address_to_collection_id(address: H160) -> Result<CollectionId, CollectionError> {
-	if &address.0[0..12] != ASSET_PRECOMPILE_ADDRESS_PREFIX {
-		return Err(CollectionError::InvalidPrefix);
-	}
-	let id_bytes: [u8; 8] = address.0[12..].try_into().unwrap();
+	ensure!(is_collection_address(address), CollectionError::InvalidPrefix);
+	let id_bytes: [u8; 8] = address.0[12..].try_into().unwrap(); // TODO!!! don't panic
 	Ok(CollectionId::from_be_bytes(id_bytes))
 }
 
@@ -195,8 +198,8 @@ pub fn is_collection_address(address: H160) -> bool {
 	&address.to_fixed_bytes()[0..12] == ASSET_PRECOMPILE_ADDRESS_PREFIX
 }
 
-#[cfg(test)]
+#[cfg(test)] // TODO remove?
 mod mock;
 
 #[cfg(test)]
-mod tests;
+mod tests; // TODO remove?

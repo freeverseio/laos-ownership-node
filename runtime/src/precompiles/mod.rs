@@ -41,6 +41,7 @@ type Erc721 = Erc721Precompile<
 	pallet_living_assets_ownership::Pallet<crate::Runtime>,
 >;
 
+// duda: why is this in mod?
 impl<Runtime> PrecompileSet for FrontierPrecompiles<Runtime>
 where
 	Runtime: pallet_evm::Config + pallet_living_assets_ownership::Config,
