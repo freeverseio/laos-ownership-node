@@ -114,7 +114,7 @@ pub mod pallet {
 		fn create_collection(
 			owner: T::AccountId,
 			base_uri: BaseURI,
-		) -> Result<CollectionId, CollectionManagerError> {
+		) -> Result<CollectionId, Self::Error> {
 			match Self::do_create_collection(owner, base_uri) {
 				Ok(collection_id) => Ok(collection_id),
 				Err(err) => match err {
@@ -146,7 +146,7 @@ pub mod pallet {
 	impl<T: Config> traits::Erc721 for Pallet<T> {
 		type Error = Erc721Error;
 
-		fn owner_of(collection_id: CollectionId, asset_id: U256) -> Result<H160, Erc721Error> {
+		fn owner_of(collection_id: CollectionId, asset_id: U256) -> Result<H160, Self::Error> {
 			match CollectionBaseURI::<T>::get(collection_id) {
 				Some(_) => Ok(convert_asset_id_to_owner(asset_id)),
 				None => Err(Erc721Error::UnexistentCollection),
