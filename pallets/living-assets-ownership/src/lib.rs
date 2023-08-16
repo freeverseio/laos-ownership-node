@@ -24,9 +24,10 @@ pub mod pallet {
 	/// Collection id type
 	pub type CollectionId = u64;
 
-	/// Base URI limit type
+	/// Base URI limit
 	const BASE_URI_LIMIT_U32: u32 = u8::MAX as u32;
-	pub type BaseURILimit = ConstU32<BASE_URI_LIMIT_U32>;
+	/// Base URI limit type
+	type BaseURILimit = ConstU32<BASE_URI_LIMIT_U32>;
 
 	/// Base URI type
 	pub type BaseURI = BoundedVec<u8, BaseURILimit>;
