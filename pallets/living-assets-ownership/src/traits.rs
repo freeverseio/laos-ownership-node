@@ -11,6 +11,8 @@ use sp_core::{H160, U256};
 /// - `owner_of_collection`: Retrieve the owner of a specified collection.
 /// - `create_collection`: Create a new collection and assign it to an owner.
 pub trait CollectionManager<AccountId> {
+	type Error;
+
 	/// Retrieves the base uri of the specified collection.
 	///
 	/// # Arguments
@@ -31,29 +33,7 @@ pub trait CollectionManager<AccountId> {
 	/// # Returns
 	///
 	/// A result containing the `collection_id` of the newly created collection or an error.
-	fn create_collection(
-		owner: AccountId,
-		base_uri: BaseURI,
-	) -> Result<CollectionId, CollectionManagerError>;
-}
-
-/// Errors that can occur when managing collections.
-///
-/// - `CollectionIdOverflow`: The ID for the new collection would overflow.
-/// - `UnknownError`: An unspecified error occurred.
-#[derive(Debug, PartialEq)]
-pub enum CollectionManagerError {
-	CollectionIdOverflow,
-	UnknownError,
-}
-
-impl AsRef<[u8]> for CollectionManagerError {
-	fn as_ref(&self) -> &[u8] {
-		match self {
-			CollectionManagerError::CollectionIdOverflow => b"CollectionIdOverflow",
-			CollectionManagerError::UnknownError => b"UnknownError",
-		}
-	}
+	fn create_collection(owner: AccountId, base_uri: BaseURI) -> Result<CollectionId, Self::Error>;
 }
 
 /// The `Erc721` trait provides an interface for handling ERC721 tokens in a blockchain environment.
@@ -64,6 +44,8 @@ impl AsRef<[u8]> for CollectionManagerError {
 ///
 /// - `owner_of`: Retrieve the owner of a specific asset within a collection.
 pub trait Erc721 {
+	type Error;
+
 	/// Retrieves the owner of a specific asset within the specified collection.
 	///
 	/// # Arguments
@@ -74,23 +56,7 @@ pub trait Erc721 {
 	/// # Returns
 	///
 	/// The Ethereum address (`H160`) of the asset's owner or an error.
-	fn owner_of(collection_id: CollectionId, asset_id: U256) -> Result<H160, Erc721Error>;
-}
-
-/// Errors that can occur when interacting with ERC721 tokens.
-///
-/// - `UnexistentCollection`: The specified collection does not exist.
-#[derive(Debug, PartialEq)]
-pub enum Erc721Error {
-	UnexistentCollection,
-}
-
-impl AsRef<[u8]> for Erc721Error {
-	fn as_ref(&self) -> &[u8] {
-		match self {
-			Erc721Error::UnexistentCollection => b"UnexistentCollection",
-		}
-	}
+	fn owner_of(collection_id: CollectionId, asset_id: U256) -> Result<H160, Self::Error>;
 }
 
 #[cfg(test)]
@@ -98,7 +64,7 @@ mod tests {
 	use frame_support::{assert_err, assert_ok};
 
 	use super::*;
-	use crate::{mock::*, Event};
+	use crate::{mock::*, Erc721Error, Event};
 
 	type AccountId = <Test as frame_system::Config>::AccountId;
 	const ALICE: AccountId = 0x1234;

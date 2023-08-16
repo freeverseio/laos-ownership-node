@@ -85,8 +85,28 @@ pub mod pallet {
 			}
 		}
 	}
+	/// Errors that can occur when managing collections.
+	///
+	/// - `CollectionIdOverflow`: The ID for the new collection would overflow.
+	/// - `UnknownError`: An unspecified error occurred.
+	#[derive(Debug, PartialEq)]
+	pub enum CollectionManagerError {
+		CollectionIdOverflow,
+		UnknownError,
+	}
+
+	impl AsRef<[u8]> for CollectionManagerError {
+		fn as_ref(&self) -> &[u8] {
+			match self {
+				CollectionManagerError::CollectionIdOverflow => b"CollectionIdOverflow",
+				CollectionManagerError::UnknownError => b"UnknownError",
+			}
+		}
+	}
 
 	impl<T: Config> traits::CollectionManager<T::AccountId> for Pallet<T> {
+		type Error = CollectionManagerError;
+
 		fn base_uri(collection_id: CollectionId) -> Option<BaseURI> {
 			CollectionBaseURI::<T>::get(collection_id)
 		}
@@ -94,27 +114,42 @@ pub mod pallet {
 		fn create_collection(
 			owner: T::AccountId,
 			base_uri: BaseURI,
-		) -> Result<CollectionId, traits::CollectionManagerError> {
+		) -> Result<CollectionId, CollectionManagerError> {
 			match Self::do_create_collection(owner, base_uri) {
 				Ok(collection_id) => Ok(collection_id),
 				Err(err) => match err {
 					Error::CollectionIdOverflow => {
-						Err(traits::CollectionManagerError::CollectionIdOverflow)
+						Err(CollectionManagerError::CollectionIdOverflow)
 					},
-					_ => Err(traits::CollectionManagerError::UnknownError),
+					_ => Err(CollectionManagerError::UnknownError),
 				},
 			}
 		}
 	}
 
+	/// Errors that can occur when interacting with ERC721 tokens.
+	///
+	/// - `UnexistentCollection`: The specified collection does not exist.
+	#[derive(Debug, PartialEq)]
+	pub enum Erc721Error {
+		UnexistentCollection,
+	}
+
+	impl AsRef<[u8]> for Erc721Error {
+		fn as_ref(&self) -> &[u8] {
+			match self {
+				Erc721Error::UnexistentCollection => b"UnexistentCollection",
+			}
+		}
+	}
+
 	impl<T: Config> traits::Erc721 for Pallet<T> {
-		fn owner_of(
-			collection_id: CollectionId,
-			asset_id: U256,
-		) -> Result<H160, traits::Erc721Error> {
+		type Error = Erc721Error;
+
+		fn owner_of(collection_id: CollectionId, asset_id: U256) -> Result<H160, Erc721Error> {
 			match CollectionBaseURI::<T>::get(collection_id) {
 				Some(_) => Ok(convert_asset_id_to_owner(asset_id)),
-				None => Err(traits::Erc721Error::UnexistentCollection),
+				None => Err(Erc721Error::UnexistentCollection),
 			}
 		}
 	}
