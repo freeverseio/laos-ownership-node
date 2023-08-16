@@ -11,7 +11,7 @@ use sp_core::{H160, U256};
 /// - `owner_of_collection`: Retrieve the owner of a specified collection.
 /// - `create_collection`: Create a new collection and assign it to an owner.
 pub trait CollectionManager<AccountId> {
-	type Error;
+	type Error: AsRef<[u8]>;
 
 	/// Retrieves the base uri of the specified collection.
 	///
@@ -44,7 +44,7 @@ pub trait CollectionManager<AccountId> {
 ///
 /// - `owner_of`: Retrieve the owner of a specific asset within a collection.
 pub trait Erc721 {
-	type Error;
+	type Error: AsRef<[u8]>;
 
 	/// Retrieves the owner of a specific asset within the specified collection.
 	///

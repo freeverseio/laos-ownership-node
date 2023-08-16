@@ -4,7 +4,7 @@
 #![allow(clippy::redundant_closure_call)]
 
 use super::*;
-use pallet_living_assets_ownership::{traits::CollectionManagerError, BaseURI};
+use pallet_living_assets_ownership::BaseURI;
 use precompile_utils::{
 	revert, succeed,
 	testing::{create_mock_handle, create_mock_handle_from_input},
@@ -32,16 +32,12 @@ fn check_log_selectors() {
 
 #[test]
 fn failing_create_collection_should_return_error() {
-	impl_precompile_mock_simple!(
-		Mock,
-		Err(CollectionManagerError::UnknownError),
-		Some(BaseURI::new())
-	);
+	impl_precompile_mock_simple!(Mock, Err("this is an error"), Some(BaseURI::new()));
 
 	let mut handle =
 		create_mock_handle_from_input(hex::decode(CREATE_COLLECTION_WITH_URI).unwrap());
 	let result = Mock::execute(&mut handle);
-	assert_eq!(result.unwrap_err(), revert(CollectionManagerError::UnknownError));
+	assert_eq!(result.unwrap_err(), revert("this is an error"));
 }
 
 #[test]
@@ -154,10 +150,12 @@ mod helpers {
 			impl pallet_living_assets_ownership::traits::CollectionManager<AccountId>
 				for CollectionManagerMock
 			{
+				type Error = &'static str;
+
 				fn create_collection(
 					owner: AccountId,
 					base_uri: BaseURI,
-				) -> Result<CollectionId, CollectionManagerError> {
+				) -> Result<CollectionId, Self::Error> {
 					($create_collection_result)(owner, base_uri)
 				}
 
