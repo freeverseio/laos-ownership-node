@@ -63,7 +63,8 @@ impl AsRef<[u8]> for CollectionManagerError {
 /// # Methods
 ///
 /// - `owner_of`: Retrieve the owner of a specific asset within a collection.
-pub trait Erc721 {
+/// - `transfer_from`: Transfers the ownership of a asset from one address to another address.
+pub trait Erc721<AccountId> {
 	/// Retrieves the owner of a specific asset within the specified collection.
 	///
 	/// # Arguments
@@ -75,6 +76,21 @@ pub trait Erc721 {
 	///
 	/// The Ethereum address (`H160`) of the asset's owner or an error.
 	fn owner_of(collection_id: CollectionId, asset_id: U256) -> Result<H160, Erc721Error>;
+
+	/// Transfers the ownership of a asset from one address to another address
+	///
+	/// # Arguments
+	///
+	/// * `collection_id` - The unique identifier for the collection.
+	/// * `from` - The current owner of the asset.
+	/// * `to` - The new owner.
+	/// * `asset_id` - The unique identifier for the asset within the collection.
+	fn transfer_from(
+		collection_id: CollectionId,
+		from: AccountId,
+		to: AccountId,
+		asset_id: U256,
+	) -> Result<(), Erc721Error>;
 }
 
 /// Errors that can occur when interacting with ERC721 tokens.

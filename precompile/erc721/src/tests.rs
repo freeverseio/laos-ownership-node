@@ -12,13 +12,15 @@ type AddressMapping = pallet_evm::IdentityAddressMapping;
 fn check_selectors() {
 	assert_eq!(Action::OwnerOf as u32, 0x6352211E);
 	assert_eq!(Action::TokenURI as u32, 0xC87B56DD);
+	assert_eq!(Action::TransferFrom as u32, 0x23b872dd);
 }
 
 #[test]
 fn owner_of_asset_should_return_an_address() {
 	impl_precompile_mock_simple!(
 		Mock,
-		Ok(H160::from_str("ff00000000000000000000000000000012345678").unwrap())
+		Ok(H160::from_str("ff00000000000000000000000000000012345678").unwrap()),
+		Ok(())
 	);
 
 	let owner_of_asset_4 =
@@ -39,7 +41,7 @@ fn owner_of_asset_should_return_an_address() {
 
 #[test]
 fn if_mock_fails_should_return_the_error() {
-	impl_precompile_mock_simple!(Mock, Err(Erc721Error::UnexistentCollection));
+	impl_precompile_mock_simple!(Mock, Err(Erc721Error::UnexistentCollection), Ok(()));
 
 	let owner_of_asset_4 =
 		hex::decode("6352211e0000000000000000000000000000000000000000000000000000000000000004")
@@ -53,7 +55,7 @@ fn if_mock_fails_should_return_the_error() {
 
 #[test]
 fn invalid_contract_address_should_error() {
-	impl_precompile_mock_simple!(Mock, Ok(H160::zero()));
+	impl_precompile_mock_simple!(Mock, Ok(H160::zero()), Ok(()));
 
 	let mut handle = create_mock_handle_from_input(Vec::new());
 	handle.code_address = H160::zero();
@@ -62,6 +64,51 @@ fn invalid_contract_address_should_error() {
 	assert_eq!(result.unwrap_err(), revert("tried to parse selector out of bounds"),);
 }
 
+mod transfer_from {
+	use super::*;
+
+	#[test]
+	fn invalid_asset_id_should_fails() {
+		todo!("todo")
+	}
+	#[test]
+	fn sender_is_not_current_owner_should_fails() {
+		todo!("todo")
+	}
+	#[test]
+	fn receiver_is_the_current_owner_should_fails() {
+		impl_precompile_mock_simple!(
+			Mock,
+			Ok(H160::from_str("ff00000000000000000000000000000012345678").unwrap()),
+			Ok(())
+		);
+
+		let selector = "23b872dd";
+		let from = "ff00000000000000000000000000000012345678";
+		let to = "ff00000000000000000000000000000012345678";
+		let asset_id = format!("{:064x}", 4); // Pads to 64 characters.
+		let transfer_from_input = format!("{}{}{}{}", selector, from, to, asset_id);
+		let transfer_from_input = hex::decode(transfer_from_input).unwrap();
+		let mut handle = create_mock_handle_from_input(transfer_from_input);
+		handle.code_address = H160::from_str("ffffffffffffffffffffffff0000000000000005").unwrap();
+		let result = Mock::execute(&mut handle);
+		assert!(result.is_err());
+		assert_eq!(result.unwrap_err(), revert("not implemented"),);
+	}
+	#[test]
+	fn receiver_is_the_zero_address_should_fails() {
+		todo!("todo")
+	}
+	#[test]
+	fn send_value_as_money_should_fails() {
+		todo!("todo")
+	}
+	#[test]
+	fn sucessful_transfer_should_work() {
+		// TODO return new owner
+		todo!("todo")
+	}
+}
 mod helpers {
 	/// Macro to define a precompile mock with custom closures for testing.
 	///
@@ -72,7 +119,7 @@ mod helpers {
 	/// # Arguments
 	///
 	/// * `$name`: An identifier to name the precompile mock type.
-	/// * `$owner_of_collection`: A closure that takes `collection_id` and `asset_id` and returns a `Result<AccountId, &'static str>`.
+	/// * `$owner_of`: A closure that takes `collection_id` and `asset_id` and returns a `Result<AccountId, &'static str>`.
 	///
 	/// # Example
 	///
@@ -84,15 +131,24 @@ mod helpers {
 	/// ```
 	#[macro_export]
 	macro_rules! impl_precompile_mock {
-		($name:ident, $owner_of_collection:expr) => {
+		($name:ident, $owner_of:expr, $transfer_from:expr) => {
 			struct Erc721Mock;
 
-			impl pallet_living_assets_ownership::traits::Erc721 for Erc721Mock {
+			impl pallet_living_assets_ownership::traits::Erc721<AccountId> for Erc721Mock {
 				fn owner_of(
-					collectio_id: CollectionId,
+					collection_id: CollectionId,
 					asset_id: U256,
 				) -> Result<AccountId, Erc721Error> {
-					($owner_of_collection)(collectio_id, asset_id)
+					($owner_of)(collection_id, asset_id)
+				}
+
+				fn transfer_from(
+					collection_id: CollectionId,
+					from: AccountId,
+					to: AccountId,
+					asset_id: U256,
+				) -> Result<(), Erc721Error> {
+					($transfer_from)(collection_id, from, to, asset_id)
 				}
 			}
 
@@ -109,7 +165,7 @@ mod helpers {
 	/// # Arguments
 	///
 	/// * `$name`: An identifier to name the precompile mock type.
-	/// * `$owner_of_collection`: An expression that evaluates to a `Result<AccountId, &'static str>`.
+	/// * `$owner_of`: An expression that evaluates to a `Result<AccountId, &'static str>`.
 	///
 	/// # Example
 	///
@@ -118,8 +174,12 @@ mod helpers {
 	/// ```
 	#[macro_export]
 	macro_rules! impl_precompile_mock_simple {
-		($name:ident, $owner_of_collection:expr) => {
-			impl_precompile_mock!($name, |_asset_id, _collection_id| { $owner_of_collection });
+		($name:ident, $owner_of:expr, $transfer_from:expr) => {
+			impl_precompile_mock!(
+				$name,
+				|_asset_id, _collection_id| { $owner_of },
+				|_collection_id, _from, _to, _asset_id| { $transfer_from }
+			);
 		};
 	}
 }

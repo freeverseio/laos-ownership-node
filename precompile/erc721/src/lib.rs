@@ -18,6 +18,8 @@ pub enum Action {
 	TokenURI = "tokenURI(uint256)",
 	/// Owner of
 	OwnerOf = "ownerOf(uint256)",
+	/// Transfer from
+	TransferFrom = "transferFrom(address,address,uint256)",
 }
 
 /// Wrapper for the precompile function.
@@ -27,14 +29,14 @@ pub struct Erc721Precompile<AddressMapping, AccountId, AssetManager>(
 where
 	AddressMapping: pallet_evm::AddressMapping<AccountId>,
 	AccountId: Encode + Debug,
-	AssetManager: Erc721;
+	AssetManager: Erc721<AccountId>;
 
 impl<AddressMapping, AccountId, AssetManager> Precompile
 	for Erc721Precompile<AddressMapping, AccountId, AssetManager>
 where
 	AddressMapping: pallet_evm::AddressMapping<AccountId>,
 	AccountId: Encode + Debug,
-	AssetManager: Erc721,
+	AssetManager: Erc721<AccountId>,
 {
 	fn execute(handle: &mut impl PrecompileHandle) -> EvmResult<PrecompileOutput> {
 		let selector = handle.read_selector()?;
@@ -42,6 +44,7 @@ where
 		handle.check_function_modifier(match selector {
 			Action::TokenURI => FunctionModifier::View,
 			Action::OwnerOf => FunctionModifier::View,
+			Action::TransferFrom => FunctionModifier::NonPayable,
 		})?;
 
 		match selector {
@@ -62,6 +65,7 @@ where
 					Err(err) => Err(revert(err)),
 				}
 			},
+			Action::TransferFrom => Err(revert("not implemented")),
 		}
 	}
 }
