@@ -25,7 +25,7 @@ fn create_new_collection_should_create_sequential_collections() {
 		// Check initial condition
 		assert_eq!(LivingAssetsModule::collection_base_uri(0), None);
 
-		let base_uri = base_uri_from_string("https://example.com/");
+		let base_uri = BaseURI::try_from("https://example.com/".as_bytes().to_vec()).unwrap();
 
 		// Iterate through the collections to be created
 		for i in 0..3 {
@@ -43,7 +43,8 @@ fn create_new_collection_should_create_sequential_collections() {
 
 #[test]
 fn should_set_base_uri_when_creating_new_collection() {
-	let base_uri = base_uri_from_string("https://example.com/");
+	let base_uri = BaseURI::try_from("https://example.com/".as_bytes().to_vec()).unwrap();
+
 	new_test_ext().execute_with(|| {
 		assert_ok!(LivingAssetsModule::create_collection(
 			RuntimeOrigin::signed(ALICE),
@@ -61,22 +62,22 @@ fn create_new_collections_should_emit_events_with_collection_id_consecutive() {
 
 		assert_ok!(LivingAssetsModule::create_collection(
 			RuntimeOrigin::signed(ALICE),
-			base_uri_from_string("ciao")
+			BaseURI::default()
 		));
 		System::assert_last_event(Event::CollectionCreated { collection_id: 0, who: ALICE }.into());
 		assert_ok!(LivingAssetsModule::create_collection(
 			RuntimeOrigin::signed(ALICE),
-			base_uri_from_string("ciao")
+			BaseURI::default()
 		));
 		System::assert_last_event(Event::CollectionCreated { collection_id: 1, who: ALICE }.into());
 		assert_ok!(LivingAssetsModule::create_collection(
 			RuntimeOrigin::signed(ALICE),
-			base_uri_from_string("ciao")
+			BaseURI::default()
 		));
 		System::assert_last_event(Event::CollectionCreated { collection_id: 2, who: ALICE }.into());
 		assert_ok!(LivingAssetsModule::create_collection(
 			RuntimeOrigin::signed(ALICE),
-			base_uri_from_string("ciao")
+			BaseURI::default()
 		));
 		System::assert_last_event(Event::CollectionCreated { collection_id: 3, who: ALICE }.into());
 	});
@@ -116,10 +117,4 @@ fn test_is_collection_address_invalid() {
 	let invalid_address = H160([0u8; 20]);
 
 	assert!(!is_collection_address(invalid_address));
-}
-
-fn base_uri_from_string(url: &str) -> BaseURI {
-	let mut base_uri = BaseURI::new();
-	base_uri.try_append(&mut url.to_string().into_bytes()).unwrap();
-	base_uri
 }

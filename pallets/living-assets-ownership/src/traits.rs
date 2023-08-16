@@ -184,7 +184,7 @@ mod tests {
 
 	#[test]
 	fn living_assets_ownership_trait_should_set_base_uri_when_creating_new_collection() {
-		let base_uri = base_uri_from_string("https://example.com/");
+		let base_uri = BaseURI::try_from("https://example.com/".as_bytes().to_vec()).unwrap();
 
 		new_test_ext().execute_with(|| {
 			assert_ok!(<LivingAssetsModule as CollectionManager<AccountId>>::create_collection(
@@ -217,11 +217,5 @@ mod tests {
 				H160::from_low_u64_be(0x0000000000000002)
 			);
 		});
-	}
-
-	fn base_uri_from_string(url: &str) -> BaseURI {
-		let mut base_uri = BaseURI::new();
-		base_uri.try_append(&mut url.to_string().into_bytes()).unwrap();
-		base_uri
 	}
 }
