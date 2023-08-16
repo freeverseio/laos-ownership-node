@@ -1,6 +1,7 @@
 use core::str::FromStr;
 
 use super::*;
+use frame_support::{assert_err, assert_ok};
 use pallet_living_assets_ownership::CollectionId;
 use precompile_utils::testing::create_mock_handle_from_input;
 use sp_core::{H160, U256};
@@ -13,6 +14,9 @@ fn check_selectors() {
 	assert_eq!(Action::OwnerOf as u32, 0x6352211E);
 	assert_eq!(Action::TokenURI as u32, 0xC87B56DD);
 }
+
+const TOKEN_URI_ASSET_4: &str =
+	"c87b56dd0000000000000000000000000000000000000000000000000000000000000004";
 
 #[test]
 fn owner_of_asset_should_return_an_address() {
@@ -80,6 +84,54 @@ fn token_owners_should_have_at_least_token_id_as_argument() {
 	let result = Mock::execute(&mut handle);
 	assert!(result.is_err());
 	assert_eq!(result.unwrap_err(), revert("input doesn't match expected length"));
+}
+
+#[test]
+fn token_uri_from_non_721_contract_should_fail() {
+	impl_precompile_mock_simple!(Mock, Ok(H160::zero()), Ok(Vec::new()));
+
+	let token_uri: Vec<u8> = hex::decode(TOKEN_URI_ASSET_4).unwrap();
+	let mut handle = create_mock_handle_from_input(token_uri);
+
+	let result = Mock::execute(&mut handle);
+	assert_err!(result, revert("invalid collection address"));
+}
+
+#[test]
+fn failing_token_uri_should_return_the_error() {
+	impl_precompile_mock_simple!(Mock, Ok(H160::zero()), Err("this is an error"));
+
+	let token_uri: Vec<u8> = hex::decode(TOKEN_URI_ASSET_4).unwrap();
+	let mut handle = create_mock_handle_from_input(token_uri);
+	handle.code_address = H160::from_str("ffffffffffffffffffffffff0000000000000005").unwrap();
+
+	let result = Mock::execute(&mut handle);
+	assert_err!(result, revert("this is an error"));
+}
+
+#[test]
+fn successful_token_uri_should_return_the_uri() {
+	impl_precompile_mock_simple!(
+		Mock,
+		Ok(H160::zero()),
+		Ok(hex::encode("https://example.com/").into_bytes())
+	);
+
+	let token_uri: Vec<u8> = hex::decode(TOKEN_URI_ASSET_4).unwrap();
+	let mut handle = create_mock_handle_from_input(token_uri);
+	handle.code_address = H160::from_str("ffffffffffffffffffffffff0000000000000005").unwrap();
+
+	let result = Mock::execute(&mut handle);
+	assert_ok!(
+		result,
+		succeed(vec![
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 40, 54, 56, 55, 52, 55, 52, 55, 48, 55, 51, 51, 97, 50, 102, 50, 102,
+			54, 53, 55, 56, 54, 49, 54, 100, 55, 48, 54, 99, 54, 53, 50, 101, 54, 51, 54, 102, 54,
+			100, 50, 102, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+		])
+	);
 }
 
 mod helpers {
