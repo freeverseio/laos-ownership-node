@@ -4,7 +4,9 @@
 /// Learn more about FRAME and the core library of Substrate FRAME pallets:
 /// <https://docs.substrate.io/reference/frame-pallets/>
 pub use pallet::*;
+use parity_scale_codec::alloc::string::ToString;
 use sp_core::H160;
+use sp_std::vec::Vec;
 
 mod functions;
 pub mod traits;
@@ -19,7 +21,7 @@ pub mod pallet {
 		BoundedVec,
 	};
 	use frame_system::pallet_prelude::*;
-	use sp_core::{H160, U256};
+	use sp_core::U256;
 
 	/// Collection id type
 	pub type CollectionId = u64;
