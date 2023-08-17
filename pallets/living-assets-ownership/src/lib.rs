@@ -87,16 +87,15 @@ pub mod pallet {
 			match Self::do_create_collection(owner) {
 				Ok(collection_id) => Ok(collection_id),
 				Err(err) => match err {
-					Error::CollectionIdOverflow => {
-						Err(traits::CollectionManagerError::CollectionIdOverflow)
-					},
+					Error::CollectionIdOverflow =>
+						Err(traits::CollectionManagerError::CollectionIdOverflow),
 					_ => Err(traits::CollectionManagerError::UnknownError),
 				},
 			}
 		}
 	}
 
-	impl<T: Config> traits::Erc721 for Pallet<T> {
+	impl<T: Config> traits::Erc721<T::AccountId> for Pallet<T> {
 		fn owner_of(
 			collection_id: CollectionId,
 			asset_id: U256,
@@ -105,6 +104,15 @@ pub mod pallet {
 				Some(_) => Ok(convert_asset_id_to_owner(asset_id)),
 				None => Err(traits::Erc721Error::UnexistentCollection),
 			}
+		}
+
+		fn transfer_from(
+			collection_id: CollectionId,
+			from: T::AccountId,
+			to: T::AccountId,
+			asset_id: U256,
+		) -> Result<(), traits::Erc721Error> {
+			Ok(())
 		}
 	}
 }
@@ -161,7 +169,7 @@ pub fn collection_id_to_address(collection_id: CollectionId) -> H160 {
 /// * A `Result` which is either the `CollectionId` or an error indicating the address is invalid.
 pub fn address_to_collection_id(address: H160) -> Result<CollectionId, CollectionError> {
 	if &address.0[0..12] != ASSET_PRECOMPILE_ADDRESS_PREFIX {
-		return Err(CollectionError::InvalidPrefix);
+		return Err(CollectionError::InvalidPrefix)
 	}
 	let id_bytes: [u8; 8] = address.0[12..].try_into().unwrap();
 	Ok(CollectionId::from_be_bytes(id_bytes))
