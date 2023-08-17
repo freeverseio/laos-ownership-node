@@ -14,13 +14,23 @@ pub mod pallet {
 	use crate::functions::convert_asset_id_to_owner;
 
 	use super::*;
-	use frame_support::pallet_prelude::{OptionQuery, ValueQuery, *};
+	use frame_support::{
+		pallet_prelude::{OptionQuery, ValueQuery, *},
+		BoundedVec,
+	};
 	use frame_system::pallet_prelude::*;
 	use sp_core::{H160, U256};
 
 	/// Collection id type
-	/// TODO: use 256 bits
 	pub type CollectionId = u64;
+
+	/// Base URI limit
+	const BASE_URI_LIMIT_U32: u32 = u8::MAX as u32;
+	/// Base URI limit type
+	type BaseURILimit = ConstU32<BASE_URI_LIMIT_U32>;
+
+	/// Base URI type
+	pub type BaseURI = BoundedVec<u8, BaseURILimit>;
 
 	#[pallet::pallet]
 	pub struct Pallet<T>(_);
@@ -32,16 +42,16 @@ pub mod pallet {
 		type RuntimeEvent: From<Event<Self>> + IsType<<Self as frame_system::Config>::RuntimeEvent>;
 	}
 
-	/// Mapping from collection id to owner
-	#[pallet::storage]
-	#[pallet::getter(fn owner_of_collection)]
-	pub(super) type OwnerOfCollection<T: Config> =
-		StorageMap<_, Blake2_128Concat, CollectionId, T::AccountId, OptionQuery>;
-
 	/// Collection counter
 	#[pallet::storage]
 	#[pallet::getter(fn collection_counter)]
 	pub(super) type CollectionCounter<T: Config> = StorageValue<_, CollectionId, ValueQuery>;
+
+	/// Collection base URI
+	#[pallet::storage]
+	#[pallet::getter(fn collection_base_uri)]
+	pub(super) type CollectionBaseURI<T: Config> =
+		StorageMap<_, Blake2_128Concat, CollectionId, BaseURI, OptionQuery>;
 
 	/// Pallet events
 	#[pallet::event]
@@ -66,43 +76,80 @@ pub mod pallet {
 	impl<T: Config> Pallet<T> {
 		#[pallet::call_index(0)]
 		#[pallet::weight(10_000 + T::DbWeight::get().writes(1).ref_time())] // TODO set proper weight
-		pub fn create_collection(origin: OriginFor<T>) -> DispatchResult {
+		pub fn create_collection(origin: OriginFor<T>, base_uri: BaseURI) -> DispatchResult {
 			let who = ensure_signed(origin)?;
 
-			match Self::do_create_collection(who) {
+			match Self::do_create_collection(who, base_uri) {
 				Ok(_) => Ok(()),
 				Err(err) => Err(err.into()),
 			}
 		}
 	}
+	/// Errors that can occur when managing collections.
+	///
+	/// - `CollectionIdOverflow`: The ID for the new collection would overflow.
+	/// - `UnknownError`: An unspecified error occurred.
+	#[derive(Debug, PartialEq)]
+	pub enum CollectionManagerError {
+		CollectionIdOverflow,
+		UnknownError,
+	}
+
+	impl AsRef<[u8]> for CollectionManagerError {
+		fn as_ref(&self) -> &[u8] {
+			match self {
+				CollectionManagerError::CollectionIdOverflow => b"CollectionIdOverflow",
+				CollectionManagerError::UnknownError => b"UnknownError",
+			}
+		}
+	}
 
 	impl<T: Config> traits::CollectionManager<T::AccountId> for Pallet<T> {
-		fn owner_of_collection(collection_id: CollectionId) -> Option<T::AccountId> {
-			OwnerOfCollection::<T>::get(collection_id)
+		type Error = CollectionManagerError;
+
+		fn base_uri(collection_id: CollectionId) -> Option<BaseURI> {
+			CollectionBaseURI::<T>::get(collection_id)
 		}
 
 		fn create_collection(
 			owner: T::AccountId,
-		) -> Result<CollectionId, traits::CollectionManagerError> {
-			match Self::do_create_collection(owner) {
+			base_uri: BaseURI,
+		) -> Result<CollectionId, Self::Error> {
+			match Self::do_create_collection(owner, base_uri) {
 				Ok(collection_id) => Ok(collection_id),
 				Err(err) => match err {
-					Error::CollectionIdOverflow =>
-						Err(traits::CollectionManagerError::CollectionIdOverflow),
-					_ => Err(traits::CollectionManagerError::UnknownError),
+					Error::CollectionIdOverflow => {
+						Err(CollectionManagerError::CollectionIdOverflow)
+					},
+					_ => Err(CollectionManagerError::UnknownError),
 				},
 			}
 		}
 	}
 
+	/// Errors that can occur when interacting with ERC721 tokens.
+	///
+	/// - `UnexistentCollection`: The specified collection does not exist.
+	#[derive(Debug, PartialEq)]
+	pub enum Erc721Error {
+		UnexistentCollection,
+	}
+
+	impl AsRef<[u8]> for Erc721Error {
+		fn as_ref(&self) -> &[u8] {
+			match self {
+				Erc721Error::UnexistentCollection => b"UnexistentCollection",
+			}
+		}
+	}
+
 	impl<T: Config> traits::Erc721<T::AccountId> for Pallet<T> {
-		fn owner_of(
-			collection_id: CollectionId,
-			asset_id: U256,
-		) -> Result<H160, traits::Erc721Error> {
-			match OwnerOfCollection::<T>::get(collection_id) {
+		type Error = Erc721Error;
+
+		fn owner_of(collection_id: CollectionId, asset_id: U256) -> Result<H160, Self::Error> {
+			match CollectionBaseURI::<T>::get(collection_id) {
 				Some(_) => Ok(convert_asset_id_to_owner(asset_id)),
-				None => Err(traits::Erc721Error::UnexistentCollection),
+				None => Err(Erc721Error::UnexistentCollection),
 			}
 		}
 
@@ -111,7 +158,7 @@ pub mod pallet {
 			from: T::AccountId,
 			to: T::AccountId,
 			asset_id: U256,
-		) -> Result<(), traits::Erc721Error> {
+		) -> Result<(), Self::Error> {
 			Ok(())
 		}
 	}
@@ -169,7 +216,7 @@ pub fn collection_id_to_address(collection_id: CollectionId) -> H160 {
 /// * A `Result` which is either the `CollectionId` or an error indicating the address is invalid.
 pub fn address_to_collection_id(address: H160) -> Result<CollectionId, CollectionError> {
 	if &address.0[0..12] != ASSET_PRECOMPILE_ADDRESS_PREFIX {
-		return Err(CollectionError::InvalidPrefix)
+		return Err(CollectionError::InvalidPrefix);
 	}
 	let id_bytes: [u8; 8] = address.0[12..].try_into().unwrap();
 	Ok(CollectionId::from_be_bytes(id_bytes))

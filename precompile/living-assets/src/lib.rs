@@ -3,11 +3,11 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 use fp_evm::{Precompile, PrecompileHandle, PrecompileOutput};
 use pallet_living_assets_ownership::{
-	collection_id_to_address, traits::CollectionManager, CollectionId,
+	collection_id_to_address, traits::CollectionManager, BaseURI, CollectionId,
 };
 use parity_scale_codec::Encode;
 use precompile_utils::{
-	keccak256, revert, succeed, Address, EvmDataWriter, EvmResult, FunctionModifier, LogExt,
+	keccak256, revert, succeed, Address, Bytes, EvmDataWriter, EvmResult, FunctionModifier, LogExt,
 	LogsBuilder, PrecompileHandleExt,
 };
 use sp_runtime::SaturatedConversion;
@@ -21,7 +21,7 @@ pub const SELECTOR_LOG_CREATE_COLLECTION: [u8; 32] = keccak256!("CreateCollectio
 #[derive(Debug, PartialEq)]
 pub enum Action {
 	/// Create collection
-	CreateCollection = "createCollection()",
+	CreateCollection = "createCollection(string)",
 }
 
 /// Wrapper for the precompile function.
@@ -49,10 +49,24 @@ where
 
 		match selector {
 			Action::CreateCollection => {
+				let mut input = handle.read_input()?;
+				input.expect_arguments(1)?;
+
+				let mut base_uri: Vec<u8> = match input.read::<Bytes>() {
+					Ok(bytes) => bytes.into(),
+					Err(e) => return Err(e),
+				};
+
+				let mut bb = BaseURI::new();
+				match bb.try_append(&mut base_uri) {
+					Ok(()) => (),
+					Err(_) => return Err(revert("base_uri too long")),
+				}
+
 				let caller = handle.context().caller;
 				let owner = AddressMapping::into_account_id(caller);
 
-				match LivingAssets::create_collection(owner) {
+				match LivingAssets::create_collection(owner, bb) {
 					Ok(collection_id) => {
 						let collection_address = collection_id_to_address(
 							collection_id.saturated_into::<CollectionId>(),

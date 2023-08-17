@@ -1,4 +1,4 @@
-use crate::CollectionId;
+use crate::{BaseURI, CollectionId};
 use sp_core::{H160, U256};
 
 /// The `CollectionManager` trait provides an interface for managing collections in a decentralized system.
@@ -11,7 +11,9 @@ use sp_core::{H160, U256};
 /// - `owner_of_collection`: Retrieve the owner of a specified collection.
 /// - `create_collection`: Create a new collection and assign it to an owner.
 pub trait CollectionManager<AccountId> {
-	/// Retrieves the owner of the specified collection.
+	type Error: AsRef<[u8]>;
+
+	/// Retrieves the base uri of the specified collection.
 	///
 	/// # Arguments
 	///
@@ -19,8 +21,8 @@ pub trait CollectionManager<AccountId> {
 	///
 	/// # Returns
 	///
-	/// The account ID of the collection's owner or `None` if the collection doesn't exist.
-	fn owner_of_collection(collection_id: CollectionId) -> Option<AccountId>;
+	/// The base URI associated with the specified collection or `None` if the collection doesn't exist.
+	fn base_uri(collection_id: CollectionId) -> Option<BaseURI>;
 
 	/// Creates a new collection and assigns it to the specified owner.
 	///
@@ -31,29 +33,7 @@ pub trait CollectionManager<AccountId> {
 	/// # Returns
 	///
 	/// A result containing the `collection_id` of the newly created collection or an error.
-	fn create_collection(owner: AccountId) -> Result<CollectionId, CollectionManagerError>;
-}
-
-/// Errors that can occur when managing collections.
-///
-/// - `CollectionAlreadyExists`: A collection with the same ID already exists.
-/// - `CollectionIdOverflow`: The ID for the new collection would overflow.
-/// - `UnknownError`: An unspecified error occurred.
-#[derive(Debug, PartialEq)]
-pub enum CollectionManagerError {
-	CollectionAlreadyExists,
-	CollectionIdOverflow,
-	UnknownError,
-}
-
-impl AsRef<[u8]> for CollectionManagerError {
-	fn as_ref(&self) -> &[u8] {
-		match self {
-			CollectionManagerError::CollectionAlreadyExists => b"CollectionAlreadyExists",
-			CollectionManagerError::CollectionIdOverflow => b"CollectionIdOverflow",
-			CollectionManagerError::UnknownError => b"UnknownError",
-		}
-	}
+	fn create_collection(owner: AccountId, base_uri: BaseURI) -> Result<CollectionId, Self::Error>;
 }
 
 /// The `Erc721` trait provides an interface for handling ERC721 tokens in a blockchain environment.
@@ -63,8 +43,9 @@ impl AsRef<[u8]> for CollectionManagerError {
 /// # Methods
 ///
 /// - `owner_of`: Retrieve the owner of a specific asset within a collection.
-/// - `transfer_from`: Transfers the ownership of a asset from one address to another address.
 pub trait Erc721<AccountId> {
+	type Error: AsRef<[u8]>;
+
 	/// Retrieves the owner of a specific asset within the specified collection.
 	///
 	/// # Arguments
@@ -75,7 +56,7 @@ pub trait Erc721<AccountId> {
 	/// # Returns
 	///
 	/// The Ethereum address (`H160`) of the asset's owner or an error.
-	fn owner_of(collection_id: CollectionId, asset_id: U256) -> Result<H160, Erc721Error>;
+	fn owner_of(collection_id: CollectionId, asset_id: U256) -> Result<H160, Self::Error>;
 
 	/// Transfers the ownership of a asset from one address to another address
 	///
@@ -90,21 +71,5 @@ pub trait Erc721<AccountId> {
 		from: AccountId,
 		to: AccountId,
 		asset_id: U256,
-	) -> Result<(), Erc721Error>;
-}
-
-/// Errors that can occur when interacting with ERC721 tokens.
-///
-/// - `UnexistentCollection`: The specified collection does not exist.
-#[derive(Debug, PartialEq)]
-pub enum Erc721Error {
-	UnexistentCollection,
-}
-
-impl AsRef<[u8]> for Erc721Error {
-	fn as_ref(&self) -> &[u8] {
-		match self {
-			Erc721Error::UnexistentCollection => b"UnexistentCollection",
-		}
-	}
+	) -> Result<(), Self::Error>;
 }

@@ -1,7 +1,7 @@
 use core::str::FromStr;
 
 use super::*;
-use pallet_living_assets_ownership::{traits::Erc721Error, CollectionId};
+use pallet_living_assets_ownership::CollectionId;
 use precompile_utils::testing::create_mock_handle_from_input;
 use sp_core::{H160, U256};
 
@@ -41,7 +41,7 @@ fn owner_of_asset_should_return_an_address() {
 
 #[test]
 fn if_mock_fails_should_return_the_error() {
-	impl_precompile_mock_simple!(Mock, Err(Erc721Error::UnexistentCollection), Ok(()));
+	impl_precompile_mock_simple!(Mock, Err("this is an error"), Ok(()));
 
 	let owner_of_asset_4 =
 		hex::decode("6352211e0000000000000000000000000000000000000000000000000000000000000004")
@@ -50,7 +50,7 @@ fn if_mock_fails_should_return_the_error() {
 	handle.code_address = H160::from_str("ffffffffffffffffffffffff0000000000000005").unwrap();
 	let result = Mock::execute(&mut handle);
 	assert!(result.is_err());
-	assert_eq!(result.unwrap_err(), revert(Erc721Error::UnexistentCollection));
+	assert_eq!(result.unwrap_err(), revert("this is an error"));
 }
 
 #[test]
@@ -61,7 +61,26 @@ fn invalid_contract_address_should_error() {
 	handle.code_address = H160::zero();
 	let result = Mock::execute(&mut handle);
 	assert!(result.is_err());
-	assert_eq!(result.unwrap_err(), revert("tried to parse selector out of bounds"),);
+	assert_eq!(result.unwrap_err(), revert("tried to parse selector out of bounds"));
+}
+
+#[test]
+fn token_owners_should_have_at_least_token_id_as_argument() {
+	impl_precompile_mock_simple!(Mock, Ok(H160::zero()), Ok(()));
+
+	let owner_of_with_2_arguments: Vec<u8> =
+		hex::decode("6352211e00000000000000000000000000000000000000000000000000000000000000040000000000000000000000000000000000000000000000000000000000000004")
+			.unwrap();
+	let mut handle = create_mock_handle_from_input(owner_of_with_2_arguments);
+	handle.code_address = H160::from_str("ffffffffffffffffffffffff0000000000000005").unwrap();
+	let result = Mock::execute(&mut handle);
+	assert!(result.is_ok());
+
+	let owner_of_with_0_arguments: Vec<u8> = hex::decode("6352211e").unwrap();
+	let mut handle = create_mock_handle_from_input(owner_of_with_0_arguments);
+	let result = Mock::execute(&mut handle);
+	assert!(result.is_err());
+	assert_eq!(result.unwrap_err(), revert("input doesn't match expected length"));
 }
 
 mod transfer_from {
@@ -171,10 +190,12 @@ mod helpers {
 			struct Erc721Mock;
 
 			impl pallet_living_assets_ownership::traits::Erc721<AccountId> for Erc721Mock {
+				type Error = &'static str;
+
 				fn owner_of(
 					collection_id: CollectionId,
 					asset_id: U256,
-				) -> Result<AccountId, Erc721Error> {
+				) -> Result<AccountId, Self::Error> {
 					($owner_of)(collection_id, asset_id)
 				}
 
@@ -183,7 +204,7 @@ mod helpers {
 					from: AccountId,
 					to: AccountId,
 					asset_id: U256,
-				) -> Result<(), Erc721Error> {
+				) -> Result<(), Self::Error> {
 					($transfer_from)(collection_id, from, to, asset_id)
 				}
 			}
