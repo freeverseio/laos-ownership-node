@@ -68,41 +68,77 @@ mod transfer_from {
 	use super::*;
 
 	#[test]
-	fn invalid_asset_id_should_fails() {
+	fn invalid_asset_id_should_fail() {
 		todo!("todo")
 	}
 	#[test]
-	fn sender_is_not_current_owner_should_fails() {
-		todo!("todo")
-	}
-	#[test]
-	fn receiver_is_the_current_owner_should_fails() {
+	fn sender_is_not_current_owner_should_fail() {
 		impl_precompile_mock_simple!(
 			Mock,
-			Ok(H160::from_str("ff00000000000000000000000000000012345678").unwrap()),
+			// owner_of result
+			Ok(H160::from_str("bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb").unwrap()),
+			// transfer_from result
 			Ok(())
 		);
 
-		let selector = "23b872dd";
-		let from = "ff00000000000000000000000000000012345678";
-		let to = "ff00000000000000000000000000000012345678";
-		let asset_id = format!("{:064x}", 4); // Pads to 64 characters.
-		let transfer_from_input = format!("{}{}{}{}", selector, from, to, asset_id);
-		let transfer_from_input = hex::decode(transfer_from_input).unwrap();
-		let mut handle = create_mock_handle_from_input(transfer_from_input);
-		handle.code_address = H160::from_str("ffffffffffffffffffffffff0000000000000005").unwrap();
+		// test data
+		let from = H160::repeat_byte(0xAA);
+		let to = H160::repeat_byte(0xBB);
+		let asset_id = 4;
+		let contract_address = H160::from_str("ffffffffffffffffffffffff0000000000000005");
+
+		let input_data = EvmDataWriter::new_with_selector(Action::TransferFrom)
+			.write(Address(from))
+			.write(Address(to))
+			.write(U256::from(asset_id))
+			.build();
+
+		let mut handle = create_mock_handle_from_input(input_data);
+		handle.code_address = contract_address.unwrap();
 		let result = Mock::execute(&mut handle);
 		assert!(result.is_err());
-		assert_eq!(result.unwrap_err(), revert("not implemented"),);
+		assert_eq!(result.unwrap_err(), revert("sender must be the current owner"),);
 	}
+
 	#[test]
-	fn receiver_is_the_zero_address_should_fails() {
+	fn receiver_is_the_current_owner_should_fail() {
+		impl_precompile_mock_simple!(
+			Mock,
+			// owner_of result
+			Ok(H160::from_str("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa").unwrap()),
+			// transfer_from result
+			Ok(())
+		);
+
+		// test data
+		let from = H160::repeat_byte(0xAA);
+		let to = H160::repeat_byte(0xAA);
+		let asset_id = 4;
+		let contract_address = H160::from_str("ffffffffffffffffffffffff0000000000000005");
+
+		let input_data = EvmDataWriter::new_with_selector(Action::TransferFrom)
+			.write(Address(from))
+			.write(Address(to))
+			.write(U256::from(asset_id))
+			.build();
+
+		let mut handle = create_mock_handle_from_input(input_data);
+		handle.code_address = contract_address.unwrap();
+		let result = Mock::execute(&mut handle);
+		assert!(result.is_err());
+		assert_eq!(result.unwrap_err(), revert("sender and receiver cannot be the same"),);
+	}
+
+	#[test]
+	fn receiver_is_the_zero_address_should_fail() {
 		todo!("todo")
 	}
+
 	#[test]
-	fn send_value_as_money_should_fails() {
+	fn send_value_as_money_should_fail() {
 		todo!("todo")
 	}
+
 	#[test]
 	fn sucessful_transfer_should_work() {
 		// TODO return new owner
