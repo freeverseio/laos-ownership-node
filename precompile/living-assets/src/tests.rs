@@ -4,6 +4,7 @@
 #![allow(clippy::redundant_closure_call)]
 
 use super::*;
+use frame_support::assert_ok;
 use pallet_living_assets_ownership::BaseURI;
 use precompile_utils::{
 	revert, succeed,
@@ -14,8 +15,6 @@ use sp_std::vec::Vec;
 
 type AccountId = H160;
 type AddressMapping = pallet_evm::IdentityAddressMapping;
-
-const CREATE_COLLECTION_WITH_URI: &str = "059dfe1300000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000010697066733a2f2f636172626f6e61726100000000000000000000000000000000";
 
 #[test]
 fn check_selectors() {
@@ -34,8 +33,11 @@ fn check_log_selectors() {
 fn failing_create_collection_should_return_error() {
 	impl_precompile_mock_simple!(Mock, Err("this is an error"), Some(BaseURI::new()));
 
-	let mut handle =
-		create_mock_handle_from_input(hex::decode(CREATE_COLLECTION_WITH_URI).unwrap());
+	let input = EvmDataWriter::new_with_selector(Action::CreateCollection)
+		.write(Bytes("ipfs::/carbonara".into()))
+		.build();
+	let mut handle = create_mock_handle_from_input(input);
+
 	let result = Mock::execute(&mut handle);
 	assert_eq!(result.unwrap_err(), revert("this is an error"));
 }
@@ -44,12 +46,14 @@ fn failing_create_collection_should_return_error() {
 fn create_collection_should_return_address() {
 	impl_precompile_mock_simple!(Mock, Ok(5), Some(BaseURI::new()));
 
-	let mut handle =
-		create_mock_handle_from_input(hex::decode(CREATE_COLLECTION_WITH_URI).unwrap());
+	let input = EvmDataWriter::new_with_selector(Action::CreateCollection)
+		.write(Bytes("ipfs::/carbonara".into()))
+		.build();
+	let mut handle = create_mock_handle_from_input(input);
+
 	let result = Mock::execute(&mut handle);
-	assert!(result.is_ok());
-	assert_eq!(
-		result.unwrap(),
+	assert_ok!(
+		result,
 		succeed(
 			hex::decode("000000000000000000000000ffffffffffffffffffffffff0000000000000005")
 				.unwrap()
@@ -61,8 +65,11 @@ fn create_collection_should_return_address() {
 fn create_collection_should_generate_log() {
 	impl_precompile_mock_simple!(Mock, Ok(0xffff), Some(BaseURI::new()));
 
-	let mut handle =
-		create_mock_handle_from_input(hex::decode(CREATE_COLLECTION_WITH_URI).unwrap());
+	let input = EvmDataWriter::new_with_selector(Action::CreateCollection)
+		.write(Bytes("ipfs::/carbonara".into()))
+		.build();
+	let mut handle = create_mock_handle_from_input(input);
+
 	let result = Mock::execute(&mut handle);
 	assert!(result.is_ok());
 	let logs = handle.logs;
@@ -80,8 +87,12 @@ fn create_collection_should_generate_log() {
 #[test]
 fn create_collection_on_mock_with_nonzero_value_fails() {
 	impl_precompile_mock_simple!(Mock, Ok(5), Some(BaseURI::new()));
-	let mut handle =
-		create_mock_handle(hex::decode(CREATE_COLLECTION_WITH_URI).unwrap(), 0, 1, H160::zero());
+
+	let input = EvmDataWriter::new_with_selector(Action::CreateCollection)
+		.write(Bytes("ipfs::/carbonara".into()))
+		.build();
+	let mut handle = create_mock_handle(input, 0, 1, H160::zero());
+
 	let result = Mock::execute(&mut handle);
 	assert!(result.is_err());
 	assert_eq!(result.unwrap_err(), revert("function is not payable"));
@@ -91,10 +102,10 @@ fn create_collection_on_mock_with_nonzero_value_fails() {
 fn create_collection_assign_collection_to_caller() {
 	impl_precompile_mock!(
 		Mock, // name of the defined precompile
-		|owner, base_uri| {
+		|owner, base_uri: BaseURI| {
 			assert_eq!(owner, H160::from_low_u64_be(0x1234));
 			assert_eq!(
-				base_uri,
+				base_uri.to_ascii_lowercase(),
 				vec![105, 112, 102, 115, 58, 47, 47, 99, 97, 114, 98, 111, 110, 97, 114, 97]
 			);
 			Ok(0)
@@ -102,12 +113,11 @@ fn create_collection_assign_collection_to_caller() {
 		|_| { Some(BaseURI::new()) }  // Closure for owner_of_collection result
 	);
 
-	let mut handle = create_mock_handle(
-		hex::decode(CREATE_COLLECTION_WITH_URI).unwrap(),
-		0,
-		0,
-		H160::from_low_u64_be(0x1234),
-	);
+	let input = EvmDataWriter::new_with_selector(Action::CreateCollection)
+		.write(Bytes("ipfs://carbonara".into()))
+		.build();
+
+	let mut handle = create_mock_handle(input, 0, 0, H160::from_low_u64_be(0x1234));
 	let result = Mock::execute(&mut handle);
 	assert!(result.is_ok());
 }
