@@ -20,11 +20,11 @@ pub enum Action {
 }
 
 /// Wrapper for the precompile function.
-pub struct Erc721Precompile<Runtime>(PhantomData<Runtime>);
+pub struct Erc721Precompile<AssetManager>(PhantomData<AssetManager>);
 
-impl<Runtime> Precompile for Erc721Precompile<Runtime>
+impl<AssetManager> Precompile for Erc721Precompile<AssetManager>
 where
-	Runtime: pallet_living_assets_ownership::traits::Erc721,
+	AssetManager: pallet_living_assets_ownership::traits::Erc721,
 {
 	fn execute(handle: &mut impl PrecompileHandle) -> EvmResult<PrecompileOutput> {
 		let selector = handle.read_selector()?;
@@ -48,7 +48,7 @@ where
 					Err(_) => return Err(revert("invalid collection address")),
 				};
 
-				match Runtime::owner_of(collection_id, asset_id) {
+				match AssetManager::owner_of(collection_id, asset_id) {
 					Ok(owner) => Ok(succeed(EvmDataWriter::new().write(Address(owner)).build())),
 					Err(err) => Err(revert(err)),
 				}
