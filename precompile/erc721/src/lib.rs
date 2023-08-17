@@ -2,7 +2,7 @@
 
 #![cfg_attr(not(feature = "std"), no_std)]
 use fp_evm::{Precompile, PrecompileHandle, PrecompileOutput};
-use pallet_living_assets_ownership::{address_to_collection_id, traits::Erc721};
+use pallet_living_assets_ownership::address_to_collection_id;
 use precompile_utils::{
 	revert, succeed, Address, EvmDataWriter, EvmResult, FunctionModifier, PrecompileHandleExt,
 };
@@ -24,7 +24,7 @@ pub struct Erc721Precompile<Runtime>(PhantomData<Runtime>);
 
 impl<Runtime> Precompile for Erc721Precompile<Runtime>
 where
-	Runtime: pallet_living_assets_ownership::Config,
+	Runtime: pallet_living_assets_ownership::traits::Erc721,
 {
 	fn execute(handle: &mut impl PrecompileHandle) -> EvmResult<PrecompileOutput> {
 		let selector = handle.read_selector()?;
@@ -48,10 +48,7 @@ where
 					Err(_) => return Err(revert("invalid collection address")),
 				};
 
-				match pallet_living_assets_ownership::Pallet::<Runtime>::owner_of(
-					collection_id,
-					asset_id,
-				) {
+				match Runtime::owner_of(collection_id, asset_id) {
 					Ok(owner) => Ok(succeed(EvmDataWriter::new().write(Address(owner)).build())),
 					Err(err) => Err(revert(err)),
 				}
