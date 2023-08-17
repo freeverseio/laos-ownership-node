@@ -104,10 +104,7 @@ fn create_collection_assign_collection_to_caller() {
 		Mock, // name of the defined precompile
 		|owner, base_uri: BaseURI| {
 			assert_eq!(owner, H160::from_low_u64_be(0x1234));
-			assert_eq!(
-				base_uri.to_ascii_lowercase(),
-				vec![105, 112, 102, 115, 58, 47, 47, 99, 97, 114, 98, 111, 110, 97, 114, 97]
-			);
+			assert_eq!(base_uri.escape_ascii().to_string(), "ipfs://carbonara");
 			Ok(0)
 		}, // Closure for create_collection result
 		|_| { Some(BaseURI::new()) }  // Closure for owner_of_collection result
