@@ -3,7 +3,6 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 use fp_evm::{Precompile, PrecompileHandle, PrecompileOutput};
 use pallet_living_assets_ownership::{address_to_collection_id, traits::Erc721};
-use parity_scale_codec::Encode;
 use precompile_utils::{
 	revert, succeed, Address, EvmDataWriter, EvmResult, FunctionModifier, PrecompileHandleExt,
 };
@@ -21,20 +20,11 @@ pub enum Action {
 }
 
 /// Wrapper for the precompile function.
-pub struct Erc721Precompile<AddressMapping, AccountId, AssetManager>(
-	PhantomData<(AddressMapping, AccountId, AssetManager)>,
-)
-where
-	AddressMapping: pallet_evm::AddressMapping<AccountId>,
-	AccountId: Encode + Debug,
-	AssetManager: Erc721;
+pub struct Erc721Precompile<Runtime>(PhantomData<Runtime>);
 
-impl<AddressMapping, AccountId, AssetManager> Precompile
-	for Erc721Precompile<AddressMapping, AccountId, AssetManager>
+impl<Runtime> Precompile for Erc721Precompile<Runtime>
 where
-	AddressMapping: pallet_evm::AddressMapping<AccountId>,
-	AccountId: Encode + Debug,
-	AssetManager: Erc721,
+	Runtime: pallet_living_assets_ownership::Config,
 {
 	fn execute(handle: &mut impl PrecompileHandle) -> EvmResult<PrecompileOutput> {
 		let selector = handle.read_selector()?;
@@ -57,7 +47,11 @@ where
 					Ok(collection_id) => collection_id,
 					Err(_) => return Err(revert("invalid collection address")),
 				};
-				match AssetManager::owner_of(collection_id, asset_id) {
+
+				match pallet_living_assets_ownership::Pallet::<Runtime>::owner_of(
+					collection_id,
+					asset_id,
+				) {
 					Ok(owner) => Ok(succeed(EvmDataWriter::new().write(Address(owner)).build())),
 					Err(err) => Err(revert(err)),
 				}
