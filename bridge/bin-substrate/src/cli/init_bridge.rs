@@ -38,7 +38,6 @@ use crate::{
 	cli::{bridge::CliBridgeBase, chain_schema::*},
 };
 use bp_runtime::Chain as ChainBase;
-use node_template_runtime as evochain_runtime;
 use relay_substrate_client::{AccountKeyPairOf, Chain, UnsignedTransaction};
 use sp_core::Pair;
 use structopt::StructOpt;
@@ -74,7 +73,7 @@ pub enum InitBridgeName {
 	WococoToBridgeHubRococo,
 	KusamaToBridgeHubPolkadot,
 	PolkadotToBridgeHubKusama,
-	EvochainToOwnershipParachainCliBridge,
+	EvochainToOwnershipParachain,
 }
 
 #[async_trait]
@@ -140,7 +139,7 @@ impl BridgeInitializer for MillauToRialtoParachainCliBridge {
 		type BridgeGrandpaCall = relay_rialto_parachain_client::BridgeGrandpaCall;
 		type SudoCall = relay_rialto_parachain_client::SudoCall;
 
-		let initialize_call =
+		let initialize_call: relay_rialto_parachain_client::runtime_types::rialto_parachain_runtime::RuntimeCall =
 			RuntimeCall::BridgeMillauGrandpa(BridgeGrandpaCall::initialize { init_data });
 
 		RuntimeCall::Sudo(SudoCall::sudo { call: Box::new(initialize_call) })
@@ -274,7 +273,7 @@ impl InitBridge {
 			InitBridgeName::PolkadotToBridgeHubKusama => {
 				PolkadotToBridgeHubKusamaCliBridge::init_bridge(self)
 			},
-			InitBridgeName::EvochainToOwnershipParachainCliBridge => {
+			InitBridgeName::EvochainToOwnershipParachain => {
 				EvochainToOwnershipParachainCliBridge::init_bridge(self)
 			},
 		}
