@@ -74,7 +74,9 @@ where
 				ensure!(from != to, revert("sender and receiver cannot be the same"));
 				ensure!(to != H160::zero(), revert("receiver cannot be zero address"));
 
-				Ok((succeed(EvmDataWriter::new().write(asset_id).build())).into())
+				Self::transfer_from(handle.code_address(), from, to, asset_id)?;
+
+				Ok((succeed(vec![])).into())
 			},
 		}
 	}
@@ -95,6 +97,37 @@ where
 		};
 		match AssetManager::owner_of(collection_id, asset_id) {
 			Ok(owner) => Ok(owner),
+			Err(err) => Err(revert(err)),
+		}
+	}
+}
+
+impl<AddressMapping, AccountId, AssetManager>
+	Erc721Precompile<AddressMapping, AccountId, AssetManager>
+where
+	AddressMapping: pallet_evm::AddressMapping<AccountId>,
+	AccountId: Encode + Debug,
+	AssetManager: Erc721<AccountId>,
+{
+	fn transfer_from(
+		code_address: H160,
+		from: H160,
+		to: H160,
+		asset_id: U256,
+	) -> Result<(), PrecompileFailure> {
+		// collection id is encoded into the contract address
+		let collection_id = match address_to_collection_id(code_address) {
+			Ok(collection_id) => collection_id,
+			Err(_) => return Err(revert("invalid collection address")),
+		};
+
+		match AssetManager::transfer_from(
+			collection_id,
+			AddressMapping::into_account_id(from),
+			AddressMapping::into_account_id(to),
+			asset_id,
+		) {
+			Ok(_) => Ok(()),
 			Err(err) => Err(revert(err)),
 		}
 	}

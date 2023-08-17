@@ -84,6 +84,7 @@ fn token_owners_should_have_at_least_token_id_as_argument() {
 }
 
 mod transfer_from {
+	use frame_support::assert_ok;
 	use precompile_utils::testing::create_mock_handle;
 
 	use super::*;
@@ -206,8 +207,57 @@ mod transfer_from {
 
 	#[test]
 	fn sucessful_transfer_should_work() {
-		// TODO return new owner
-		todo!("todo")
+		impl_precompile_mock_simple!(
+			Mock,
+			// owner_of result
+			Ok(H160::from_str("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa").unwrap()),
+			// transfer_from result
+			Ok(())
+		);
+
+		// test data
+		let from = H160::repeat_byte(0xAA);
+		let to = H160::repeat_byte(0xBB);
+		let asset_id = 4;
+		let contract_address = H160::from_str("ffffffffffffffffffffffff0000000000000005");
+
+		let input_data = EvmDataWriter::new_with_selector(Action::TransferFrom)
+			.write(Address(from))
+			.write(Address(to))
+			.write(U256::from(asset_id))
+			.build();
+
+		let mut handle = create_mock_handle_from_input(input_data);
+		handle.code_address = contract_address.unwrap();
+		assert_ok!(Mock::execute(&mut handle));
+	}
+	#[test]
+	fn unsucessful_transfer_should_fail() {
+		impl_precompile_mock_simple!(
+			Mock,
+			// owner_of result
+			Ok(H160::from_str("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa").unwrap()),
+			// transfer_from result
+			Err("this is an error")
+		);
+
+		// test data
+		let from = H160::repeat_byte(0xAA);
+		let to = H160::repeat_byte(0xBB);
+		let asset_id = 4;
+		let contract_address = H160::from_str("ffffffffffffffffffffffff0000000000000005");
+
+		let input_data = EvmDataWriter::new_with_selector(Action::TransferFrom)
+			.write(Address(from))
+			.write(Address(to))
+			.write(U256::from(asset_id))
+			.build();
+
+		let mut handle = create_mock_handle_from_input(input_data);
+		handle.code_address = contract_address.unwrap();
+		let result = Mock::execute(&mut handle);
+		assert!(result.is_err());
+		assert_eq!(result.unwrap_err(), revert("this is an error"));
 	}
 }
 mod helpers {
