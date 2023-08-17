@@ -84,12 +84,10 @@ fn token_owners_should_have_at_least_token_id_as_argument() {
 }
 
 mod transfer_from {
+	use precompile_utils::testing::create_mock_handle;
+
 	use super::*;
 
-	#[test]
-	fn invalid_asset_id_should_fail() {
-		todo!("todo")
-	}
 	#[test]
 	fn sender_is_not_current_owner_should_fail() {
 		impl_precompile_mock_simple!(
@@ -145,17 +143,65 @@ mod transfer_from {
 		handle.code_address = contract_address.unwrap();
 		let result = Mock::execute(&mut handle);
 		assert!(result.is_err());
-		assert_eq!(result.unwrap_err(), revert("sender and receiver cannot be the same"),);
+		assert_eq!(result.unwrap_err(), revert("sender and receiver cannot be the same"));
 	}
 
 	#[test]
 	fn receiver_is_the_zero_address_should_fail() {
-		todo!("todo")
+		impl_precompile_mock_simple!(
+			Mock,
+			// owner_of result
+			Ok(H160::from_str("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa").unwrap()),
+			// transfer_from result
+			Ok(())
+		);
+
+		// test data
+		let from = H160::repeat_byte(0xAA);
+		let to = H160::repeat_byte(0x0);
+		let asset_id = 4;
+		let contract_address = H160::from_str("ffffffffffffffffffffffff0000000000000005");
+
+		let input_data = EvmDataWriter::new_with_selector(Action::TransferFrom)
+			.write(Address(from))
+			.write(Address(to))
+			.write(U256::from(asset_id))
+			.build();
+
+		let mut handle = create_mock_handle_from_input(input_data);
+		handle.code_address = contract_address.unwrap();
+		let result = Mock::execute(&mut handle);
+		assert!(result.is_err());
+		assert_eq!(result.unwrap_err(), revert("receiver cannot be zero address"));
 	}
 
 	#[test]
 	fn send_value_as_money_should_fail() {
-		todo!("todo")
+		impl_precompile_mock_simple!(
+			Mock,
+			// owner_of result
+			Ok(H160::from_str("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa").unwrap()),
+			// transfer_from result
+			Ok(())
+		);
+
+		// test data
+		let from = H160::repeat_byte(0xAA);
+		let to = H160::repeat_byte(0x0);
+		let asset_id = 4;
+		let contract_address = H160::from_str("ffffffffffffffffffffffff0000000000000005");
+
+		let input_data = EvmDataWriter::new_with_selector(Action::TransferFrom)
+			.write(Address(from))
+			.write(Address(to))
+			.write(U256::from(asset_id))
+			.build();
+
+		let mut handle = create_mock_handle(input_data, 0, 1, H160::zero());
+		handle.code_address = contract_address.unwrap();
+		let result = Mock::execute(&mut handle);
+		assert!(result.is_err());
+		assert_eq!(result.unwrap_err(), revert("function is not payable"));
 	}
 
 	#[test]

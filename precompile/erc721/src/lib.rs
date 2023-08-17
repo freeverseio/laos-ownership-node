@@ -72,6 +72,7 @@ where
 				let owner = Self::owner_of(asset_id, handle.code_address())?;
 				ensure!(owner == from, revert("sender must be the current owner"));
 				ensure!(from != to, revert("sender and receiver cannot be the same"));
+				ensure!(to != H160::zero(), revert("receiver cannot be zero address"));
 
 				Ok((succeed(EvmDataWriter::new().write(asset_id).build())).into())
 			},
