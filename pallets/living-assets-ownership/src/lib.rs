@@ -68,6 +68,7 @@ pub mod pallet {
 	pub enum Error<T> {
 		/// Collection id overflow
 		CollectionIdOverflow,
+		/// Unexistent collection
 		UnexistentCollection,
 	}
 
