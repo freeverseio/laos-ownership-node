@@ -3,7 +3,7 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 use fp_evm::{Precompile, PrecompileHandle, PrecompileOutput};
 use pallet_living_assets_ownership::{
-	collection_id_to_address, traits::CollectionManager, BaseURI, CollectionId,
+	collection_id_to_address, traits::CollectionManager, CollectionId,
 };
 use parity_scale_codec::Encode;
 use precompile_utils::{
@@ -52,21 +52,20 @@ where
 				let mut input = handle.read_input()?;
 				input.expect_arguments(1)?;
 
-				let mut base_uri: Vec<u8> = match input.read::<Bytes>() {
+				let base_uri_bytes: Vec<u8> = match input.read::<Bytes>() {
 					Ok(bytes) => bytes.into(),
 					Err(e) => return Err(e),
 				};
 
-				let mut bb = BaseURI::new();
-				match bb.try_append(&mut base_uri) {
-					Ok(()) => (),
+				let base_uri = match base_uri_bytes.try_into() {
+					Ok(value) => value,
 					Err(_) => return Err(revert("base_uri too long")),
-				}
+				};
 
 				let caller = handle.context().caller;
 				let owner = AddressMapping::into_account_id(caller);
 
-				match LivingAssets::create_collection(owner, bb) {
+				match LivingAssets::create_collection(owner, base_uri) {
 					Ok(collection_id) => {
 						let collection_address = collection_id_to_address(
 							collection_id.saturated_into::<CollectionId>(),

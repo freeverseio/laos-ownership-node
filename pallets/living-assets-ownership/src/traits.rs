@@ -13,7 +13,7 @@ use sp_core::{H160, U256};
 pub trait CollectionManager {
 	type Error: AsRef<[u8]> + PartialEq;
 	type AccountId;
-	type BaseURI;
+	type BaseURI: TryFrom<Vec<u8>>;
 
 	/// Retrieves the base uri of the specified collection.
 	///
