@@ -128,7 +128,7 @@ mod traits {
 	use super::*;
 	use crate::{
 		traits::{CollectionManager, Erc721},
-		Erc721Error, Event,
+		Error, Event,
 	};
 	use frame_support::{assert_err, assert_ok};
 
@@ -227,7 +227,7 @@ mod traits {
 	fn owner_of_asset_of_unexistent_collection_should_error() {
 		new_test_ext().execute_with(|| {
 			let result = <LivingAssetsModule as Erc721>::owner_of(0, 2.into());
-			assert_err!(result, Erc721Error::UnexistentCollection);
+			assert_err!(result, Error::UnexistentCollection);
 		});
 	}
 
