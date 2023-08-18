@@ -37,7 +37,7 @@ pub mod pallet {
 
 	/// Configure the pallet by specifying the parameters and types on which it depends.
 	#[pallet::config]
-	pub trait Config: frame_system::Config {
+	pub trait Config: frame_system::Config + traits::Config {
 		/// Because this pallet emits events, it depends on the runtime's definition of an event.
 		type RuntimeEvent: From<Event<Self>> + IsType<<Self as frame_system::Config>::RuntimeEvent>;
 	}
@@ -59,7 +59,10 @@ pub mod pallet {
 	pub enum Event<T: Config> {
 		/// Collection created
 		/// parameters. [collection_id, who]
-		CollectionCreated { collection_id: CollectionId, who: T::AccountId },
+		CollectionCreated {
+			collection_id: CollectionId,
+			who: <T as frame_system::Config>::AccountId,
+		},
 	}
 
 	// Errors inform users that something went wrong.
@@ -104,7 +107,7 @@ pub mod pallet {
 		}
 	}
 
-	impl<T: Config> traits::CollectionManager<T::AccountId> for Pallet<T> {
+	impl<T: Config> traits::CollectionManager<<T as frame_system::Config>::AccountId> for Pallet<T> {
 		type Error = CollectionManagerError;
 
 		fn base_uri(collection_id: CollectionId) -> Option<BaseURI> {
@@ -112,7 +115,7 @@ pub mod pallet {
 		}
 
 		fn create_collection(
-			owner: T::AccountId,
+			owner: <T as frame_system::Config>::AccountId,
 			base_uri: BaseURI,
 		) -> Result<CollectionId, Self::Error> {
 			match Self::do_create_collection(owner, base_uri) {
@@ -143,7 +146,7 @@ pub mod pallet {
 		}
 	}
 
-	impl<T: Config> traits::Erc721<T::AccountId> for Pallet<T> {
+	impl<T: Config> traits::Erc721<T> for Pallet<T> {
 		type Error = Erc721Error;
 
 		fn owner_of(collection_id: CollectionId, asset_id: U256) -> Result<H160, Self::Error> {
@@ -155,8 +158,8 @@ pub mod pallet {
 
 		fn transfer_from(
 			collection_id: CollectionId,
-			from: T::AccountId,
-			to: T::AccountId,
+			from: <T as traits::Config>::AccountId,
+			to: <T as traits::Config>::AccountId,
 			asset_id: U256,
 		) -> Result<(), Self::Error> {
 			Ok(())

@@ -7180,6 +7180,7 @@ dependencies = [
  "frame-system",
  "hex",
  "hex-literal 0.4.1",
+ "pallet-evm",
  "parity-scale-codec",
  "scale-info",
  "serde",

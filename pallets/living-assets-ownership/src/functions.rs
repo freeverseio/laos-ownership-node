@@ -6,7 +6,7 @@ use sp_core::{H160, U256};
 impl<T: Config> Pallet<T> {
 	/// See [Self::create_collection]
 	pub fn do_create_collection(
-		who: T::AccountId,
+		who: <T as frame_system::Config>::AccountId,
 		base_uri: BaseURI,
 	) -> Result<CollectionId, Error<T>> {
 		// Retrieve the current collection count to use as the new collection's ID

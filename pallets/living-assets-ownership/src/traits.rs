@@ -1,5 +1,10 @@
 use crate::{BaseURI, CollectionId};
+use frame_support::Parameter;
+use pallet_evm::AddressMapping;
+use parity_scale_codec::MaxEncodedLen;
 use sp_core::{H160, U256};
+use sp_runtime::traits::{MaybeDisplay, MaybeSerializeDeserialize, Member};
+use sp_std::fmt::Debug;
 
 /// The `CollectionManager` trait provides an interface for managing collections in a decentralized system.
 ///
@@ -36,6 +41,16 @@ pub trait CollectionManager<AccountId> {
 	fn create_collection(owner: AccountId, base_uri: BaseURI) -> Result<CollectionId, Self::Error>;
 }
 
+pub trait Config {
+	type AccountId: Parameter
+		+ Member
+		+ MaybeSerializeDeserialize
+		+ Debug
+		+ MaybeDisplay
+		+ Ord
+		+ MaxEncodedLen;
+	type AddressMapping: pallet_evm::AddressMapping<Self::AccountId>;
+}
 /// The `Erc721` trait provides an interface for handling ERC721 tokens in a blockchain environment.
 ///
 /// ERC721 tokens are a standard for representing ownership of unique items on the Ethereum blockchain.
@@ -43,7 +58,7 @@ pub trait CollectionManager<AccountId> {
 /// # Methods
 ///
 /// - `owner_of`: Retrieve the owner of a specific asset within a collection.
-pub trait Erc721<AccountId> {
+pub trait Erc721<T: Config> {
 	type Error: AsRef<[u8]>;
 
 	/// Retrieves the owner of a specific asset within the specified collection.
@@ -68,8 +83,8 @@ pub trait Erc721<AccountId> {
 	/// * `asset_id` - The unique identifier for the asset within the collection.
 	fn transfer_from(
 		collection_id: CollectionId,
-		from: AccountId,
-		to: AccountId,
+		from: T::AccountId,
+		to: T::AccountId,
 		asset_id: U256,
 	) -> Result<(), Self::Error>;
 }

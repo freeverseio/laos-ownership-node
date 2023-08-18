@@ -1,14 +1,11 @@
-//! Living Assets precompile module.
-
 #![cfg_attr(not(feature = "std"), no_std)]
 use fp_evm::{Precompile, PrecompileFailure, PrecompileHandle, PrecompileOutput};
-use frame_support::pallet_prelude::*;
-use pallet_living_assets_ownership::{address_to_collection_id, traits::Erc721};
-use parity_scale_codec::Encode;
+use frame_support::ensure;
+use pallet_evm::AddressMapping;
+use pallet_living_assets_ownership::address_to_collection_id;
 use precompile_utils::{
 	revert, succeed, Address, EvmDataWriter, EvmResult, FunctionModifier, PrecompileHandleExt,
 };
-
 use sp_core::{H160, U256};
 use sp_std::{fmt::Debug, marker::PhantomData};
 
@@ -24,20 +21,11 @@ pub enum Action {
 }
 
 /// Wrapper for the precompile function.
-pub struct Erc721Precompile<AddressMapping, AccountId, AssetManager>(
-	PhantomData<(AddressMapping, AccountId, AssetManager)>,
-)
-where
-	AddressMapping: pallet_evm::AddressMapping<AccountId>,
-	AccountId: Encode + Debug,
-	AssetManager: Erc721<AccountId>;
+pub struct Erc721Precompile<T>(PhantomData<(T)>);
 
-impl<AddressMapping, AccountId, AssetManager> Precompile
-	for Erc721Precompile<AddressMapping, AccountId, AssetManager>
+impl<T> Precompile for Erc721Precompile<T>
 where
-	AddressMapping: pallet_evm::AddressMapping<AccountId>,
-	AccountId: Encode + Debug,
-	AssetManager: Erc721<AccountId>,
+	T: pallet_living_assets_ownership::traits::Config,
 {
 	fn execute(handle: &mut impl PrecompileHandle) -> EvmResult<PrecompileOutput> {
 		let selector = handle.read_selector()?;
@@ -54,6 +42,7 @@ where
 				// get input data
 				let mut input = handle.read_input()?;
 				input.expect_arguments(1)?;
+
 				let asset_id: U256 = input.read()?;
 
 				let owner = Self::owner_of(asset_id, handle.code_address())?;
@@ -82,12 +71,10 @@ where
 	}
 }
 
-impl<AddressMapping, AccountId, AssetManager>
-	Erc721Precompile<AddressMapping, AccountId, AssetManager>
+impl<T> Erc721Precompile<T>
 where
-	AddressMapping: pallet_evm::AddressMapping<AccountId>,
-	AccountId: Encode + Debug,
-	AssetManager: Erc721<AccountId>,
+	T: pallet_living_assets_ownership::traits::Config,
+	// AddressMapping: pallet_evm::AddressMapping<AccountId>,
 {
 	fn owner_of(asset_id: U256, code_address: H160) -> Result<H160, PrecompileFailure> {
 		// collection id is encoded into the contract address
@@ -95,19 +82,17 @@ where
 			Ok(collection_id) => collection_id,
 			Err(_) => return Err(revert("invalid collection address")),
 		};
-		match AssetManager::owner_of(collection_id, asset_id) {
+
+		match T::AccountId::owner_of(collection_id, asset_id) {
 			Ok(owner) => Ok(owner),
 			Err(err) => Err(revert(err)),
 		}
 	}
 }
 
-impl<AddressMapping, AccountId, AssetManager>
-	Erc721Precompile<AddressMapping, AccountId, AssetManager>
+impl<T> Erc721Precompile<T>
 where
-	AddressMapping: pallet_evm::AddressMapping<AccountId>,
-	AccountId: Encode + Debug,
-	AssetManager: Erc721<AccountId>,
+	T: pallet_living_assets_ownership::traits::Config,
 {
 	fn transfer_from(
 		code_address: H160,
@@ -121,15 +106,17 @@ where
 			Err(_) => return Err(revert("invalid collection address")),
 		};
 
-		match AssetManager::transfer_from(
+		match pallet_living_assets_ownership::traits::Erc721::<T>::transfer_from(
 			collection_id,
 			AddressMapping::into_account_id(from),
 			AddressMapping::into_account_id(to),
 			asset_id,
 		) {
 			Ok(_) => Ok(()),
-			Err(err) => Err(revert(err)),
+			Err(_) => Err(revert("err")),
 		}
+
+		// pallet_living_assets_ownership::traits::Erc721::Error
 	}
 }
 
