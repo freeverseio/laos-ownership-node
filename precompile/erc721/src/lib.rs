@@ -32,7 +32,7 @@ where
 		})?;
 
 		match selector {
-			Action::TokenURI => Err(revert("not implemented")),
+			Action::TokenURI => Self::token_uri(handle),
 			Action::OwnerOf => Self::owner_of(handle),
 		}
 	}
@@ -56,6 +56,24 @@ where
 
 		match AssetManager::owner_of(collection_id, asset_id) {
 			Ok(owner) => Ok(succeed(EvmDataWriter::new().write(Address(owner)).build())),
+			Err(err) => Err(revert(err)),
+		}
+	}
+
+	fn token_uri(handle: &mut impl PrecompileHandle) -> EvmResult<PrecompileOutput> {
+		let mut input = handle.read_input()?;
+		input.expect_arguments(1)?;
+
+		let asset_id: U256 = input.read()?;
+
+		// collection id is encoded into the contract address
+		let collection_id = match address_to_collection_id(handle.code_address()) {
+			Ok(collection_id) => collection_id,
+			Err(_) => return Err(revert("invalid collection address")),
+		};
+
+		match AssetManager::token_uri(collection_id, asset_id) {
+			Ok(token_uri) => Ok(succeed(EvmDataWriter::new().write(token_uri).build())),
 			Err(err) => Err(revert(err)),
 		}
 	}

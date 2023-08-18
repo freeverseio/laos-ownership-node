@@ -17,7 +17,8 @@ fn check_selectors() {
 fn owner_of_asset_should_return_an_address() {
 	impl_precompile_mock_simple!(
 		Mock,
-		Ok(H160::from_str("ff00000000000000000000000000000012345678").unwrap())
+		Ok(H160::from_str("ff00000000000000000000000000000012345678").unwrap()),
+		Ok(vec![])
 	);
 
 	let owner_of_asset_4 =
@@ -38,7 +39,7 @@ fn owner_of_asset_should_return_an_address() {
 
 #[test]
 fn if_mock_fails_should_return_the_error() {
-	impl_precompile_mock_simple!(Mock, Err("this is an error"));
+	impl_precompile_mock_simple!(Mock, Err("this is an error"), Ok(vec![]));
 
 	let owner_of_asset_4 =
 		hex::decode("6352211e0000000000000000000000000000000000000000000000000000000000000004")
@@ -52,7 +53,7 @@ fn if_mock_fails_should_return_the_error() {
 
 #[test]
 fn invalid_contract_address_should_error() {
-	impl_precompile_mock_simple!(Mock, Ok(H160::zero()));
+	impl_precompile_mock_simple!(Mock, Ok(H160::zero()), Ok(vec![]));
 
 	let mut handle = create_mock_handle_from_input(Vec::new());
 	handle.code_address = H160::zero();
@@ -63,7 +64,7 @@ fn invalid_contract_address_should_error() {
 
 #[test]
 fn token_owners_should_have_at_least_token_id_as_argument() {
-	impl_precompile_mock_simple!(Mock, Ok(H160::zero()));
+	impl_precompile_mock_simple!(Mock, Ok(H160::zero()), Ok(vec![]));
 
 	let owner_of_with_2_arguments: Vec<u8> =
 		hex::decode("6352211e00000000000000000000000000000000000000000000000000000000000000040000000000000000000000000000000000000000000000000000000000000004")
@@ -102,7 +103,7 @@ mod helpers {
 	/// ```
 	#[macro_export]
 	macro_rules! impl_precompile_mock {
-		($name:ident, $owner_of_collection:expr) => {
+		($name:ident, $owner_of_collection:expr, $token_uri:expr) => {
 			struct Erc721Mock;
 
 			impl pallet_living_assets_ownership::traits::Erc721 for Erc721Mock {
@@ -113,6 +114,13 @@ mod helpers {
 					asset_id: U256,
 				) -> Result<AccountId, Self::Error> {
 					($owner_of_collection)(collectio_id, asset_id)
+				}
+
+				fn token_uri(
+					collectio_id: CollectionId,
+					asset_id: U256,
+				) -> Result<Vec<u8>, Self::Error> {
+					($token_uri)(collectio_id, asset_id)
 				}
 			}
 
@@ -138,8 +146,12 @@ mod helpers {
 	/// ```
 	#[macro_export]
 	macro_rules! impl_precompile_mock_simple {
-		($name:ident, $owner_of_collection:expr) => {
-			impl_precompile_mock!($name, |_asset_id, _collection_id| { $owner_of_collection });
+		($name:ident, $owner_of_collection:expr, $token_uri:expr) => {
+			impl_precompile_mock!(
+				$name,
+				|_asset_id, _collection_id| { $owner_of_collection },
+				|_asset_id, _collection_id| { $token_uri }
+			);
 		};
 	}
 }
