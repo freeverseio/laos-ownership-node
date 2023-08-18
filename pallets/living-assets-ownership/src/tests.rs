@@ -124,6 +124,109 @@ fn test_is_collection_address_invalid() {
 	assert!(!is_collection_address(invalid_address));
 }
 
+#[test]
+fn owner_of_unexistent_asset_is_default_one() {
+	todo!();
+}
+#[test]
+fn sender_is_not_current_owner_should_fail() {
+	impl_precompile_mock_simple!(
+		Mock,
+		// owner_of result
+		Ok(H160::from_str("bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb").unwrap()),
+		// transfer_from result
+		Ok(())
+	);
+
+	// test data
+	let from = H160::repeat_byte(0xAA);
+	let to = H160::repeat_byte(0xBB);
+	let asset_id = 4;
+	let contract_address = H160::from_str("ffffffffffffffffffffffff0000000000000005");
+
+	let input_data = EvmDataWriter::new_with_selector(Action::TransferFrom)
+		.write(Address(from))
+		.write(Address(to))
+		.write(U256::from(asset_id))
+		.build();
+
+	let mut handle = create_mock_handle_from_input(input_data);
+	handle.code_address = contract_address.unwrap();
+	let result = Mock::execute(&mut handle);
+	assert!(result.is_err());
+	assert_eq!(result.unwrap_err(), revert("sender must be the current owner"),);
+
+	new_test_ext().execute_with(|| {
+		let collection_id =
+			<LivingAssetsModule as CollectionManager<AccountId>>::create_collection(
+				ALICE,
+				BaseURI::default(),
+			)
+			.unwrap();
+		assert_eq!(
+			<LivingAssetsModule as Erc721>::owner_of(collection_id, 2.into()).unwrap(),
+			H160::from_low_u64_be(0x0000000000000002)
+		);
+	});
+}
+
+// #[test]
+// fn receiver_is_the_current_owner_should_fail() {
+// 	impl_precompile_mock_simple!(
+// 		Mock,
+// 		// owner_of result
+// 		Ok(H160::from_str("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa").unwrap()),
+// 		// transfer_from result
+// 		Ok(())
+// 	);
+
+// 	// test data
+// 	let from = H160::repeat_byte(0xAA);
+// 	let to = H160::repeat_byte(0xAA);
+// 	let asset_id = 4;
+// 	let contract_address = H160::from_str("ffffffffffffffffffffffff0000000000000005");
+
+// 	let input_data = EvmDataWriter::new_with_selector(Action::TransferFrom)
+// 		.write(Address(from))
+// 		.write(Address(to))
+// 		.write(U256::from(asset_id))
+// 		.build();
+
+// 	let mut handle = create_mock_handle_from_input(input_data);
+// 	handle.code_address = contract_address.unwrap();
+// 	let result = Mock::execute(&mut handle);
+// 	assert!(result.is_err());
+// 	assert_eq!(result.unwrap_err(), revert("sender and receiver cannot be the same"));
+// }
+
+// #[test]
+// fn receiver_is_the_zero_address_should_fail() {
+// 	impl_precompile_mock_simple!(
+// 		Mock,
+// 		// owner_of result
+// 		Ok(H160::from_str("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa").unwrap()),
+// 		// transfer_from result
+// 		Ok(())
+// 	);
+
+// 	// test data
+// 	let from = H160::repeat_byte(0xAA);
+// 	let to = H160::repeat_byte(0x0);
+// 	let asset_id = 4;
+// 	let contract_address = H160::from_str("ffffffffffffffffffffffff0000000000000005");
+
+// 	let input_data = EvmDataWriter::new_with_selector(Action::TransferFrom)
+// 		.write(Address(from))
+// 		.write(Address(to))
+// 		.write(U256::from(asset_id))
+// 		.build();
+
+// 	let mut handle = create_mock_handle_from_input(input_data);
+// 	handle.code_address = contract_address.unwrap();
+// 	let result = Mock::execute(&mut handle);
+// 	assert!(result.is_err());
+// 	assert_eq!(result.unwrap_err(), revert("receiver cannot be zero address"));
+// }
 mod traits {
 	use super::*;
 	use crate::{

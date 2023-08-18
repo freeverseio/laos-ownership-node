@@ -60,6 +60,7 @@ pub mod pallet {
 		/// Collection created
 		/// parameters. [collection_id, who]
 		CollectionCreated { collection_id: CollectionId, who: T::AccountId },
+		// TODO errors
 	}
 
 	// Errors inform users that something went wrong.
@@ -67,6 +68,7 @@ pub mod pallet {
 	pub enum Error<T> {
 		/// Collection id overflow
 		CollectionIdOverflow,
+		// TODO events
 	}
 
 	// Dispatchable functions allows users to interact with the pallet and invoke state changes.
