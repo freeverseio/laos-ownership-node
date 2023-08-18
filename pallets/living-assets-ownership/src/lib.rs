@@ -25,7 +25,7 @@ pub mod pallet {
 	pub type CollectionId = u64;
 
 	/// Base URI type
-	pub type BaseURI<Limit> = BoundedVec<u8, Limit>;
+	pub type BaseURI<T> = BoundedVec<u8, <T as Config>::BaseURILimit>;
 
 	#[pallet::pallet]
 	pub struct Pallet<T>(_);
@@ -57,7 +57,7 @@ pub mod pallet {
 	#[pallet::storage]
 	#[pallet::getter(fn collection_base_uri)]
 	pub(super) type CollectionBaseURI<T: Config> =
-		StorageMap<_, Blake2_128Concat, CollectionId, BaseURI<T::BaseURILimit>, OptionQuery>;
+		StorageMap<_, Blake2_128Concat, CollectionId, BaseURI<T>, OptionQuery>;
 
 	/// Pallet events
 	#[pallet::event]
@@ -95,10 +95,7 @@ pub mod pallet {
 	impl<T: Config> Pallet<T> {
 		#[pallet::call_index(0)]
 		#[pallet::weight(10_000 + T::DbWeight::get().writes(1).ref_time())] // TODO set proper weight
-		pub fn create_collection(
-			origin: OriginFor<T>,
-			base_uri: BaseURI<T::BaseURILimit>,
-		) -> DispatchResult {
+		pub fn create_collection(origin: OriginFor<T>, base_uri: BaseURI<T>) -> DispatchResult {
 			let who = ensure_signed(origin)?;
 
 			match Self::do_create_collection(who, base_uri) {
@@ -111,7 +108,7 @@ pub mod pallet {
 	impl<T: Config> traits::CollectionManager for Pallet<T> {
 		type Error = Error<T>;
 		type AccountId = T::AccountId;
-		type BaseURI = BaseURI<T::BaseURILimit>;
+		type BaseURI = BaseURI<T>;
 
 		fn base_uri(collection_id: CollectionId) -> Option<Self::BaseURI> {
 			CollectionBaseURI::<T>::get(collection_id)

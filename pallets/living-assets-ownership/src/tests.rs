@@ -1,13 +1,14 @@
 use core::str::FromStr;
 
 use crate::{
-	address_to_collection_id, collection_id_to_address, is_collection_address, mock::*, BaseURI,
+	address_to_collection_id, collection_id_to_address, is_collection_address, mock::*,
 	CollectionError, Event,
 };
 use frame_support::assert_ok;
 use sp_core::H160;
 
 type AccountId = <Test as frame_system::Config>::AccountId;
+type BaseURI = crate::BaseURI<Test>;
 
 const ALICE: AccountId = 0x1234;
 
