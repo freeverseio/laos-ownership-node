@@ -7,7 +7,7 @@ use precompile_utils::{
 };
 
 use sp_core::{H160, U256};
-use sp_std::{fmt::Debug, marker::PhantomData};
+use sp_std::{fmt::Debug, marker::PhantomData, vec, vec::Vec};
 
 #[precompile_utils_macro::generate_function_selector]
 #[derive(Debug, PartialEq)]
