@@ -64,9 +64,22 @@ pub mod pallet {
 
 	// Errors inform users that something went wrong.
 	#[pallet::error]
+	#[derive(PartialEq)]
 	pub enum Error<T> {
 		/// Collection id overflow
 		CollectionIdOverflow,
+		/// Unexistent collection
+		UnexistentCollection,
+	}
+
+	impl<T: Config> AsRef<[u8]> for Error<T> {
+		fn as_ref(&self) -> &[u8] {
+			match self {
+				Error::__Ignore(_, _) => b"__Ignore",
+				Error::CollectionIdOverflow => b"CollectionIdOverflow",
+				Error::UnexistentCollection => b"UnexistentCollection",
+			}
+		}
 	}
 
 	// Dispatchable functions allows users to interact with the pallet and invoke state changes.
@@ -85,27 +98,9 @@ pub mod pallet {
 			}
 		}
 	}
-	/// Errors that can occur when managing collections.
-	///
-	/// - `CollectionIdOverflow`: The ID for the new collection would overflow.
-	/// - `UnknownError`: An unspecified error occurred.
-	#[derive(Debug, PartialEq)]
-	pub enum CollectionManagerError {
-		CollectionIdOverflow,
-		UnknownError,
-	}
-
-	impl AsRef<[u8]> for CollectionManagerError {
-		fn as_ref(&self) -> &[u8] {
-			match self {
-				CollectionManagerError::CollectionIdOverflow => b"CollectionIdOverflow",
-				CollectionManagerError::UnknownError => b"UnknownError",
-			}
-		}
-	}
 
 	impl<T: Config> traits::CollectionManager for Pallet<T> {
-		type Error = CollectionManagerError;
+		type Error = Error<T>;
 		type AccountId = T::AccountId;
 
 		fn base_uri(collection_id: CollectionId) -> Option<BaseURI> {
@@ -116,41 +111,17 @@ pub mod pallet {
 			owner: T::AccountId,
 			base_uri: BaseURI,
 		) -> Result<CollectionId, Self::Error> {
-			match Self::do_create_collection(owner, base_uri) {
-				Ok(collection_id) => Ok(collection_id),
-				Err(err) => match err {
-					Error::CollectionIdOverflow => {
-						Err(CollectionManagerError::CollectionIdOverflow)
-					},
-					_ => Err(CollectionManagerError::UnknownError),
-				},
-			}
-		}
-	}
-
-	/// Errors that can occur when interacting with ERC721 tokens.
-	///
-	/// - `UnexistentCollection`: The specified collection does not exist.
-	#[derive(Debug, PartialEq)]
-	pub enum Erc721Error {
-		UnexistentCollection,
-	}
-
-	impl AsRef<[u8]> for Erc721Error {
-		fn as_ref(&self) -> &[u8] {
-			match self {
-				Erc721Error::UnexistentCollection => b"UnexistentCollection",
-			}
+			Self::do_create_collection(owner, base_uri)
 		}
 	}
 
 	impl<T: Config> traits::Erc721 for Pallet<T> {
-		type Error = Erc721Error;
+		type Error = Error<T>;
 
 		fn owner_of(collection_id: CollectionId, asset_id: U256) -> Result<H160, Self::Error> {
 			match CollectionBaseURI::<T>::get(collection_id) {
 				Some(_) => Ok(convert_asset_id_to_owner(asset_id)),
-				None => Err(Erc721Error::UnexistentCollection),
+				None => Err(Error::UnexistentCollection),
 			}
 		}
 	}
