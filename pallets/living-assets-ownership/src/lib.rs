@@ -104,8 +104,9 @@ pub mod pallet {
 		}
 	}
 
-	impl<T: Config> traits::CollectionManager<T::AccountId> for Pallet<T> {
+	impl<T: Config> traits::CollectionManager for Pallet<T> {
 		type Error = CollectionManagerError;
+		type AccountId = T::AccountId;
 
 		fn base_uri(collection_id: CollectionId) -> Option<BaseURI> {
 			CollectionBaseURI::<T>::get(collection_id)

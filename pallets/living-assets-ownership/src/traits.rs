@@ -10,8 +10,9 @@ use sp_core::{H160, U256};
 ///
 /// - `owner_of_collection`: Retrieve the owner of a specified collection.
 /// - `create_collection`: Create a new collection and assign it to an owner.
-pub trait CollectionManager<AccountId> {
+pub trait CollectionManager {
 	type Error: AsRef<[u8]>;
+	type AccountId;
 
 	/// Retrieves the base uri of the specified collection.
 	///
@@ -33,7 +34,10 @@ pub trait CollectionManager<AccountId> {
 	/// # Returns
 	///
 	/// A result containing the `collection_id` of the newly created collection or an error.
-	fn create_collection(owner: AccountId, base_uri: BaseURI) -> Result<CollectionId, Self::Error>;
+	fn create_collection(
+		owner: Self::AccountId,
+		base_uri: BaseURI,
+	) -> Result<CollectionId, Self::Error>;
 }
 
 /// The `Erc721` trait provides an interface for handling ERC721 tokens in a blockchain environment.

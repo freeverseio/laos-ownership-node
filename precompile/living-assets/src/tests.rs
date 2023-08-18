@@ -154,10 +154,11 @@ mod helpers {
 		($name:ident, $create_collection_result:expr, $base_uri_result:expr) => {
 			struct CollectionManagerMock;
 
-			impl pallet_living_assets_ownership::traits::CollectionManager<AccountId>
+			impl pallet_living_assets_ownership::traits::CollectionManager
 				for CollectionManagerMock
 			{
 				type Error = &'static str;
+				type AccountId = AccountId;
 
 				fn create_collection(
 					owner: AccountId,

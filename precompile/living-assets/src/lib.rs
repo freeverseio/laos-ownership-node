@@ -31,14 +31,14 @@ pub struct CollectionManagerPrecompile<AddressMapping, AccountId, LivingAssets>(
 where
 	AddressMapping: pallet_evm::AddressMapping<AccountId>,
 	AccountId: Encode + Debug,
-	LivingAssets: CollectionManager<AccountId>;
+	LivingAssets: CollectionManager;
 
 impl<AddressMapping, AccountId, LivingAssets> Precompile
 	for CollectionManagerPrecompile<AddressMapping, AccountId, LivingAssets>
 where
 	AddressMapping: pallet_evm::AddressMapping<AccountId>,
 	AccountId: Encode + Debug,
-	LivingAssets: CollectionManager<AccountId>,
+	LivingAssets: CollectionManager<AccountId = AccountId>,
 {
 	fn execute(handle: &mut impl PrecompileHandle) -> EvmResult<PrecompileOutput> {
 		let selector = handle.read_selector()?;
