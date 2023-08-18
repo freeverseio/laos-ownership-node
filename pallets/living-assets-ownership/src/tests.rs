@@ -226,7 +226,7 @@ mod traits {
 	#[test]
 	fn owner_of_asset_of_unexistent_collection_should_error() {
 		new_test_ext().execute_with(|| {
-			let result = <LivingAssetsModule as Erc721>::owner_of(0, 2.into());
+			let result = <LivingAssetsModule as Erc721<Test>>::owner_of(0, 2.into());
 			assert_err!(result, Erc721Error::UnexistentCollection);
 		});
 	}
@@ -241,7 +241,7 @@ mod traits {
 				)
 				.unwrap();
 			assert_eq!(
-				<LivingAssetsModule as Erc721>::owner_of(collection_id, 2.into()).unwrap(),
+				<LivingAssetsModule as Erc721<Test>>::owner_of(collection_id, 2.into()).unwrap(),
 				H160::from_low_u64_be(0x0000000000000002)
 			);
 		});

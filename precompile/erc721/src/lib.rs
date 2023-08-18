@@ -3,12 +3,12 @@ use fp_evm::{Precompile, PrecompileFailure, PrecompileHandle, PrecompileOutput};
 use frame_support::ensure;
 use pallet_evm::AddressMapping;
 use pallet_living_assets_ownership::address_to_collection_id;
+use pallet_living_assets_ownership::traits::Erc721;
 use precompile_utils::{
 	revert, succeed, Address, EvmDataWriter, EvmResult, FunctionModifier, PrecompileHandleExt,
 };
 use sp_core::{H160, U256};
 use sp_std::{fmt::Debug, marker::PhantomData};
-
 #[precompile_utils_macro::generate_function_selector]
 #[derive(Debug, PartialEq)]
 pub enum Action {
@@ -21,10 +21,11 @@ pub enum Action {
 }
 
 /// Wrapper for the precompile function.
-pub struct Erc721Precompile<T>(PhantomData<(T)>);
+pub struct Erc721Precompile<AssetManager, T>(PhantomData<(AssetManager, T)>);
 
-impl<T> Precompile for Erc721Precompile<T>
+impl<AssetManager, T> Precompile for Erc721Precompile<AssetManager, T>
 where
+	AssetManager: Erc721<T>,
 	T: pallet_living_assets_ownership::traits::Config,
 {
 	fn execute(handle: &mut impl PrecompileHandle) -> EvmResult<PrecompileOutput> {
@@ -71,8 +72,9 @@ where
 	}
 }
 
-impl<T> Erc721Precompile<T>
+impl<AssetManager, T> Erc721Precompile<AssetManager, T>
 where
+	AssetManager: Erc721<T>,
 	T: pallet_living_assets_ownership::traits::Config,
 	// AddressMapping: pallet_evm::AddressMapping<AccountId>,
 {
@@ -83,15 +85,16 @@ where
 			Err(_) => return Err(revert("invalid collection address")),
 		};
 
-		match T::AccountId::owner_of(collection_id, asset_id) {
+		match AssetManager::owner_of(collection_id, asset_id) {
 			Ok(owner) => Ok(owner),
 			Err(err) => Err(revert(err)),
 		}
 	}
 }
 
-impl<T> Erc721Precompile<T>
+impl<AssetManager, T> Erc721Precompile<AssetManager, T>
 where
+	AssetManager: Erc721<T>,
 	T: pallet_living_assets_ownership::traits::Config,
 {
 	fn transfer_from(
@@ -106,10 +109,10 @@ where
 			Err(_) => return Err(revert("invalid collection address")),
 		};
 
-		match pallet_living_assets_ownership::traits::Erc721::<T>::transfer_from(
+		match AssetManager::transfer_from(
 			collection_id,
-			AddressMapping::into_account_id(from),
-			AddressMapping::into_account_id(to),
+			T::AddressMapping::into_account_id(from),
+			T::AddressMapping::into_account_id(to),
 			asset_id,
 		) {
 			Ok(_) => Ok(()),

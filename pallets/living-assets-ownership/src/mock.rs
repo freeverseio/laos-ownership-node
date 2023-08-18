@@ -1,6 +1,7 @@
 use crate as pallet_livingassets_ownership;
 use frame_support::traits::{ConstU16, ConstU64};
-use sp_core::H256;
+use pallet_evm::IdentityAddressMapping;
+use sp_core::{H160, H256};
 use sp_runtime::{
 	traits::{BlakeTwo256, IdentityLookup},
 	BuildStorage,
@@ -46,6 +47,11 @@ impl frame_system::Config for Test {
 
 impl pallet_livingassets_ownership::Config for Test {
 	type RuntimeEvent = RuntimeEvent;
+}
+
+impl pallet_livingassets_ownership::traits::Config for Test {
+	type AccountId = H160;
+	type AddressMapping = IdentityAddressMapping;
 }
 
 // Build genesis storage according to the mock runtime.

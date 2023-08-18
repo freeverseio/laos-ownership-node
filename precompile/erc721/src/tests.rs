@@ -5,7 +5,7 @@ use pallet_living_assets_ownership::CollectionId;
 use precompile_utils::testing::create_mock_handle_from_input;
 use sp_core::{H160, U256};
 
-type AccountId = H160;
+// type AccountId = H160;
 
 #[test]
 fn check_selectors() {
@@ -284,27 +284,32 @@ mod helpers {
 		($name:ident, $owner_of:expr, $transfer_from:expr) => {
 			struct Erc721Mock;
 
-			impl pallet_living_assets_ownership::traits::Erc721<AccountId> for Erc721Mock {
+			// type T = H160;
+
+			impl<T> pallet_living_assets_ownership::traits::Erc721<T> for Erc721Mock
+			where
+				T: pallet_living_assets_ownership::traits::Config,
+			{
 				type Error = &'static str;
 
 				fn owner_of(
 					collection_id: CollectionId,
 					asset_id: U256,
-				) -> Result<AccountId, Self::Error> {
+				) -> Result<T::AccountId, Self::Error> {
 					($owner_of)(collection_id, asset_id)
 				}
 
 				fn transfer_from(
 					collection_id: CollectionId,
-					from: AccountId,
-					to: AccountId,
+					from: T::AccountId,
+					to: T::AccountId,
 					asset_id: U256,
 				) -> Result<(), Self::Error> {
 					($transfer_from)(collection_id, from, to, asset_id)
 				}
 			}
 
-			type $name = Erc721Precompile<Erc721Mock>;
+			type $name = Erc721Precompile<Erc721Mock, T>;
 		};
 	}
 
