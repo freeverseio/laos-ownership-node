@@ -37,11 +37,11 @@ pub mod pallet {
 		type RuntimeEvent: From<Event<Self>> + IsType<<Self as frame_system::Config>::RuntimeEvent>;
 
 		/// Specifies the advised maximum length for a Base URI.
+		//s
+		/// The URI standard (RFC 3986) doesn't dictates a limit for the length of URIs.
+		/// However it seems the max supported length in browsers is 2,048 characters.
 		///
-		/// This adheres to the URI standard (RFC 3986) which dictates a limit
-		/// of 2,083 characters for URIs.
-		///
-		/// The base should be capped at 2,050 characters in length. This ensures room for
+		/// The base should be capped at 2,015 characters in length. This ensures room for
 		/// the token URI formation, where it combines `BaseURILimit`, a `'/'`, and a `tokenID`
 		/// (which takes up 33 characters).
 		#[pallet::constant]
