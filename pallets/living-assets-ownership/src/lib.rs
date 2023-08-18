@@ -133,7 +133,15 @@ pub mod pallet {
 		}
 
 		fn token_uri(collection_id: CollectionId, asset_id: U256) -> Result<Vec<u8>, Self::Error> {
-			todo!()
+			let base_uri = match CollectionBaseURI::<T>::get(collection_id) {
+				Some(base_uri) => base_uri,
+				None => return Err(Error::UnexistentCollection),
+			};
+			// contatenate base_uri with asset_id
+			let mut token_uri = base_uri.to_vec();
+			token_uri.push(b'/');
+			token_uri.extend_from_slice(&asset_id.to_string().as_bytes());
+			Ok(token_uri)
 		}
 	}
 }
