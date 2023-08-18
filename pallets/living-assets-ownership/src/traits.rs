@@ -1,4 +1,4 @@
-use crate::{BaseURI, CollectionId};
+use crate::CollectionId;
 use sp_core::{H160, U256};
 
 /// The `CollectionManager` trait provides an interface for managing collections in a decentralized system.
@@ -13,6 +13,7 @@ use sp_core::{H160, U256};
 pub trait CollectionManager {
 	type Error: AsRef<[u8]> + PartialEq;
 	type AccountId;
+	type BaseURI;
 
 	/// Retrieves the base uri of the specified collection.
 	///
@@ -23,7 +24,7 @@ pub trait CollectionManager {
 	/// # Returns
 	///
 	/// The base URI associated with the specified collection or `None` if the collection doesn't exist.
-	fn base_uri(collection_id: CollectionId) -> Option<BaseURI>;
+	fn base_uri(collection_id: CollectionId) -> Option<Self::BaseURI>;
 
 	/// Creates a new collection and assigns it to the specified owner.
 	///
@@ -36,7 +37,7 @@ pub trait CollectionManager {
 	/// A result containing the `collection_id` of the newly created collection or an error.
 	fn create_collection(
 		owner: Self::AccountId,
-		base_uri: BaseURI,
+		base_uri: Self::BaseURI,
 	) -> Result<CollectionId, Self::Error>;
 }
 

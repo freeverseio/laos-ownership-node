@@ -102,14 +102,15 @@ pub mod pallet {
 	impl<T: Config> traits::CollectionManager for Pallet<T> {
 		type Error = Error<T>;
 		type AccountId = T::AccountId;
+		type BaseURI = BaseURI;
 
-		fn base_uri(collection_id: CollectionId) -> Option<BaseURI> {
+		fn base_uri(collection_id: CollectionId) -> Option<Self::BaseURI> {
 			CollectionBaseURI::<T>::get(collection_id)
 		}
 
 		fn create_collection(
 			owner: T::AccountId,
-			base_uri: BaseURI,
+			base_uri: Self::BaseURI,
 		) -> Result<CollectionId, Self::Error> {
 			Self::do_create_collection(owner, base_uri)
 		}
