@@ -12,11 +12,6 @@ type AccountId = <Test as frame_system::Config>::AccountId;
 const ALICE: AccountId = 0x1234;
 
 #[test]
-fn max_length_of_collection_base_uri_should_be_255() {
-	assert_eq!(BaseURI::bound(), 255);
-}
-
-#[test]
 fn base_uri_unexistent_collection_is_none() {
 	new_test_ext().execute_with(|| {
 		assert_eq!(LivingAssetsModule::collection_base_uri(0), None);

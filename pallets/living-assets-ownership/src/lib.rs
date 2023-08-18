@@ -24,13 +24,8 @@ pub mod pallet {
 	/// Collection id type
 	pub type CollectionId = u64;
 
-	/// Base URI limit
-	const BASE_URI_LIMIT_U32: u32 = u8::MAX as u32;
-	/// Base URI limit type
-	type BaseURILimit = ConstU32<BASE_URI_LIMIT_U32>;
-
 	/// Base URI type
-	pub type BaseURI = BoundedVec<u8, BaseURILimit>;
+	pub type BaseURI<Limit> = BoundedVec<u8, Limit>;
 
 	#[pallet::pallet]
 	pub struct Pallet<T>(_);
@@ -40,6 +35,9 @@ pub mod pallet {
 	pub trait Config: frame_system::Config {
 		/// Because this pallet emits events, it depends on the runtime's definition of an event.
 		type RuntimeEvent: From<Event<Self>> + IsType<<Self as frame_system::Config>::RuntimeEvent>;
+
+		#[pallet::constant]
+		type BaseURILimit: Get<u32>;
 	}
 
 	/// Collection counter
@@ -51,7 +49,7 @@ pub mod pallet {
 	#[pallet::storage]
 	#[pallet::getter(fn collection_base_uri)]
 	pub(super) type CollectionBaseURI<T: Config> =
-		StorageMap<_, Blake2_128Concat, CollectionId, BaseURI, OptionQuery>;
+		StorageMap<_, Blake2_128Concat, CollectionId, BaseURI<T::BaseURILimit>, OptionQuery>;
 
 	/// Pallet events
 	#[pallet::event]
@@ -89,7 +87,10 @@ pub mod pallet {
 	impl<T: Config> Pallet<T> {
 		#[pallet::call_index(0)]
 		#[pallet::weight(10_000 + T::DbWeight::get().writes(1).ref_time())] // TODO set proper weight
-		pub fn create_collection(origin: OriginFor<T>, base_uri: BaseURI) -> DispatchResult {
+		pub fn create_collection(
+			origin: OriginFor<T>,
+			base_uri: BaseURI<T::BaseURILimit>,
+		) -> DispatchResult {
 			let who = ensure_signed(origin)?;
 
 			match Self::do_create_collection(who, base_uri) {
@@ -102,7 +103,7 @@ pub mod pallet {
 	impl<T: Config> traits::CollectionManager for Pallet<T> {
 		type Error = Error<T>;
 		type AccountId = T::AccountId;
-		type BaseURI = BaseURI;
+		type BaseURI = BaseURI<T::BaseURILimit>;
 
 		fn base_uri(collection_id: CollectionId) -> Option<Self::BaseURI> {
 			CollectionBaseURI::<T>::get(collection_id)
