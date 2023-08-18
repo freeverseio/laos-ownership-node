@@ -5,7 +5,6 @@
 
 use super::*;
 use frame_support::assert_ok;
-use pallet_living_assets_ownership::BaseURI;
 use precompile_utils::{
 	revert, succeed,
 	testing::{create_mock_handle, create_mock_handle_from_input},
@@ -13,6 +12,7 @@ use precompile_utils::{
 use sp_core::H160;
 use sp_std::vec::Vec;
 
+type BaseURI = Vec<u8>;
 type AccountId = H160;
 type AddressMapping = pallet_evm::IdentityAddressMapping;
 
@@ -154,19 +154,21 @@ mod helpers {
 		($name:ident, $create_collection_result:expr, $base_uri_result:expr) => {
 			struct CollectionManagerMock;
 
-			impl pallet_living_assets_ownership::traits::CollectionManager<AccountId>
+			impl pallet_living_assets_ownership::traits::CollectionManager
 				for CollectionManagerMock
 			{
 				type Error = &'static str;
+				type AccountId = AccountId;
+				type BaseURI = BaseURI;
 
 				fn create_collection(
 					owner: AccountId,
-					base_uri: BaseURI,
+					base_uri: Self::BaseURI,
 				) -> Result<CollectionId, Self::Error> {
 					($create_collection_result)(owner, base_uri)
 				}
 
-				fn base_uri(collection_id: CollectionId) -> Option<BaseURI> {
+				fn base_uri(collection_id: CollectionId) -> Option<Self::BaseURI> {
 					($base_uri_result)(collection_id)
 				}
 			}

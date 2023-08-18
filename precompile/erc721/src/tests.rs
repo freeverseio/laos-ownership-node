@@ -285,8 +285,9 @@ mod helpers {
 		($name:ident, $owner_of:expr, $transfer_from:expr) => {
 			struct Erc721Mock;
 
-			impl pallet_living_assets_ownership::traits::Erc721<AccountId> for Erc721Mock {
+			impl pallet_living_assets_ownership::traits::Erc721 for Erc721Mock {
 				type Error = &'static str;
+				type AccountId = AccountId;
 
 				fn owner_of(
 					collection_id: CollectionId,
@@ -305,7 +306,7 @@ mod helpers {
 				}
 			}
 
-			type $name = Erc721Precompile<AddressMapping, AccountId, Erc721Mock>;
+			type $name = Erc721Precompile<Erc721Mock, AddressMapping>;
 		};
 	}
 

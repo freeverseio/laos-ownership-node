@@ -1,5 +1,6 @@
 use crate::{BaseURI, CollectionId};
 use sp_core::{H160, U256};
+use sp_std::vec::Vec;
 
 /// The `CollectionManager` trait provides an interface for managing collections in a decentralized system.
 ///
@@ -10,8 +11,10 @@ use sp_core::{H160, U256};
 ///
 /// - `owner_of_collection`: Retrieve the owner of a specified collection.
 /// - `create_collection`: Create a new collection and assign it to an owner.
-pub trait CollectionManager<AccountId> {
-	type Error: AsRef<[u8]>;
+pub trait CollectionManager {
+	type Error: AsRef<[u8]> + PartialEq;
+	type AccountId;
+	type BaseURI: TryFrom<Vec<u8>>;
 
 	/// Retrieves the base uri of the specified collection.
 	///
@@ -22,7 +25,7 @@ pub trait CollectionManager<AccountId> {
 	/// # Returns
 	///
 	/// The base URI associated with the specified collection or `None` if the collection doesn't exist.
-	fn base_uri(collection_id: CollectionId) -> Option<BaseURI>;
+	fn base_uri(collection_id: CollectionId) -> Option<Self::BaseURI>;
 
 	/// Creates a new collection and assigns it to the specified owner.
 	///
@@ -33,7 +36,10 @@ pub trait CollectionManager<AccountId> {
 	/// # Returns
 	///
 	/// A result containing the `collection_id` of the newly created collection or an error.
-	fn create_collection(owner: AccountId, base_uri: BaseURI) -> Result<CollectionId, Self::Error>;
+	fn create_collection(
+		owner: Self::AccountId,
+		base_uri: Self::BaseURI,
+	) -> Result<CollectionId, Self::Error>;
 }
 
 /// The `Erc721` trait provides an interface for handling ERC721 tokens in a blockchain environment.
@@ -43,8 +49,9 @@ pub trait CollectionManager<AccountId> {
 /// # Methods
 ///
 /// - `owner_of`: Retrieve the owner of a specific asset within a collection.
-pub trait Erc721<AccountId> {
-	type Error: AsRef<[u8]>;
+pub trait Erc721 {
+	type Error: AsRef<[u8]> + PartialEq;
+	type AccountId;
 
 	/// Retrieves the owner of a specific asset within the specified collection.
 	///
@@ -68,8 +75,8 @@ pub trait Erc721<AccountId> {
 	/// * `asset_id` - The unique identifier for the asset within the collection.
 	fn transfer_from(
 		collection_id: CollectionId,
-		from: AccountId,
-		to: AccountId,
+		from: Self::AccountId,
+		to: Self::AccountId,
 		asset_id: U256,
 	) -> Result<(), Self::Error>;
 }
