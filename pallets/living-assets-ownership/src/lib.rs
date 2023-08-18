@@ -69,7 +69,6 @@ pub mod pallet {
 		/// Collection id overflow
 		CollectionIdOverflow,
 		UnexistentCollection,
-		UnknownError,
 	}
 
 	impl<T: Config> AsRef<[u8]> for Error<T> {
@@ -78,7 +77,6 @@ pub mod pallet {
 				Error::__Ignore(_, _) => b"__Ignore",
 				Error::CollectionIdOverflow => b"CollectionIdOverflow",
 				Error::UnexistentCollection => b"UnexistentCollection",
-				Error::UnknownError => b"UnknownError",
 			}
 		}
 	}
