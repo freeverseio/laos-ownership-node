@@ -11,7 +11,8 @@ type AccountId = <Test as frame_system::Config>::AccountId;
 type BaseURI = crate::BaseURI<Test>;
 
 const ALICE: AccountId = 0x1234;
-
+const BOB: AccountId = 0x2234;
+use super::*;
 #[test]
 fn base_uri_unexistent_collection_is_none() {
 	new_test_ext().execute_with(|| {
@@ -118,6 +119,191 @@ fn test_is_collection_address_invalid() {
 	let invalid_address = H160([0u8; 20]);
 
 	assert!(!is_collection_address(invalid_address));
+}
+
+mod transfer_from {
+	use frame_support::assert_ok;
+	use sp_core::U256;
+
+	use super::*;
+
+	#[test]
+	fn owner_of_unexistent_asset_is_default_one() {
+		todo!();
+	}
+
+	#[test]
+	// fn sender_is_not_current_owner_should_fail() {
+	// 	new_test_ext().execute_with(|| {
+	// 		assert_ok!(LivingAssetsModule::transfer_from(
+	// 			RuntimeOrigin::signed(ALICE),
+	// 			ALICE,
+	// 			ALICE,
+	// 			U256::zero(),
+	// 		));
+	// 	});
+	// }
+	#[test]
+	fn sender_is_not_current_owner_should_fail() {
+		// impl_precompile_mock_simple!(
+		// 	Mock,
+		// 	// owner_of result
+		// 	Ok(H160::from_str("bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb").unwrap()),
+		// 	// transfer_from result
+		// 	Ok(())
+		// );
+
+		// // test data
+		// let from = H160::repeat_byte(0xAA);
+		// let to = H160::repeat_byte(0xBB);
+		// let asset_id = 4;
+		// let contract_address = H160::from_str("ffffffffffffffffffffffff0000000000000005");
+
+		// let input_data = EvmDataWriter::new_with_selector(Action::TransferFrom)
+		// 	.write(Address(from))
+		// 	.write(Address(to))
+		// 	.write(U256::from(asset_id))
+		// 	.build();
+
+		// let mut handle = create_mock_handle_from_input(input_data);
+		// handle.code_address = contract_address.unwrap();
+		// let result = Mock::execute(&mut handle);
+		// assert!(result.is_err());
+		// assert_eq!(result.unwrap_err(), revert("sender must be the current owner"),);
+	}
+
+	// #[test]
+	// fn receiver_is_the_current_owner_should_fail() {
+	// 	impl_precompile_mock_simple!(
+	// 		Mock,
+	// 		// owner_of result
+	// 		Ok(H160::from_str("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa").unwrap()),
+	// 		// transfer_from result
+	// 		Ok(())
+	// 	);
+
+	// 	// test data
+	// 	let from = H160::repeat_byte(0xAA);
+	// 	let to = H160::repeat_byte(0xAA);
+	// 	let asset_id = 4;
+	// 	let contract_address = H160::from_str("ffffffffffffffffffffffff0000000000000005");
+
+	// 	let input_data = EvmDataWriter::new_with_selector(Action::TransferFrom)
+	// 		.write(Address(from))
+	// 		.write(Address(to))
+	// 		.write(U256::from(asset_id))
+	// 		.build();
+
+	// 	let mut handle = create_mock_handle_from_input(input_data);
+	// 	handle.code_address = contract_address.unwrap();
+	// 	let result = Mock::execute(&mut handle);
+	// 	assert!(result.is_err());
+	// 	assert_eq!(result.unwrap_err(), revert("sender and receiver cannot be the same"));
+	// }
+
+	// #[test]
+	// fn receiver_is_the_zero_address_should_fail() {
+	// 	impl_precompile_mock_simple!(
+	// 		Mock,
+	// 		// owner_of result
+	// 		Ok(H160::from_str("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa").unwrap()),
+	// 		// transfer_from result
+	// 		Ok(())
+	// 	);
+
+	// 	// test data
+	// 	let from = H160::repeat_byte(0xAA);
+	// 	let to = H160::repeat_byte(0x0);
+	// 	let asset_id = 4;
+	// 	let contract_address = H160::from_str("ffffffffffffffffffffffff0000000000000005");
+
+	// 	let input_data = EvmDataWriter::new_with_selector(Action::TransferFrom)
+	// 		.write(Address(from))
+	// 		.write(Address(to))
+	// 		.write(U256::from(asset_id))
+	// 		.build();
+
+	// 	let mut handle = create_mock_handle_from_input(input_data);
+	// 	handle.code_address = contract_address.unwrap();
+	// 	let result = Mock::execute(&mut handle);
+	// 	assert!(result.is_err());
+	// 	assert_eq!(result.unwrap_err(), revert("receiver cannot be zero address"));
+	// }
+
+	// #[test]
+	// fn send_value_as_money_should_fail() {
+	// 	impl_precompile_mock_simple!(
+	// 		Mock,
+	// 		// owner_of result
+	// 		Ok(H160::from_str("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa").unwrap()),
+	// 		// transfer_from result
+	// 		Ok(())
+	// 	);
+
+	// 	// test data
+	// 	let from = H160::repeat_byte(0xAA);
+	// 	let to = H160::repeat_byte(0x0);
+	// 	let asset_id = 4;
+	// 	let contract_address = H160::from_str("ffffffffffffffffffffffff0000000000000005");
+
+	// 	let input_data = EvmDataWriter::new_with_selector(Action::TransferFrom)
+	// 		.write(Address(from))
+	// 		.write(Address(to))
+	// 		.write(U256::from(asset_id))
+	// 		.build();
+
+	// 	let mut handle = create_mock_handle(input_data, 0, 1, H160::zero());
+	// 	handle.code_address = contract_address.unwrap();
+	// 	let result = Mock::execute(&mut handle);
+	// 	assert!(result.is_err());
+	// 	assert_eq!(result.unwrap_err(), revert("function is not payable"));
+	// }
+
+	#[test]
+	fn sucessful_transfer_should_work() {
+		let asset_id = U256::zero();
+
+		new_test_ext().execute_with(|| {
+			System::set_block_number(1);
+			assert!(Asset::<Test>::get(asset_id).is_none());
+			assert_ok!(LivingAssetsModule::transfer_from(
+				RuntimeOrigin::signed(ALICE),
+				ALICE,
+				BOB,
+				asset_id,
+			));
+			assert_eq!(Asset::<Test>::get(asset_id).unwrap(), BOB);
+			System::assert_last_event(Event::AssetTransferred { asset_id, receiver: BOB }.into());
+		});
+	}
+	// #[test]
+	// fn unsucessful_transfer_should_fail() {
+	// 	impl_precompile_mock_simple!(
+	// 		Mock,
+	// 		// owner_of result
+	// 		Ok(H160::from_str("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa").unwrap()),
+	// 		// transfer_from result
+	// 		Err("this is an error")
+	// 	);
+
+	// 	// test data
+	// 	let from = H160::repeat_byte(0xAA);
+	// 	let to = H160::repeat_byte(0xBB);
+	// 	let asset_id = 4;
+	// 	let contract_address = H160::from_str("ffffffffffffffffffffffff0000000000000005");
+
+	// 	let input_data = EvmDataWriter::new_with_selector(Action::TransferFrom)
+	// 		.write(Address(from))
+	// 		.write(Address(to))
+	// 		.write(U256::from(asset_id))
+	// 		.build();
+
+	// 	let mut handle = create_mock_handle_from_input(input_data);
+	// 	handle.code_address = contract_address.unwrap();
+	// 	let result = Mock::execute(&mut handle);
+	// 	assert!(result.is_err());
+	// 	assert_eq!(result.unwrap_err(), revert("this is an error"));
+	// }
 }
 
 mod traits {

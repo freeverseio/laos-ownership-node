@@ -11,15 +11,20 @@ pub mod traits;
 
 #[frame_support::pallet]
 pub mod pallet {
+
 	use crate::functions::convert_asset_id_to_owner;
 
 	use super::*;
 	use frame_support::{
 		pallet_prelude::{OptionQuery, ValueQuery, *},
+		storage::types::QueryKindTrait,
 		BoundedVec,
 	};
 	use frame_system::pallet_prelude::*;
+	use pallet_evm::{pallet, AddressMapping};
+	// use pallet_evm::AddressMapping;
 	use sp_core::{H160, U256};
+	// use sp_runtime::{traits::AccountIdConversion, AccountId32};
 
 	/// Collection id type
 	pub type CollectionId = u64;
@@ -32,7 +37,7 @@ pub mod pallet {
 
 	/// Configure the pallet by specifying the parameters and types on which it depends.
 	#[pallet::config]
-	pub trait Config: frame_system::Config {
+	pub trait Config: frame_system::Config + pallet_evm::Config {
 		/// Because this pallet emits events, it depends on the runtime's definition of an event.
 		type RuntimeEvent: From<Event<Self>> + IsType<<Self as frame_system::Config>::RuntimeEvent>;
 
@@ -59,6 +64,17 @@ pub mod pallet {
 	pub(super) type CollectionBaseURI<T: Config> =
 		StorageMap<_, Blake2_128Concat, CollectionId, BaseURI<T>, OptionQuery>;
 
+	#[pallet::storage]
+	pub(super) type Asset<T: Config> =
+		StorageMap<_, Blake2_128Concat, U256, T::AccountId, OptionQuery>;
+
+	fn asset<T: Config>(key: U256) -> <T as frame_system::Config>::AccountId {
+		Asset::<T>::get(key).unwrap_or_else(|| {
+			let owner = convert_asset_id_to_owner(key);
+			<T as pallet_evm::Config>::AddressMapping::into_account_id(owner)
+		})
+	}
+
 	/// Pallet events
 	#[pallet::event]
 	#[pallet::generate_deposit(pub(super) fn deposit_event)]
@@ -66,6 +82,9 @@ pub mod pallet {
 		/// Collection created
 		/// parameters. [collection_id, who]
 		CollectionCreated { collection_id: CollectionId, who: T::AccountId },
+		/// Asset transferred to `who`
+		/// parameters. [asset_id_id, who]
+		AssetTransferred { asset_id: U256, receiver: T::AccountId },
 	}
 
 	// Errors inform users that something went wrong.
@@ -76,6 +95,7 @@ pub mod pallet {
 		CollectionIdOverflow,
 		/// Unexistent collection
 		UnexistentCollection,
+		// SenderIsNotTheCurrentOwner,
 	}
 
 	impl<T: Config> AsRef<[u8]> for Error<T> {
@@ -103,7 +123,29 @@ pub mod pallet {
 				Err(err) => Err(err.into()),
 			}
 		}
+
+		#[pallet::call_index(1)]
+		#[pallet::weight(10_000 + T::DbWeight::get().writes(1).ref_time())] // TODO set proper weight
+		pub fn transfer_from(
+			origin: OriginFor<T>,
+			from: T::AccountId,
+			to: T::AccountId,
+			asset_id: U256,
+		) -> DispatchResult {
+			let who = ensure_signed(origin)?;
+
+			// checks
+			// ensure!(owner == from, revert("sender must be the current owner"));
+			// ensure!(from != to, revert("sender and receiver cannot be the same"));
+			// ensure!(to != H160::zero(), revert("receiver cannot be zero address"));
+
+			Asset::<T>::set(asset_id, Some(to.clone()));
+			Self::deposit_event(Event::AssetTransferred { asset_id, receiver: to });
+
+			Ok(())
+		}
 	}
+
 	/// Errors that can occur when managing collections.
 	///
 	/// - `CollectionIdOverflow`: The ID for the new collection would overflow.
