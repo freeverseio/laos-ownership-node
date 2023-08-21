@@ -37,7 +37,7 @@ use sp_version::RuntimeVersion;
 use frame_support::{
 	construct_runtime,
 	dispatch::DispatchClass,
-	parameter_types
+	parameter_types,
 	traits::{
 		ConstBool, ConstU32, ConstU64, ConstU8, Currency, EitherOfDiverse, Everything, FindAuthor,
 		Hooks, Imbalance, OnUnbalanced,
