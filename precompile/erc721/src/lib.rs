@@ -26,7 +26,7 @@ where
 {
 	fn execute(handle: &mut impl PrecompileHandle) -> EvmResult<PrecompileOutput> {
 		// collection id is encoded into the contract address
-		let collection_id = match address_to_collection_id(handle.code_address()) {
+		let collection_id = address_to_collection_id(handle.code_address()).map_err(|_| Err(revert("invalid collection address")))?;
 			Ok(collection_id) => collection_id,
 			Err(_) => return Err(revert("invalid collection address")),
 		};

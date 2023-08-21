@@ -138,7 +138,7 @@ pub mod pallet {
 				Some(base_uri) => base_uri,
 				None => return Err(Error::UnexistentCollection),
 			};
-			// contatenate base_uri with asset_id
+			// concatenate base_uri with asset_id
 			let mut token_uri = base_uri.to_vec();
 			token_uri.push(b'/');
 			token_uri.extend_from_slice(&asset_id.to_string().as_bytes());
