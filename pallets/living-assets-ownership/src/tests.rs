@@ -7,11 +7,10 @@ use crate::{
 use frame_support::assert_ok;
 use sp_core::H160;
 
-type AccountId = <Test as frame_system::Config>::AccountId;
 type BaseURI = crate::BaseURI<Test>;
 
-const ALICE: AccountId = 0x1234;
-const BOB: AccountId = 0x2234;
+const ALICE: &'static str = "0xffffffffffffffffffffffff0000000000000001";
+const BOB: &'static str = "0xffffffffffffffffffffffff0000000000000002";
 use super::*;
 #[test]
 fn base_uri_unexistent_collection_is_none() {
@@ -33,7 +32,7 @@ fn create_new_collection_should_create_sequential_collections() {
 		for i in 0..3 {
 			// Create the collection
 			assert_ok!(LivingAssetsModule::create_collection(
-				RuntimeOrigin::signed(ALICE),
+				RuntimeOrigin::signed(H160::from_str(ALICE).unwrap()),
 				base_uri.clone()
 			));
 
@@ -49,7 +48,7 @@ fn should_set_base_uri_when_creating_new_collection() {
 
 	new_test_ext().execute_with(|| {
 		assert_ok!(LivingAssetsModule::create_collection(
-			RuntimeOrigin::signed(ALICE),
+			RuntimeOrigin::signed(H160::from_str(ALICE).unwrap()),
 			base_uri.clone()
 		));
 		assert_eq!(LivingAssetsModule::collection_base_uri(0).unwrap(), base_uri);
@@ -63,25 +62,37 @@ fn create_new_collections_should_emit_events_with_collection_id_consecutive() {
 		System::set_block_number(1);
 
 		assert_ok!(LivingAssetsModule::create_collection(
-			RuntimeOrigin::signed(ALICE),
+			RuntimeOrigin::signed(H160::from_str(ALICE).unwrap()),
 			BaseURI::default()
 		));
-		System::assert_last_event(Event::CollectionCreated { collection_id: 0, who: ALICE }.into());
+		System::assert_last_event(
+			Event::CollectionCreated { collection_id: 0, who: H160::from_str(ALICE).unwrap() }
+				.into(),
+		);
 		assert_ok!(LivingAssetsModule::create_collection(
-			RuntimeOrigin::signed(ALICE),
+			RuntimeOrigin::signed(H160::from_str(ALICE).unwrap()),
 			BaseURI::default()
 		));
-		System::assert_last_event(Event::CollectionCreated { collection_id: 1, who: ALICE }.into());
+		System::assert_last_event(
+			Event::CollectionCreated { collection_id: 1, who: H160::from_str(ALICE).unwrap() }
+				.into(),
+		);
 		assert_ok!(LivingAssetsModule::create_collection(
-			RuntimeOrigin::signed(ALICE),
+			RuntimeOrigin::signed(H160::from_str(ALICE).unwrap()),
 			BaseURI::default()
 		));
-		System::assert_last_event(Event::CollectionCreated { collection_id: 2, who: ALICE }.into());
+		System::assert_last_event(
+			Event::CollectionCreated { collection_id: 2, who: H160::from_str(ALICE).unwrap() }
+				.into(),
+		);
 		assert_ok!(LivingAssetsModule::create_collection(
-			RuntimeOrigin::signed(ALICE),
+			RuntimeOrigin::signed(H160::from_str(ALICE).unwrap()),
 			BaseURI::default()
 		));
-		System::assert_last_event(Event::CollectionCreated { collection_id: 3, who: ALICE }.into());
+		System::assert_last_event(
+			Event::CollectionCreated { collection_id: 3, who: H160::from_str(ALICE).unwrap() }
+				.into(),
+		);
 	});
 }
 
@@ -121,198 +132,14 @@ fn test_is_collection_address_invalid() {
 	assert!(!is_collection_address(invalid_address));
 }
 
-mod transfer_from {
-	use frame_support::assert_ok;
-	use sp_core::U256;
-
-	use super::*;
-
-	#[test]
-	fn owner_of_unexistent_asset_is_default_one() {
-		todo!();
-	}
-
-	#[test]
-	// fn sender_is_not_current_owner_should_fail() {
-	// 	new_test_ext().execute_with(|| {
-	// 		assert_ok!(LivingAssetsModule::transfer_from(
-	// 			RuntimeOrigin::signed(ALICE),
-	// 			ALICE,
-	// 			ALICE,
-	// 			U256::zero(),
-	// 		));
-	// 	});
-	// }
-	#[test]
-	fn sender_is_not_current_owner_should_fail() {
-		// impl_precompile_mock_simple!(
-		// 	Mock,
-		// 	// owner_of result
-		// 	Ok(H160::from_str("bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb").unwrap()),
-		// 	// transfer_from result
-		// 	Ok(())
-		// );
-
-		// // test data
-		// let from = H160::repeat_byte(0xAA);
-		// let to = H160::repeat_byte(0xBB);
-		// let asset_id = 4;
-		// let contract_address = H160::from_str("ffffffffffffffffffffffff0000000000000005");
-
-		// let input_data = EvmDataWriter::new_with_selector(Action::TransferFrom)
-		// 	.write(Address(from))
-		// 	.write(Address(to))
-		// 	.write(U256::from(asset_id))
-		// 	.build();
-
-		// let mut handle = create_mock_handle_from_input(input_data);
-		// handle.code_address = contract_address.unwrap();
-		// let result = Mock::execute(&mut handle);
-		// assert!(result.is_err());
-		// assert_eq!(result.unwrap_err(), revert("sender must be the current owner"),);
-	}
-
-	// #[test]
-	// fn receiver_is_the_current_owner_should_fail() {
-	// 	impl_precompile_mock_simple!(
-	// 		Mock,
-	// 		// owner_of result
-	// 		Ok(H160::from_str("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa").unwrap()),
-	// 		// transfer_from result
-	// 		Ok(())
-	// 	);
-
-	// 	// test data
-	// 	let from = H160::repeat_byte(0xAA);
-	// 	let to = H160::repeat_byte(0xAA);
-	// 	let asset_id = 4;
-	// 	let contract_address = H160::from_str("ffffffffffffffffffffffff0000000000000005");
-
-	// 	let input_data = EvmDataWriter::new_with_selector(Action::TransferFrom)
-	// 		.write(Address(from))
-	// 		.write(Address(to))
-	// 		.write(U256::from(asset_id))
-	// 		.build();
-
-	// 	let mut handle = create_mock_handle_from_input(input_data);
-	// 	handle.code_address = contract_address.unwrap();
-	// 	let result = Mock::execute(&mut handle);
-	// 	assert!(result.is_err());
-	// 	assert_eq!(result.unwrap_err(), revert("sender and receiver cannot be the same"));
-	// }
-
-	// #[test]
-	// fn receiver_is_the_zero_address_should_fail() {
-	// 	impl_precompile_mock_simple!(
-	// 		Mock,
-	// 		// owner_of result
-	// 		Ok(H160::from_str("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa").unwrap()),
-	// 		// transfer_from result
-	// 		Ok(())
-	// 	);
-
-	// 	// test data
-	// 	let from = H160::repeat_byte(0xAA);
-	// 	let to = H160::repeat_byte(0x0);
-	// 	let asset_id = 4;
-	// 	let contract_address = H160::from_str("ffffffffffffffffffffffff0000000000000005");
-
-	// 	let input_data = EvmDataWriter::new_with_selector(Action::TransferFrom)
-	// 		.write(Address(from))
-	// 		.write(Address(to))
-	// 		.write(U256::from(asset_id))
-	// 		.build();
-
-	// 	let mut handle = create_mock_handle_from_input(input_data);
-	// 	handle.code_address = contract_address.unwrap();
-	// 	let result = Mock::execute(&mut handle);
-	// 	assert!(result.is_err());
-	// 	assert_eq!(result.unwrap_err(), revert("receiver cannot be zero address"));
-	// }
-
-	// #[test]
-	// fn send_value_as_money_should_fail() {
-	// 	impl_precompile_mock_simple!(
-	// 		Mock,
-	// 		// owner_of result
-	// 		Ok(H160::from_str("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa").unwrap()),
-	// 		// transfer_from result
-	// 		Ok(())
-	// 	);
-
-	// 	// test data
-	// 	let from = H160::repeat_byte(0xAA);
-	// 	let to = H160::repeat_byte(0x0);
-	// 	let asset_id = 4;
-	// 	let contract_address = H160::from_str("ffffffffffffffffffffffff0000000000000005");
-
-	// 	let input_data = EvmDataWriter::new_with_selector(Action::TransferFrom)
-	// 		.write(Address(from))
-	// 		.write(Address(to))
-	// 		.write(U256::from(asset_id))
-	// 		.build();
-
-	// 	let mut handle = create_mock_handle(input_data, 0, 1, H160::zero());
-	// 	handle.code_address = contract_address.unwrap();
-	// 	let result = Mock::execute(&mut handle);
-	// 	assert!(result.is_err());
-	// 	assert_eq!(result.unwrap_err(), revert("function is not payable"));
-	// }
-
-	#[test]
-	fn sucessful_transfer_should_work() {
-		let asset_id = U256::zero();
-
-		new_test_ext().execute_with(|| {
-			System::set_block_number(1);
-			assert!(Asset::<Test>::get(asset_id).is_none());
-			assert_ok!(LivingAssetsModule::transfer_from(
-				RuntimeOrigin::signed(ALICE),
-				ALICE,
-				BOB,
-				asset_id,
-			));
-			assert_eq!(Asset::<Test>::get(asset_id).unwrap(), BOB);
-			System::assert_last_event(Event::AssetTransferred { asset_id, receiver: BOB }.into());
-		});
-	}
-	// #[test]
-	// fn unsucessful_transfer_should_fail() {
-	// 	impl_precompile_mock_simple!(
-	// 		Mock,
-	// 		// owner_of result
-	// 		Ok(H160::from_str("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa").unwrap()),
-	// 		// transfer_from result
-	// 		Err("this is an error")
-	// 	);
-
-	// 	// test data
-	// 	let from = H160::repeat_byte(0xAA);
-	// 	let to = H160::repeat_byte(0xBB);
-	// 	let asset_id = 4;
-	// 	let contract_address = H160::from_str("ffffffffffffffffffffffff0000000000000005");
-
-	// 	let input_data = EvmDataWriter::new_with_selector(Action::TransferFrom)
-	// 		.write(Address(from))
-	// 		.write(Address(to))
-	// 		.write(U256::from(asset_id))
-	// 		.build();
-
-	// 	let mut handle = create_mock_handle_from_input(input_data);
-	// 	handle.code_address = contract_address.unwrap();
-	// 	let result = Mock::execute(&mut handle);
-	// 	assert!(result.is_err());
-	// 	assert_eq!(result.unwrap_err(), revert("this is an error"));
-	// }
-}
-
 mod traits {
 	use super::*;
 	use crate::{
 		traits::{CollectionManager, Erc721},
 		Error, Event,
 	};
-	use frame_support::{assert_err, assert_ok};
+	use frame_support::{assert_err, assert_noop, assert_ok};
+	use sp_core::U256;
 
 	#[test]
 	fn base_uri_of_unexistent_collection_is_none() {
@@ -329,11 +156,12 @@ mod traits {
 			System::set_block_number(1);
 
 			assert_ok!(<LivingAssetsModule as CollectionManager>::create_collection(
-				ALICE,
+				H160::from_str(ALICE).unwrap(),
 				BaseURI::default(),
 			));
 			System::assert_last_event(
-				Event::CollectionCreated { collection_id: 0, who: ALICE }.into(),
+				Event::CollectionCreated { collection_id: 0, who: H160::from_str(ALICE).unwrap() }
+					.into(),
 			);
 		});
 	}
@@ -343,7 +171,7 @@ mod traits {
 		new_test_ext().execute_with(|| {
 			assert_eq!(
 				<LivingAssetsModule as CollectionManager>::create_collection(
-					ALICE,
+					H160::from_str(ALICE).unwrap(),
 					BaseURI::default()
 				)
 				.unwrap(),
@@ -351,7 +179,7 @@ mod traits {
 			);
 			assert_eq!(
 				<LivingAssetsModule as CollectionManager>::create_collection(
-					ALICE,
+					H160::from_str(ALICE).unwrap(),
 					BaseURI::default()
 				)
 				.unwrap(),
@@ -359,7 +187,7 @@ mod traits {
 			);
 			assert_eq!(
 				<LivingAssetsModule as CollectionManager>::create_collection(
-					ALICE,
+					H160::from_str(ALICE).unwrap(),
 					BaseURI::default()
 				)
 				.unwrap(),
@@ -367,7 +195,7 @@ mod traits {
 			);
 			assert_eq!(
 				<LivingAssetsModule as CollectionManager>::create_collection(
-					ALICE,
+					H160::from_str(ALICE).unwrap(),
 					BaseURI::default()
 				)
 				.unwrap(),
@@ -375,7 +203,7 @@ mod traits {
 			);
 			assert_eq!(
 				<LivingAssetsModule as CollectionManager>::create_collection(
-					ALICE,
+					H160::from_str(ALICE).unwrap(),
 					BaseURI::default()
 				)
 				.unwrap(),
@@ -383,7 +211,7 @@ mod traits {
 			);
 			assert_eq!(
 				<LivingAssetsModule as CollectionManager>::create_collection(
-					ALICE,
+					H160::from_str(ALICE).unwrap(),
 					BaseURI::default()
 				)
 				.unwrap(),
@@ -398,7 +226,7 @@ mod traits {
 
 		new_test_ext().execute_with(|| {
 			assert_ok!(<LivingAssetsModule as CollectionManager>::create_collection(
-				ALICE,
+				H160::from_str(ALICE).unwrap(),
 				base_uri.clone()
 			));
 			assert_eq!(LivingAssetsModule::collection_base_uri(0).unwrap(), base_uri);
@@ -417,7 +245,7 @@ mod traits {
 	fn erc721_owner_of_asset_of_collection() {
 		new_test_ext().execute_with(|| {
 			let collection_id = <LivingAssetsModule as CollectionManager>::create_collection(
-				ALICE,
+				H160::from_str(ALICE).unwrap(),
 				BaseURI::default(),
 			)
 			.unwrap();
@@ -425,6 +253,85 @@ mod traits {
 				<LivingAssetsModule as Erc721>::owner_of(collection_id, 2.into()).unwrap(),
 				H160::from_low_u64_be(0x0000000000000002)
 			);
+		});
+	}
+
+	#[test]
+	fn sender_is_not_current_owner_should_fail() {
+		let asset_id = U256::from(5);
+		let sender = H160::from_str("0000000000000000000000000000000000000006").unwrap();
+		let receiver = H160::from_str(BOB).unwrap();
+		new_test_ext().execute_with(|| {
+			System::set_block_number(1);
+			assert!(Asset::<Test>::get(asset_id).is_none());
+			CollectionBaseURI::<Test>::insert(1, BaseURI::default());
+			assert_noop!(
+				<LivingAssetsModule as Erc721>::transfer_from(1, sender, receiver, asset_id,),
+				Error::<Test>::SenderNotOwner
+			);
+		});
+	}
+
+	#[test]
+	fn same_sender_and_receiver_should_fail() {
+		let asset_id = U256::from(5);
+		let sender = H160::from_str("0000000000000000000000000000000000000005").unwrap();
+		new_test_ext().execute_with(|| {
+			System::set_block_number(1);
+			assert!(Asset::<Test>::get(asset_id).is_none());
+			CollectionBaseURI::<Test>::insert(1, BaseURI::default());
+			assert_noop!(
+				<LivingAssetsModule as Erc721>::transfer_from(1, sender, sender, asset_id,),
+				Error::<Test>::SameSenderReceiver
+			);
+		});
+	}
+
+	#[test]
+	fn receiver_is_the_zero_address_should_fail() {
+		let asset_id = U256::from(5);
+		let sender = H160::from_str("0000000000000000000000000000000000000005").unwrap();
+		let receiver = H160::from_str("0000000000000000000000000000000000000000").unwrap();
+		new_test_ext().execute_with(|| {
+			System::set_block_number(1);
+			assert!(Asset::<Test>::get(asset_id).is_none());
+			CollectionBaseURI::<Test>::insert(1, BaseURI::default());
+			assert_noop!(
+				<LivingAssetsModule as Erc721>::transfer_from(1, sender, receiver, asset_id,),
+				Error::<Test>::ReceiverIsZeroAddress
+			);
+		});
+	}
+
+	#[test]
+	fn unexistent_collection_when_transfer_from_should_fail() {
+		let asset_id = U256::from(5);
+		let sender = H160::from_str("0000000000000000000000000000000000000005").unwrap();
+		let receiver = H160::from_str(BOB).unwrap();
+		new_test_ext().execute_with(|| {
+			System::set_block_number(1);
+			assert!(Asset::<Test>::get(asset_id).is_none());
+			assert_noop!(
+				<LivingAssetsModule as Erc721>::transfer_from(1, sender, receiver, asset_id,),
+				Error::<Test>::UnexistentCollection
+			);
+		});
+	}
+
+	#[test]
+	fn sucessful_transfer_from_trait_should_work() {
+		let asset_id = U256::from(5);
+		let sender = H160::from_str("0000000000000000000000000000000000000005").unwrap();
+		let receiver = H160::from_str(BOB).unwrap();
+		new_test_ext().execute_with(|| {
+			System::set_block_number(1);
+			assert!(Asset::<Test>::get(asset_id).is_none());
+			CollectionBaseURI::<Test>::insert(1, BaseURI::default());
+			assert_ok!(<LivingAssetsModule as Erc721>::transfer_from(
+				1, sender, receiver, asset_id,
+			));
+			assert_eq!(Asset::<Test>::get(asset_id).unwrap(), receiver);
+			System::assert_last_event(Event::AssetTransferred { asset_id, receiver }.into());
 		});
 	}
 }

@@ -17,14 +17,11 @@ pub mod pallet {
 	use super::*;
 	use frame_support::{
 		pallet_prelude::{OptionQuery, ValueQuery, *},
-		storage::types::QueryKindTrait,
 		BoundedVec,
 	};
 	use frame_system::pallet_prelude::*;
-	use pallet_evm::{pallet, AddressMapping};
-	// use pallet_evm::AddressMapping;
+	use pallet_evm::AddressMapping;
 	use sp_core::{H160, U256};
-	// use sp_runtime::{traits::AccountIdConversion, AccountId32};
 
 	/// Collection id type
 	pub type CollectionId = u64;
@@ -95,7 +92,14 @@ pub mod pallet {
 		CollectionIdOverflow,
 		/// Unexistent collection
 		UnexistentCollection,
-		// SenderIsNotTheCurrentOwner,
+		// SenderNotOwner,
+		SenderNotOwner,
+		// UnexistenAsset,
+		UnexistenAsset,
+		// SameSenderReceiver,
+		SameSenderReceiver,
+		// ReceiverIsZeroAddress,
+		ReceiverIsZeroAddress,
 	}
 
 	impl<T: Config> AsRef<[u8]> for Error<T> {
@@ -104,6 +108,10 @@ pub mod pallet {
 				Error::__Ignore(_, _) => b"__Ignore",
 				Error::CollectionIdOverflow => b"CollectionIdOverflow",
 				Error::UnexistentCollection => b"UnexistentCollection",
+				Error::SenderNotOwner => b"SenderNotOwner",
+				Error::UnexistenAsset => b"UnexistenAsset",
+				Error::SameSenderReceiver => b"SameSenderReceiver",
+				Error::ReceiverIsZeroAddress => b"ReceiverIsZeroAddress",
 			}
 		}
 	}
@@ -122,27 +130,6 @@ pub mod pallet {
 				Ok(_) => Ok(()),
 				Err(err) => Err(err.into()),
 			}
-		}
-
-		#[pallet::call_index(1)]
-		#[pallet::weight(10_000 + T::DbWeight::get().writes(1).ref_time())] // TODO set proper weight
-		pub fn transfer_from(
-			origin: OriginFor<T>,
-			from: T::AccountId,
-			to: T::AccountId,
-			asset_id: U256,
-		) -> DispatchResult {
-			let who = ensure_signed(origin)?;
-
-			// checks
-			// ensure!(owner == from, revert("sender must be the current owner"));
-			// ensure!(from != to, revert("sender and receiver cannot be the same"));
-			// ensure!(to != H160::zero(), revert("receiver cannot be zero address"));
-
-			Asset::<T>::set(asset_id, Some(to.clone()));
-			Self::deposit_event(Event::AssetTransferred { asset_id, receiver: to });
-
-			Ok(())
 		}
 	}
 
@@ -199,6 +186,19 @@ pub mod pallet {
 			to: T::AccountId,
 			asset_id: U256,
 		) -> Result<(), Self::Error> {
+			// let who = ensure_signed(origin)?;  // TODO check this cannot be called from pallet
+
+			CollectionBaseURI::<T>::get(collection_id).ok_or(Error::UnexistentCollection)?;
+			ensure!(asset::<T>(asset_id) == from, Error::SenderNotOwner);
+			ensure!(from != to, Error::SameSenderReceiver);
+			ensure!(
+				to != T::AddressMapping::into_account_id(H160::zero()),
+				Error::ReceiverIsZeroAddress
+			);
+
+			Asset::<T>::set(asset_id, Some(to.clone()));
+			Self::deposit_event(Event::AssetTransferred { asset_id, receiver: to });
+
 			Ok(())
 		}
 	}

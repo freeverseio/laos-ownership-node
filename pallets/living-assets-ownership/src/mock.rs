@@ -1,13 +1,18 @@
 use crate as pallet_livingassets_ownership;
 use frame_support::parameter_types;
-use frame_support::traits::{ConstU16, ConstU64};
+use frame_support::traits::{ConstU16, ConstU64, FindAuthor};
 use frame_support::weights::Weight;
-use pallet_evm::{AddressMapping, EnsureAddressTruncated, FeeCalculator};
+use pallet_evm::{
+	runner, EnsureAddressNever, EnsureAddressRoot, FeeCalculator, FixedGasWeightMapping,
+	IdentityAddressMapping, SubstrateBlockHashMapping,
+};
 use sp_core::{ConstU32, H160, H256, U256};
+use sp_runtime::ConsensusEngineId;
 use sp_runtime::{
 	traits::{BlakeTwo256, IdentityLookup},
-	AccountId32, BuildStorage,
+	BuildStorage,
 };
+use sp_std::{boxed::Box, prelude::*, str::FromStr};
 
 type Block = frame_system::mocking::MockBlock<Test>;
 type Nonce = u32;
@@ -20,6 +25,7 @@ frame_support::construct_runtime!(
 		LivingAssetsModule: pallet_livingassets_ownership,
 		Balances: pallet_balances,
 		Timestamp: pallet_timestamp,
+		EVM: pallet_evm,
 	}
 );
 
@@ -34,7 +40,7 @@ impl frame_system::Config for Test {
 	type Hash = H256;
 	type Nonce = Nonce;
 	type Hashing = BlakeTwo256;
-	type AccountId = u64;
+	type AccountId = H160;
 	type Lookup = IdentityLookup<Self::AccountId>;
 	type RuntimeEvent = RuntimeEvent;
 	type BlockHashCount = ConstU64<250>;
@@ -55,29 +61,27 @@ impl pallet_livingassets_ownership::Config for Test {
 }
 
 parameter_types! {
-	// For weight estimation, we assume that the most locks on an individual account will be 50.
-	// This number may need to be adjusted in the future if this assumption no longer holds true.
-	pub const MaxLocks: u32 = 50;
-	pub const ExistentialDeposit: u64 = 500;
+	pub const ExistentialDeposit: u64 = 1;
 }
 
 impl pallet_balances::Config for Test {
-	type MaxLocks = MaxLocks;
-	type Balance = u64;
 	type RuntimeEvent = RuntimeEvent;
+	type WeightInfo = ();
+	type Balance = u64;
 	type DustRemoval = ();
 	type ExistentialDeposit = ExistentialDeposit;
 	type AccountStore = System;
-	type RuntimeHoldReason = ();
-	type WeightInfo = ();
-	type MaxReserves = ();
 	type ReserveIdentifier = ();
 	type FreezeIdentifier = ();
+	type MaxLocks = ();
+	type MaxReserves = ();
 	type MaxHolds = ();
 	type MaxFreezes = ();
+	type RuntimeHoldReason = ();
 }
+
 parameter_types! {
-	pub const MinimumPeriod: u64 = 6000 / 2;
+	pub const MinimumPeriod: u64 = 1000;
 }
 
 impl pallet_timestamp::Config for Test {
@@ -86,74 +90,52 @@ impl pallet_timestamp::Config for Test {
 	type MinimumPeriod = MinimumPeriod;
 	type WeightInfo = ();
 }
+
 pub struct FixedGasPrice;
 impl FeeCalculator for FixedGasPrice {
 	fn min_gas_price() -> (U256, Weight) {
-		(1.into(), Weight::zero())
+		// Return some meaningful gas price and weight
+		(1_000_000_000u128.into(), Weight::from_parts(7u64, 0))
 	}
 }
+pub struct FindAuthorTruncated;
+impl FindAuthor<H160> for FindAuthorTruncated {
+	fn find_author<'a, I>(_digests: I) -> Option<H160>
+	where
+		I: 'a + IntoIterator<Item = (ConsensusEngineId, &'a [u8])>,
+	{
+		Some(H160::from_str("1234500000000000000000000000000000000000").unwrap())
+	}
+}
+const BLOCK_GAS_LIMIT: u64 = 150_000_000;
 const MAX_POV_SIZE: u64 = 5 * 1024 * 1024;
+
 parameter_types! {
-		pub const TransactionByteFee: u64 = 1;
-	pub const ChainId: u64 = 42;
-	pub const BlockGasLimit: U256 = U256::MAX;
-	pub WeightPerGas: Weight = Weight::from_parts(1, 0);
-	pub GasLimitPovSizeRatio: u64 = {
-		let block_gas_limit = BlockGasLimit::get().min(u64::MAX.into()).low_u64();
-		block_gas_limit.saturating_div(MAX_POV_SIZE)
-	};
+	pub BlockGasLimit: U256 = U256::from(BLOCK_GAS_LIMIT);
+	pub const GasLimitPovSizeRatio: u64 = BLOCK_GAS_LIMIT.saturating_div(MAX_POV_SIZE);
+	pub WeightPerGas: Weight = Weight::from_parts(20_000, 0);
 }
-
-pub struct HashedAddressMapping;
-
-impl AddressMapping<AccountId32> for HashedAddressMapping {
-	fn into_account_id(address: H160) -> AccountId32 {
-		let mut data = [0u8; 32];
-		data[0..20].copy_from_slice(&address[..]);
-		AccountId32::from(Into::<[u8; 32]>::into(data))
-	}
-}
-// pub struct FindAuthorTruncated;
-// impl FindAuthor<H160> for FindAuthorTruncated {
-// 	fn find_author<'a, I>(_digests: I) -> Option<H160>
-// 	where
-// 		I: 'a + IntoIterator<Item = (ConsensusEngineId, &'a [u8])>,
-// 	{
-// 		Some(address_build(0).address)
-// 	}
-// }
 impl pallet_evm::Config for Test {
 	type FeeCalculator = FixedGasPrice;
-	type GasWeightMapping = pallet_evm::FixedGasWeightMapping<Self>;
+	type GasWeightMapping = FixedGasWeightMapping<Self>;
 	type WeightPerGas = WeightPerGas;
-	type BlockHashMapping = pallet_ethereum::EthereumBlockHashMapping<Self>;
-	type CallOrigin = EnsureAddressTruncated;
-	type WithdrawOrigin = EnsureAddressTruncated;
-	type AddressMapping = HashedAddressMapping;
+	type BlockHashMapping = SubstrateBlockHashMapping<Self>;
+	type CallOrigin = EnsureAddressRoot<Self::AccountId>;
+	type WithdrawOrigin = EnsureAddressNever<Self::AccountId>;
+	type AddressMapping = IdentityAddressMapping;
 	type Currency = Balances;
 	type RuntimeEvent = RuntimeEvent;
 	type PrecompilesType = ();
 	type PrecompilesValue = ();
-	type ChainId = ChainId;
+	type ChainId = ();
 	type BlockGasLimit = BlockGasLimit;
-	type Runner = pallet_evm::runner::stack::Runner<Self>;
+	type Runner = runner::stack::Runner<Self>;
 	type OnChargeTransaction = ();
 	type OnCreate = ();
-	type FindAuthor = ();
+	type FindAuthor = FindAuthorTruncated;
+	type GasLimitPovSizeRatio = GasLimitPovSizeRatio;
 	type Timestamp = Timestamp;
 	type WeightInfo = ();
-	type GasLimitPovSizeRatio = GasLimitPovSizeRatio;
-}
-
-// parameter_types! {
-// 	pub const PostBlockAndTxnHashes: PostLogContent = PostLogContent::BlockAndTxnHashes;
-// }
-
-impl pallet_ethereum::Config for Test {
-	type RuntimeEvent = RuntimeEvent;
-	type StateRoot = ();
-	type PostLogContent = ();
-	type ExtraDataLength = ConstU32<30>;
 }
 
 // Build genesis storage according to the mock runtime.
