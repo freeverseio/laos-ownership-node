@@ -1,6 +1,7 @@
 use core::str::FromStr;
 
 use super::*;
+use frame_support::assert_ok;
 use pallet_living_assets_ownership::CollectionId;
 use precompile_utils::testing::create_mock_handle_from_input;
 use sp_core::{H160, U256};
@@ -80,6 +81,29 @@ fn token_owners_should_have_at_least_token_id_as_argument() {
 	let result = Mock::execute(&mut handle);
 	assert!(result.is_err());
 	assert_eq!(result.unwrap_err(), revert("input doesn't match expected length"));
+}
+
+#[test]
+fn token_uri_should_return_a_string() {
+	impl_precompile_mock_simple!(
+		Mock,
+		Ok(H160::zero()),
+		Ok("This is the token URI".to_string().into_bytes())
+	);
+
+	let input = EvmDataWriter::new_with_selector(Action::TokenURI).write(U256::from(4)).build();
+	let mut handle = create_mock_handle_from_input(input);
+	handle.code_address = H160::from_str("ffffffffffffffffffffffff0000000000000005").unwrap();
+
+	let result = Mock::execute(&mut handle);
+	assert_ok!(
+		result,
+		succeed(
+			EvmDataWriter::new()
+				.write(Bytes("This is the token URI".to_string().into_bytes()))
+				.build()
+		)
+	);
 }
 
 mod helpers {

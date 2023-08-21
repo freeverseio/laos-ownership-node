@@ -2,7 +2,8 @@
 use fp_evm::{Precompile, PrecompileHandle, PrecompileOutput};
 use pallet_living_assets_ownership::{address_to_collection_id, CollectionId};
 use precompile_utils::{
-	revert, succeed, Address, EvmDataWriter, EvmResult, FunctionModifier, PrecompileHandleExt,
+	revert, succeed, Address, Bytes, EvmDataWriter, EvmResult, FunctionModifier,
+	PrecompileHandleExt,
 };
 use sp_core::U256;
 use sp_std::{fmt::Debug, marker::PhantomData};
@@ -73,7 +74,7 @@ where
 		let asset_id: U256 = input.read()?;
 
 		match AssetManager::token_uri(collection_id, asset_id) {
-			Ok(token_uri) => Ok(succeed(EvmDataWriter::new().write(token_uri).build())),
+			Ok(token_uri) => Ok(succeed(EvmDataWriter::new().write(Bytes(token_uri)).build())),
 			Err(err) => Err(revert(err)),
 		}
 	}
