@@ -84,8 +84,10 @@ where
 			Ok(value) => H160::from_slice(&value.as_slice()[12..32]),
 			Err(_) => return Err(revert("error getting owner")),
 		};
+		let caller = handle.context().caller;
 
 		// checks
+		ensure!(owner == caller, revert("caller must be the current owner"));
 		ensure!(owner == from, revert("sender must be the current owner"));
 		ensure!(from != to, revert("sender and receiver cannot be the same"));
 		ensure!(to != H160::zero(), revert("receiver cannot be zero address"));
@@ -107,26 +109,6 @@ where
 		}
 	}
 }
-
-// impl<AddressMapping, AccountId, AssetManager>
-// 	Erc721Precompile<AddressMapping, AccountId, AssetManager>
-// where
-// 	AddressMapping: pallet_evm::AddressMapping<AccountId>,
-// 	AccountId: Encode + Debug,
-// 	AssetManager: Erc721<AccountId>,
-// {
-// 	fn owner_of(asset_id: U256, code_address: H160) -> Result<H160, PrecompileFailure> {
-// 		// collection id is encoded into the contract address
-// 		let collection_id = match address_to_collection_id(code_address) {
-// 			Ok(collection_id) => collection_id,
-// 			Err(_) => return Err(revert("invalid collection address")),
-// 		};
-// 		match AssetManager::owner_of(collection_id, asset_id) {
-// 			Ok(owner) => Ok(owner),
-// 			Err(err) => Err(revert(err)),
-// 		}
-// 	}
-// }
 
 #[cfg(test)]
 mod tests;
