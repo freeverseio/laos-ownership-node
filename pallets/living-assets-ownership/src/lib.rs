@@ -134,10 +134,11 @@ pub mod pallet {
 		}
 
 		fn token_uri(collection_id: CollectionId, asset_id: U256) -> Result<Vec<u8>, Self::Error> {
-			let base_uri = match CollectionBaseURI::<T>::get(collection_id) {
+			let base_uri = match Pallet::<T>::collection_base_uri(collection_id) {
 				Some(base_uri) => base_uri,
 				None => return Err(Error::UnexistentCollection),
 			};
+
 			// concatenate base_uri with asset_id
 			let mut token_uri = base_uri.to_vec();
 			token_uri.push(b'/');
