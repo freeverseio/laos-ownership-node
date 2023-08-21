@@ -56,10 +56,8 @@ where
 
 		let asset_id: U256 = input.read()?;
 
-		match AssetManager::owner_of(collection_id, asset_id) {
-			Ok(owner) => Ok(succeed(EvmDataWriter::new().write(Address(owner)).build())),
-			Err(err) => Err(revert(err)),
-		}
+		let owner = AssetManager::owner_of(collection_id, asset_id).map_err(|err| revert(err))?;
+		Ok(succeed(EvmDataWriter::new().write(Address(owner)).build()))
 	}
 
 	fn token_uri(
@@ -71,10 +69,8 @@ where
 
 		let asset_id: U256 = input.read()?;
 
-		match AssetManager::token_uri(collection_id, asset_id) {
-			Ok(token_uri) => Ok(succeed(EvmDataWriter::new().write(Bytes(token_uri)).build())),
-			Err(err) => Err(revert(err)),
-		}
+		let uri = AssetManager::token_uri(collection_id, asset_id).map_err(|err| revert(err))?;
+		Ok(succeed(EvmDataWriter::new().write(Bytes(uri)).build()))
 	}
 }
 
