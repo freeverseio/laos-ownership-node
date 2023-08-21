@@ -1,6 +1,6 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 use fp_evm::{Precompile, PrecompileHandle, PrecompileOutput};
-use pallet_living_assets_ownership::address_to_collection_id;
+use pallet_living_assets_ownership::{address_to_collection_id, CollectionId};
 use precompile_utils::{
 	revert, succeed, Address, EvmDataWriter, EvmResult, FunctionModifier, PrecompileHandleExt,
 };
@@ -38,8 +38,8 @@ where
 		})?;
 
 		match selector {
-			Action::TokenURI => Self::token_uri(handle),
-			Action::OwnerOf => Self::owner_of(handle),
+			Action::TokenURI => Self::token_uri(collection_id, handle),
+			Action::OwnerOf => Self::owner_of(collection_id, handle),
 		}
 	}
 }
@@ -48,17 +48,14 @@ impl<AssetManager> Erc721Precompile<AssetManager>
 where
 	AssetManager: pallet_living_assets_ownership::traits::Erc721,
 {
-	fn owner_of(handle: &mut impl PrecompileHandle) -> EvmResult<PrecompileOutput> {
+	fn owner_of(
+		collection_id: CollectionId,
+		handle: &mut impl PrecompileHandle,
+	) -> EvmResult<PrecompileOutput> {
 		let mut input = handle.read_input()?;
 		input.expect_arguments(1)?;
 
 		let asset_id: U256 = input.read()?;
-
-		// collection id is encoded into the contract address
-		let collection_id = match address_to_collection_id(handle.code_address()) {
-			Ok(collection_id) => collection_id,
-			Err(_) => return Err(revert("invalid collection address")),
-		};
 
 		match AssetManager::owner_of(collection_id, asset_id) {
 			Ok(owner) => Ok(succeed(EvmDataWriter::new().write(Address(owner)).build())),
@@ -66,17 +63,14 @@ where
 		}
 	}
 
-	fn token_uri(handle: &mut impl PrecompileHandle) -> EvmResult<PrecompileOutput> {
+	fn token_uri(
+		collection_id: CollectionId,
+		handle: &mut impl PrecompileHandle,
+	) -> EvmResult<PrecompileOutput> {
 		let mut input = handle.read_input()?;
 		input.expect_arguments(1)?;
 
 		let asset_id: U256 = input.read()?;
-
-		// collection id is encoded into the contract address
-		let collection_id = match address_to_collection_id(handle.code_address()) {
-			Ok(collection_id) => collection_id,
-			Err(_) => return Err(revert("invalid collection address")),
-		};
 
 		match AssetManager::token_uri(collection_id, asset_id) {
 			Ok(token_uri) => Ok(succeed(EvmDataWriter::new().write(token_uri).build())),
