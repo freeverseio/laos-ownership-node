@@ -24,6 +24,12 @@ where
 	AssetManager: pallet_living_assets_ownership::traits::Erc721,
 {
 	fn execute(handle: &mut impl PrecompileHandle) -> EvmResult<PrecompileOutput> {
+		// collection id is encoded into the contract address
+		let collection_id = match address_to_collection_id(handle.code_address()) {
+			Ok(collection_id) => collection_id,
+			Err(_) => return Err(revert("invalid collection address")),
+		};
+
 		let selector = handle.read_selector()?;
 
 		handle.check_function_modifier(match selector {
