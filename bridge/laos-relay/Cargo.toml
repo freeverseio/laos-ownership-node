@@ -28,13 +28,11 @@ bp-header-chain = { git = "https://github.com/freeverseio/parity-bridges-common.
 bp-messages = { git = "https://github.com/freeverseio/parity-bridges-common.git", branch = "polkadot-v1.0.0" }
 bp-parachains = { git = "https://github.com/freeverseio/parity-bridges-common.git", branch = "polkadot-v1.0.0" }
 bp-millau = { git = "https://github.com/freeverseio/parity-bridges-common.git", branch = "polkadot-v1.0.0" }
-bp-polkadot-core = { git = "https://github.com/freeverseio/parity-bridges-common.git", branch = "polkadot-v1.0.0" }
 bp-runtime = { git = "https://github.com/freeverseio/parity-bridges-common.git", branch = "polkadot-v1.0.0" }
 bridge-runtime-common = { git = "https://github.com/freeverseio/parity-bridges-common.git", branch = "polkadot-v1.0.0" }
 millau-runtime = { git = "https://github.com/freeverseio/parity-bridges-common.git", branch = "polkadot-v1.0.0" }
 pallet-bridge-parachains = { git = "https://github.com/freeverseio/parity-bridges-common.git", branch = "polkadot-v1.0.0" }
 pallet-bridge-messages = { git = "https://github.com/freeverseio/parity-bridges-common.git", branch = "polkadot-v1.0.0" }
-parachains-relay = { git = "https://github.com/freeverseio/parity-bridges-common.git", branch = "polkadot-v1.0.0" }
 relay-millau-client = { git = "https://github.com/freeverseio/parity-bridges-common.git", branch = "polkadot-v1.0.0" }
 relay-evochain-client = { path = "../client-evochain" }
 relay-ownership-parachain-client = { path = "../client-ownership-parachain" }
@@ -42,7 +40,6 @@ relay-substrate-client = { git = "https://github.com/freeverseio/parity-bridges-
 relay-utils = { git = "https://github.com/freeverseio/parity-bridges-common.git", branch = "polkadot-v1.0.0" }
 # we are not using this runtime to craft call or transactions, but we still need it
 # to prepare large XCM messages
-rialto-parachain-runtime = { git = "https://github.com/freeverseio/parity-bridges-common.git", branch = "polkadot-v1.0.0" }
 substrate-relay-helper = { git = "https://github.com/freeverseio/parity-bridges-common.git", branch = "polkadot-v1.0.0" }
 
 node-template-runtime = { git = "https://github.com/freeverseio/laos-evolution-node.git", branch = "feat/relayer-updates" }
