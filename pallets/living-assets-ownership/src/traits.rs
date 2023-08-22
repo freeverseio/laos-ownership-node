@@ -49,6 +49,7 @@ pub trait CollectionManager {
 /// # Methods
 ///
 /// - `owner_of`: Retrieve the owner of a specific asset within a collection.
+/// - `token_uri`: Retrieve the URI associated with a specific asset within a collection.
 pub trait Erc721 {
 	type Error: AsRef<[u8]> + PartialEq;
 	type AccountId;
@@ -64,6 +65,20 @@ pub trait Erc721 {
 	///
 	/// The Ethereum address (`H160`) of the asset's owner or an error.
 	fn owner_of(collection_id: CollectionId, asset_id: U256) -> Result<H160, Self::Error>;
+
+	/// Retrieves the URI associated with a specific asset within the specified collection.
+	///
+	/// The URI is often used to provide metadata, images, or other information related to the asset.
+	/// This URI should conform to the ERC721 metadata standards and can be a URL, IPFS hash, or other URI format.
+	///
+	/// # Arguments
+	///
+	/// * `asset_id` - The unique identifier for the asset within the collection.
+	///
+	/// # Returns
+	///
+	/// A `Vec<u8>` representing the URI of the asset or an error if retrieval fails.
+	fn token_uri(collection_id: CollectionId, asset_id: U256) -> Result<Vec<u8>, Self::Error>;
 
 	/// Transfers the ownership of a asset from one address to another address
 	///

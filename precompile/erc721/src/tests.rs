@@ -1,6 +1,7 @@
 use core::str::FromStr;
 
 use super::*;
+use frame_support::assert_ok;
 use pallet_living_assets_ownership::CollectionId;
 use precompile_utils::testing::create_mock_handle_from_input;
 use sp_core::{H160, U256};
@@ -20,6 +21,7 @@ fn owner_of_asset_should_return_an_address() {
 	impl_precompile_mock_simple!(
 		Mock,
 		Ok(H160::from_str("ff00000000000000000000000000000012345678").unwrap()),
+		Ok(vec![]),
 		Ok(())
 	);
 
@@ -41,7 +43,7 @@ fn owner_of_asset_should_return_an_address() {
 
 #[test]
 fn if_mock_fails_should_return_the_error() {
-	impl_precompile_mock_simple!(Mock, Err("this is an error"), Ok(()));
+	impl_precompile_mock_simple!(Mock, Err("this is an error"), Ok(vec![]), Ok(()));
 
 	let owner_of_asset_4 =
 		hex::decode("6352211e0000000000000000000000000000000000000000000000000000000000000004")
@@ -55,18 +57,18 @@ fn if_mock_fails_should_return_the_error() {
 
 #[test]
 fn invalid_contract_address_should_error() {
-	impl_precompile_mock_simple!(Mock, Ok(H160::zero()), Ok(()));
+	impl_precompile_mock_simple!(Mock, Ok(H160::zero()), Ok(vec![]), Ok(()));
 
 	let mut handle = create_mock_handle_from_input(Vec::new());
 	handle.code_address = H160::zero();
 	let result = Mock::execute(&mut handle);
 	assert!(result.is_err());
-	assert_eq!(result.unwrap_err(), revert("tried to parse selector out of bounds"));
+	assert_eq!(result.unwrap_err(), revert("invalid collection address"));
 }
 
 #[test]
 fn token_owners_should_have_at_least_token_id_as_argument() {
-	impl_precompile_mock_simple!(Mock, Ok(H160::zero()), Ok(()));
+	impl_precompile_mock_simple!(Mock, Ok(H160::zero()), Ok(vec![]), Ok(()));
 
 	let owner_of_with_2_arguments: Vec<u8> =
 		hex::decode("6352211e00000000000000000000000000000000000000000000000000000000000000040000000000000000000000000000000000000000000000000000000000000004")
@@ -78,6 +80,7 @@ fn token_owners_should_have_at_least_token_id_as_argument() {
 
 	let owner_of_with_0_arguments: Vec<u8> = hex::decode("6352211e").unwrap();
 	let mut handle = create_mock_handle_from_input(owner_of_with_0_arguments);
+	handle.code_address = H160::from_str("ffffffffffffffffffffffff0000000000000005").unwrap();
 	let result = Mock::execute(&mut handle);
 	assert!(result.is_err());
 	assert_eq!(result.unwrap_err(), revert("input doesn't match expected length"));
@@ -95,6 +98,8 @@ mod transfer_from {
 			Mock,
 			// owner_of result
 			Ok(H160::from_str("bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb").unwrap()),
+			// token_uri result
+			Ok(vec![]),
 			// transfer_from result
 			Ok(())
 		);
@@ -124,6 +129,8 @@ mod transfer_from {
 			Mock,
 			// owner_of result
 			Ok(H160::from_str("bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb").unwrap()),
+			// token_uri result
+			Ok(vec![]),
 			// transfer_from result
 			Ok(())
 		);
@@ -158,6 +165,8 @@ mod transfer_from {
 			Mock,
 			// owner_of result
 			Ok(H160::from_str("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa").unwrap()),
+			// token_uri result
+			Ok(vec![]),
 			// transfer_from result
 			Ok(())
 		);
@@ -192,6 +201,8 @@ mod transfer_from {
 			Mock,
 			// owner_of result
 			Ok(H160::from_str("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa").unwrap()),
+			// token_uri result
+			Ok(vec![]),
 			// transfer_from result
 			Ok(())
 		);
@@ -226,6 +237,8 @@ mod transfer_from {
 			Mock,
 			// owner_of result
 			Ok(H160::from_str("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa").unwrap()),
+			// token_uri result
+			Ok(vec![]),
 			// transfer_from result
 			Ok(())
 		);
@@ -255,6 +268,8 @@ mod transfer_from {
 			Mock,
 			// owner_of result
 			Ok(H160::from_str("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa").unwrap()),
+			// token_uri result
+			Ok(vec![]),
 			// transfer_from result
 			Ok(())
 		);
@@ -286,6 +301,8 @@ mod transfer_from {
 			Mock,
 			// owner_of result
 			Ok(H160::from_str("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa").unwrap()),
+			// token_uri result
+			Ok(vec![]),
 			// transfer_from result
 			Err("this is an error")
 		);
@@ -314,6 +331,30 @@ mod transfer_from {
 		assert_eq!(result.unwrap_err(), revert("this is an error"));
 	}
 }
+#[test]
+fn token_uri_should_return_a_string() {
+	impl_precompile_mock_simple!(
+		Mock,
+		Ok(H160::zero()),
+		Ok("This is the token URI".to_string().into_bytes()),
+		Ok(())
+	);
+
+	let input = EvmDataWriter::new_with_selector(Action::TokenURI).write(U256::from(4)).build();
+	let mut handle = create_mock_handle_from_input(input);
+	handle.code_address = H160::from_str("ffffffffffffffffffffffff0000000000000005").unwrap();
+
+	let result = Mock::execute(&mut handle);
+	assert_ok!(
+		result,
+		succeed(
+			EvmDataWriter::new()
+				.write(Bytes("This is the token URI".to_string().into_bytes()))
+				.build()
+		)
+	);
+}
+
 mod helpers {
 	/// Macro to define a precompile mock with custom closures for testing.
 	///
@@ -336,7 +377,7 @@ mod helpers {
 	/// ```
 	#[macro_export]
 	macro_rules! impl_precompile_mock {
-		($name:ident, $owner_of:expr, $transfer_from:expr) => {
+		($name:ident, $owner_of:expr, $token_uri:expr, $transfer_from:expr) => {
 			struct Erc721Mock;
 
 			impl pallet_living_assets_ownership::traits::Erc721 for Erc721Mock {
@@ -348,6 +389,13 @@ mod helpers {
 					asset_id: U256,
 				) -> Result<AccountId, Self::Error> {
 					($owner_of)(collection_id, asset_id)
+				}
+
+				fn token_uri(
+					collectio_id: CollectionId,
+					asset_id: U256,
+				) -> Result<Vec<u8>, Self::Error> {
+					($token_uri)(collectio_id, asset_id)
 				}
 
 				fn transfer_from(
@@ -382,10 +430,11 @@ mod helpers {
 	/// ```
 	#[macro_export]
 	macro_rules! impl_precompile_mock_simple {
-		($name:ident, $owner_of:expr, $transfer_from:expr) => {
+		($name:ident, $owner_of:expr, $token_uri:expr, $transfer_from:expr) => {
 			impl_precompile_mock!(
 				$name,
 				|_asset_id, _collection_id| { $owner_of },
+				|_asset_id, _collection_id| { $token_uri },
 				|_collection_id, _from, _to, _asset_id| { $transfer_from }
 			);
 		};

@@ -1,9 +1,10 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 use fp_evm::{Precompile, PrecompileHandle, PrecompileOutput};
 use frame_support::pallet_prelude::*;
-use pallet_living_assets_ownership::address_to_collection_id;
+use pallet_living_assets_ownership::{address_to_collection_id, CollectionId};
 use precompile_utils::{
-	revert, succeed, Address, EvmDataWriter, EvmResult, FunctionModifier, PrecompileHandleExt,
+	revert, succeed, Address, Bytes, EvmDataWriter, EvmResult, FunctionModifier,
+	PrecompileHandleExt,
 };
 
 use sp_core::{H160, U256};
@@ -31,6 +32,10 @@ where
 	AddressMapping: pallet_evm::AddressMapping<AssetManager::AccountId>,
 {
 	fn execute(handle: &mut impl PrecompileHandle) -> EvmResult<PrecompileOutput> {
+		// collection id is encoded into the contract address
+		let collection_id = address_to_collection_id(handle.code_address())
+			.map_err(|_| revert("invalid collection address"))?;
+
 		let selector = handle.read_selector()?;
 
 		handle.check_function_modifier(match selector {
@@ -40,8 +45,8 @@ where
 		})?;
 
 		match selector {
-			Action::TokenURI => Err(revert("not implemented")),
-			Action::OwnerOf => Self::owner_of(handle),
+			Action::TokenURI => Self::token_uri(collection_id, handle),
+			Action::OwnerOf => Self::owner_of(collection_id, handle),
 			Action::TransferFrom => Self::transfer_from(handle),
 		}
 	}
@@ -52,22 +57,30 @@ where
 	AssetManager: pallet_living_assets_ownership::traits::Erc721,
 	AddressMapping: pallet_evm::AddressMapping<AssetManager::AccountId>,
 {
-	fn owner_of(handle: &mut impl PrecompileHandle) -> EvmResult<PrecompileOutput> {
+	fn owner_of(
+		collection_id: CollectionId,
+		handle: &mut impl PrecompileHandle,
+	) -> EvmResult<PrecompileOutput> {
 		let mut input = handle.read_input()?;
 		input.expect_arguments(1)?;
 
 		let asset_id: U256 = input.read()?;
 
-		// collection id is encoded into the contract address
-		let collection_id = match address_to_collection_id(handle.code_address()) {
-			Ok(collection_id) => collection_id,
-			Err(_) => return Err(revert("invalid collection address")),
-		};
+		let owner = AssetManager::owner_of(collection_id, asset_id).map_err(|err| revert(err))?;
+		Ok(succeed(EvmDataWriter::new().write(Address(owner)).build()))
+	}
 
-		match AssetManager::owner_of(collection_id, asset_id) {
-			Ok(owner) => Ok(succeed(EvmDataWriter::new().write(Address(owner)).build())),
-			Err(err) => Err(revert(err)),
-		}
+	fn token_uri(
+		collection_id: CollectionId,
+		handle: &mut impl PrecompileHandle,
+	) -> EvmResult<PrecompileOutput> {
+		let mut input = handle.read_input()?;
+		input.expect_arguments(1)?;
+
+		let asset_id: U256 = input.read()?;
+
+		let uri = AssetManager::token_uri(collection_id, asset_id).map_err(|err| revert(err))?;
+		Ok(succeed(EvmDataWriter::new().write(Bytes(uri)).build()))
 	}
 
 	fn transfer_from(handle: &mut impl PrecompileHandle) -> EvmResult<PrecompileOutput> {
@@ -78,8 +91,14 @@ where
 		let to: H160 = input.read::<Address>()?.into();
 		let asset_id: U256 = input.read()?;
 
+		// collection id is encoded into the contract address
+		let collection_id = match address_to_collection_id(handle.code_address()) {
+			Ok(collection_id) => collection_id,
+			Err(_) => return Err(revert("invalid collection address")),
+		};
+
 		// get current owner
-		let result = Self::owner_of(handle)?;
+		let result = Self::owner_of(collection_id, handle)?;
 		let owner: H160 = match TryInto::<Vec<u8>>::try_into(result.output) {
 			Ok(value) => H160::from_slice(&value.as_slice()[12..32]),
 			Err(_) => return Err(revert("error getting owner")),
@@ -91,12 +110,6 @@ where
 		ensure!(owner == from, revert("sender must be the current owner"));
 		ensure!(from != to, revert("sender and receiver cannot be the same"));
 		ensure!(to != H160::zero(), revert("receiver cannot be zero address"));
-
-		// collection id is encoded into the contract address
-		let collection_id = match address_to_collection_id(handle.code_address()) {
-			Ok(collection_id) => collection_id,
-			Err(_) => return Err(revert("invalid collection address")),
-		};
 
 		match AssetManager::transfer_from(collection_id, from, to, asset_id) {
 			Ok(_) => Ok(succeed(vec![])),
