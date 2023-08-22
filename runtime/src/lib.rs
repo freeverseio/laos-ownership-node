@@ -156,6 +156,8 @@ pub type Executive = frame_executive::Executive<
 	AllPalletsWithSystem,
 >;
 
+pub type Precompiles = FrontierPrecompiles<Runtime>;
+
 /// Handles converting a weight scalar to a fee value, based on the scale and granularity of the
 /// node's balance type.
 ///
@@ -211,7 +213,7 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
 	spec_name: create_runtime_str!("laos-parachain"),
 	impl_name: create_runtime_str!("laos-parachain"),
 	authoring_version: 1,
-	spec_version: 3,
+	spec_version: 4,
 	impl_version: 0,
 	apis: RUNTIME_API_VERSIONS,
 	transaction_version: 1,
@@ -468,6 +470,7 @@ impl pallet_collator_selection::Config for Runtime {
 
 impl pallet_living_assets_ownership::Config for Runtime {
 	type RuntimeEvent = RuntimeEvent;
+	type BaseURILimit = ConstU32<2015>;
 }
 
 impl pallet_sudo::Config for Runtime {
@@ -679,7 +682,7 @@ construct_runtime!(
 		Sudo: pallet_sudo = 40,
 
 		// Local pallets
-		CollectionManager: pallet_living_assets_ownership = 41,
+		LivingAssetsOwnership: pallet_living_assets_ownership = 41,
 
 		// Frontier
 		Ethereum: pallet_ethereum = 50,
