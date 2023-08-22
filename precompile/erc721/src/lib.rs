@@ -98,12 +98,7 @@ where
 			Err(_) => return Err(revert("invalid collection address")),
 		};
 
-		match AssetManager::transfer_from(
-			collection_id,
-			AddressMapping::into_account_id(from),
-			AddressMapping::into_account_id(to),
-			asset_id,
-		) {
+		match AssetManager::transfer_from(collection_id, from, to, asset_id) {
 			Ok(_) => Ok(succeed(vec![])),
 			Err(err) => Err(revert(err)),
 		}

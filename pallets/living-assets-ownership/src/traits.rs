@@ -75,8 +75,8 @@ pub trait Erc721 {
 	/// * `asset_id` - The unique identifier for the asset within the collection.
 	fn transfer_from(
 		collection_id: CollectionId,
-		from: Self::AccountId,
-		to: Self::AccountId,
+		from: H160,
+		to: H160,
 		asset_id: U256,
 	) -> Result<(), Self::Error>;
 }

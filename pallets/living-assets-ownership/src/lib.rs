@@ -20,7 +20,6 @@ pub mod pallet {
 		BoundedVec,
 	};
 	use frame_system::pallet_prelude::*;
-	use pallet_evm::AddressMapping;
 	use sp_core::{H160, U256};
 
 	/// Collection id type
@@ -62,14 +61,10 @@ pub mod pallet {
 		StorageMap<_, Blake2_128Concat, CollectionId, BaseURI<T>, OptionQuery>;
 
 	#[pallet::storage]
-	pub(super) type Asset<T: Config> =
-		StorageMap<_, Blake2_128Concat, U256, T::AccountId, OptionQuery>;
+	pub(super) type Asset<T: Config> = StorageMap<_, Blake2_128Concat, U256, H160, OptionQuery>;
 
-	fn asset<T: Config>(key: U256) -> <T as frame_system::Config>::AccountId {
-		Asset::<T>::get(key).unwrap_or_else(|| {
-			let owner = convert_asset_id_to_owner(key);
-			<T as pallet_evm::Config>::AddressMapping::into_account_id(owner)
-		})
+	fn asset<T: Config>(key: U256) -> H160 {
+		Asset::<T>::get(key).unwrap_or_else(|| convert_asset_id_to_owner(key))
 	}
 
 	/// Pallet events
@@ -81,7 +76,7 @@ pub mod pallet {
 		CollectionCreated { collection_id: CollectionId, who: T::AccountId },
 		/// Asset transferred to `who`
 		/// parameters. [asset_id_id, who]
-		AssetTransferred { asset_id: U256, receiver: T::AccountId },
+		AssetTransferred { asset_id: U256, receiver: H160 },
 	}
 
 	// Errors inform users that something went wrong.
@@ -175,25 +170,19 @@ pub mod pallet {
 
 		fn owner_of(collection_id: CollectionId, asset_id: U256) -> Result<H160, Self::Error> {
 			CollectionBaseURI::<T>::get(collection_id).ok_or(Error::UnexistentCollection)?;
-			let owner = H160::from_slice(asset::<T>(asset_id).encode().as_slice());
-			Ok(owner.into())
+			Ok(asset::<T>(asset_id))
 		}
 
 		fn transfer_from(
 			collection_id: CollectionId,
-			from: T::AccountId,
-			to: T::AccountId,
+			from: H160,
+			to: H160,
 			asset_id: U256,
 		) -> Result<(), Self::Error> {
-			// let who = ensure_signed(origin)?;  // TODO check this cannot be called from pallet
-
 			CollectionBaseURI::<T>::get(collection_id).ok_or(Error::UnexistentCollection)?;
 			ensure!(asset::<T>(asset_id) == from, Error::SenderNotOwner);
 			ensure!(from != to, Error::SameSenderReceiver);
-			ensure!(
-				to != T::AddressMapping::into_account_id(H160::zero()),
-				Error::ReceiverIsZeroAddress
-			);
+			ensure!(to != H160::zero(), Error::ReceiverIsZeroAddress);
 
 			Asset::<T>::set(asset_id, Some(to.clone()));
 			Self::deposit_event(Event::AssetTransferred { asset_id, receiver: to });

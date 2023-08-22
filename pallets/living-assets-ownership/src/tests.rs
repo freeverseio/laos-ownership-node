@@ -320,7 +320,6 @@ mod traits {
 
 	#[test]
 	fn sucessful_transfer_from_trait_should_work() {
-		// let asset_id = U256::from(5);
 		let asset_id = U256::from(
 			hex::decode("03C0F0f4ab324C46e55D02D0033343B4Be8A55532d").unwrap().as_slice(),
 		);
