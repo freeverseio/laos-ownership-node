@@ -11,8 +11,7 @@ use sp_core::{H160, H256, U256};
 use sp_std::{fmt::Debug, marker::PhantomData, vec, vec::Vec};
 
 /// Solidity selector of the TransferFrom log, which is the Keccak of the Log signature.
-pub const SELECTOR_LOG_TRANSFER_FROM: [u8; 32] =
-	keccak256!("TransferFrom(address,address,uint256)");
+pub const SELECTOR_LOG_TRANSFER_FROM: [u8; 32] = keccak256!("Transfer(address,address,uint256)");
 
 #[precompile_utils_macro::generate_function_selector]
 #[derive(Debug, PartialEq)]

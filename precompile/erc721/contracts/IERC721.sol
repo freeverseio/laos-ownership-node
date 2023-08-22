@@ -10,5 +10,7 @@ interface IERC721 {
 
     function ownerOf(uint256 _tokenId) external view returns (address);
 
+    event Transfer(address indexed _from, address indexed _to, uint256 indexed _tokenId);
+
     function transferFrom(address _from, address _to, uint256 _tokenId) external;
 }
