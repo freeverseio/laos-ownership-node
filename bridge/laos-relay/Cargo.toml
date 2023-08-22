@@ -65,3 +65,8 @@ hex-literal = "0.4"
 sp-keyring = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v1.0.0" }
 tempfile = "3.7"
 finality-grandpa = { version = "0.16.2" }
+
+[features]
+runtime-benchmarks = [
+    "millau-runtime/runtime-benchmarks",
+]
