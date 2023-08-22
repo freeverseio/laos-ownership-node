@@ -1,5 +1,3 @@
-use crate::evochain_messages;
-
 use super::{
 	AccountId, AllPalletsWithSystem, Balances, ParachainSystem, PolkadotXcm, Runtime, RuntimeCall,
 	RuntimeEvent, RuntimeOrigin, WeightToFee, XcmpQueue,
@@ -211,7 +209,7 @@ impl xcm_executor::Config for XcmConfig {
 	type AssetLocker = ();
 	type AssetExchanger = ();
 	type FeeManager = ();
-	type MessageExporter = evochain_messages::ToEvochainBlobExporter;
+	type MessageExporter = ();
 	type UniversalAliases = Nothing;
 	type CallDispatcher = RuntimeCall;
 	type SafeCallFilter = Everything;

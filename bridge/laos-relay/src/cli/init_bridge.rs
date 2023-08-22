@@ -18,11 +18,9 @@ use async_trait::async_trait;
 use codec::Encode;
 
 use crate::{
-	bridges::{
-		ownership_parachain_evochain::{
-			evochain_headers_to_ownership_parachain::EvochainToOwnershipParachainCliBridge,
-			millau_headers_to_ownership_parachain::MillauToOwnershipParachainCliBridge,
-		},
+	bridges::ownership_parachain_evochain::{
+		evochain_headers_to_ownership_parachain::EvochainToOwnershipParachainCliBridge,
+		millau_headers_to_ownership_parachain::MillauToOwnershipParachainCliBridge,
 	},
 	cli::{bridge::CliBridgeBase, chain_schema::*},
 };

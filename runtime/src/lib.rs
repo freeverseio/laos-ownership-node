@@ -6,14 +6,12 @@
 #[cfg(feature = "std")]
 include!(concat!(env!("OUT_DIR"), "/wasm_binary.rs"));
 
-pub mod evochain_messages;
+// pub mod evochain_messages;
 mod weights;
 pub mod xcm_config;
 use parity_scale_codec as codec;
-use xcm_config::*;
 
 use bp_ownership_parachain::{MAXIMUM_BLOCK_WEIGHT, NORMAL_DISPATCH_RATIO};
-use bridge_runtime_common::generate_bridge_reject_obsolete_headers_and_messages;
 use codec::{Decode, Encode};
 use core::marker::PhantomData;
 use cumulus_pallet_parachain_system::RelayNumberStrictlyIncreases;
@@ -28,7 +26,7 @@ use sp_runtime::{
 	create_runtime_str, generic, impl_opaque_keys,
 	traits::{
 		AccountIdLookup, BlakeTwo256, Block as BlockT, DispatchInfoOf, Dispatchable, Get,
-		IdentifyAccount, PostDispatchInfoOf, SignedExtension, UniqueSaturatedInto, Verify,
+		IdentifyAccount, PostDispatchInfoOf, UniqueSaturatedInto, Verify,
 	},
 	transaction_validity::{TransactionSource, TransactionValidity, TransactionValidityError},
 	ApplyExtrinsicResult, ConsensusEngineId,
@@ -85,48 +83,9 @@ use pallet_evm::{
 	Account as EVMAccount, EVMCurrencyAdapter, EnsureAddressTruncated, FeeCalculator,
 	HashedAddressMapping, OnChargeEVMTransaction, Runner,
 };
-use scale_info::TypeInfo;
 
 mod precompiles;
 use precompiles::FrontierPrecompiles;
-
-// generate signed extension that rejects obsolete bridge transactions
-generate_bridge_reject_obsolete_headers_and_messages! {
-	RuntimeCall, AccountId,
-	// Grandpa
-	BridgeEvochainGrandpa,
-	// Messages
-	BridgeEvochainMessages
-}
-
-/// Dummy signed extension that does nothing.
-///
-/// We're using it to have the same set of signed extensions on all parachains with bridge pallets
-/// deployed (bridge hubs and rialto parachain).
-#[derive(Encode, Decode, Debug, PartialEq, Eq, Clone, TypeInfo)]
-pub struct DummyBridgeRefundEvochainMessages;
-
-impl SignedExtension for DummyBridgeRefundEvochainMessages {
-	const IDENTIFIER: &'static str = "DummyBridgeRefundEvochainMessages";
-	type AccountId = AccountId;
-	type Call = RuntimeCall;
-	type AdditionalSigned = ();
-	type Pre = ();
-
-	fn additional_signed(&self) -> Result<Self::AdditionalSigned, TransactionValidityError> {
-		Ok(())
-	}
-
-	fn pre_dispatch(
-		self,
-		_who: &Self::AccountId,
-		_call: &Self::Call,
-		_info: &DispatchInfoOf<Self::Call>,
-		_len: usize,
-	) -> Result<Self::Pre, TransactionValidityError> {
-		Ok(())
-	}
-}
 
 /// Import the living assets ownership pallet.
 pub use pallet_living_assets_ownership;
@@ -178,8 +137,6 @@ pub type SignedExtra = (
 	frame_system::CheckNonce<Runtime>,
 	frame_system::CheckWeight<Runtime>,
 	pallet_transaction_payment::ChargeTransactionPayment<Runtime>,
-	BridgeRejectObsoleteHeadersAndMessages,
-	DummyBridgeRefundEvochainMessages,
 );
 
 /// Unchecked extrinsic type as expected by this runtime.

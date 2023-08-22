@@ -19,7 +19,7 @@
 // TODO: this is almost exact copy of `evochain_messages.rs` from Rococo runtime.
 // Should be extracted to a separate crate and reused here.
 
-use crate::{Runtime, WithEvochainMessagesInstance};
+use crate::Runtime;
 
 use bp_messages::LaneId;
 use bridge_runtime_common::messages_xcm_extension::{
@@ -48,20 +48,20 @@ pub type FromEvochainMessageDispatch =
 		(),
 	>;
 
-/// Export XCM messages to be relayed to Evochain.
-pub type ToEvochainBlobExporter =
-	HaulBlobExporter<XcmBlobHaulerAdapter<ToEvochainXcmBlobHauler>, crate::EvochainNetwork, ()>;
+// /// Export XCM messages to be relayed to Evochain.
+// pub type ToEvochainBlobExporter =
+// 	HaulBlobExporter<XcmBlobHaulerAdapter<ToEvochainXcmBlobHauler>, crate::EvochainNetwork, ()>;
 
-/// To-Evochain XCM hauler.
-pub struct ToEvochainXcmBlobHauler;
+// /// To-Evochain XCM hauler.
+// pub struct ToEvochainXcmBlobHauler;
 
-impl XcmBlobHauler for ToEvochainXcmBlobHauler {
-	type MessageSender = pallet_bridge_messages::Pallet<Runtime, WithEvochainMessagesInstance>;
+// impl XcmBlobHauler for ToEvochainXcmBlobHauler {
+// 	type MessageSender = pallet_bridge_messages::Pallet<Runtime, WithEvochainMessagesInstance>;
 
-	fn xcm_lane() -> LaneId {
-		LaneIdFromChainId::<Runtime, WithEvochainMessagesInstance>::get()
-	}
-}
+// 	fn xcm_lane() -> LaneId {
+// 		LaneIdFromChainId::<Runtime, WithEvochainMessagesInstance>::get()
+// 	}
+// }
 
 #[cfg(test)]
 mod tests {
