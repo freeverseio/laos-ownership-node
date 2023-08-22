@@ -52,7 +52,6 @@ pub trait CollectionManager {
 /// - `token_uri`: Retrieve the URI associated with a specific asset within a collection.
 pub trait Erc721 {
 	type Error: AsRef<[u8]> + PartialEq;
-	type AccountId;
 
 	/// Retrieves the owner of a specific asset within the specified collection.
 	///

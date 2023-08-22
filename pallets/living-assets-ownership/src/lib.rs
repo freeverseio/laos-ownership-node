@@ -64,7 +64,7 @@ pub mod pallet {
 	#[pallet::storage]
 	pub(super) type Asset<T: Config> = StorageMap<_, Blake2_128Concat, U256, H160, OptionQuery>;
 
-	fn asset<T: Config>(key: U256) -> H160 {
+	fn asset_owner<T: Config>(key: U256) -> H160 {
 		Asset::<T>::get(key).unwrap_or_else(|| convert_asset_id_to_owner(key))
 	}
 
@@ -86,14 +86,14 @@ pub mod pallet {
 	pub enum Error<T> {
 		/// Collection id overflow
 		CollectionIdOverflow,
-		/// Unexistent collection
-		UnexistentCollection,
-		// SenderNotOwner,
-		SenderNotOwner,
-		// UnexistenAsset,
-		UnexistenAsset,
-		// SameSenderReceiver,
-		SameSenderReceiver,
+		/// Collection does not exist
+		CollectionDoesNotExist,
+		// NoPermission,
+		NoPermission,
+		// AssetDoesNotExist,
+		AssetDoesNotExist,
+		// CannotTransferSelf,
+		CannotTransferSelf,
 		// ReceiverIsZeroAddress,
 		ReceiverIsZeroAddress,
 	}
@@ -103,10 +103,10 @@ pub mod pallet {
 			match self {
 				Error::__Ignore(_, _) => b"__Ignore",
 				Error::CollectionIdOverflow => b"CollectionIdOverflow",
-				Error::UnexistentCollection => b"UnexistentCollection",
-				Error::SenderNotOwner => b"SenderNotOwner",
-				Error::UnexistenAsset => b"UnexistenAsset",
-				Error::SameSenderReceiver => b"SameSenderReceiver",
+				Error::CollectionDoesNotExist => b"CollectionDoesNotExist",
+				Error::NoPermission => b"NoPermission",
+				Error::AssetDoesNotExist => b"AssetDoesNotExist",
+				Error::CannotTransferSelf => b"CannotTransferSelf",
 				Error::ReceiverIsZeroAddress => b"ReceiverIsZeroAddress",
 			}
 		}
@@ -167,11 +167,10 @@ pub mod pallet {
 
 	impl<T: Config> traits::Erc721 for Pallet<T> {
 		type Error = Error<T>;
-		type AccountId = T::AccountId;
 
 		fn owner_of(collection_id: CollectionId, asset_id: U256) -> Result<H160, Self::Error> {
-			CollectionBaseURI::<T>::get(collection_id).ok_or(Error::UnexistentCollection)?;
-			Ok(asset::<T>(asset_id))
+			Pallet::<T>::collection_base_uri(collection_id).ok_or(Error::CollectionDoesNotExist)?;
+			Ok(asset_owner::<T>(asset_id))
 		}
 
 		fn transfer_from(
@@ -180,9 +179,9 @@ pub mod pallet {
 			to: H160,
 			asset_id: U256,
 		) -> Result<(), Self::Error> {
-			CollectionBaseURI::<T>::get(collection_id).ok_or(Error::UnexistentCollection)?;
-			ensure!(asset::<T>(asset_id) == from, Error::SenderNotOwner);
-			ensure!(from != to, Error::SameSenderReceiver);
+			Pallet::<T>::collection_base_uri(collection_id).ok_or(Error::CollectionDoesNotExist)?;
+			ensure!(asset_owner::<T>(asset_id) == from, Error::NoPermission);
+			ensure!(from != to, Error::CannotTransferSelf);
 			ensure!(to != H160::zero(), Error::ReceiverIsZeroAddress);
 
 			Asset::<T>::set(asset_id, Some(to.clone()));
@@ -193,7 +192,7 @@ pub mod pallet {
 
 		fn token_uri(collection_id: CollectionId, asset_id: U256) -> Result<Vec<u8>, Self::Error> {
 			let base_uri = Pallet::<T>::collection_base_uri(collection_id)
-				.ok_or(Error::UnexistentCollection)?;
+				.ok_or(Error::CollectionDoesNotExist)?;
 
 			// concatenate base_uri with asset_id
 			let mut token_uri = base_uri.to_vec();

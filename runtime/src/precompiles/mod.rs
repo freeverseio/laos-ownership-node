@@ -35,10 +35,7 @@ type LivingAssetsPrecompile = CollectionManagerPrecompile<
 	pallet_living_assets_ownership::Pallet<crate::Runtime>,
 >;
 
-type Erc721 = Erc721Precompile<
-	pallet_living_assets_ownership::Pallet<crate::Runtime>,
-	pallet_evm::HashedAddressMapping<BlakeTwo256>,
->;
+type Erc721 = Erc721Precompile<pallet_living_assets_ownership::Pallet<crate::Runtime>>;
 
 impl<Runtime> PrecompileSet for FrontierPrecompiles<Runtime>
 where

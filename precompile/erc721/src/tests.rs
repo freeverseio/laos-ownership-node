@@ -7,7 +7,6 @@ use precompile_utils::testing::create_mock_handle_from_input;
 use sp_core::{H160, U256};
 
 type AccountId = H160;
-type AddressMapping = pallet_evm::IdentityAddressMapping;
 
 #[test]
 fn check_selectors() {
@@ -382,7 +381,6 @@ mod helpers {
 
 			impl pallet_living_assets_ownership::traits::Erc721 for Erc721Mock {
 				type Error = &'static str;
-				type AccountId = AccountId;
 
 				fn owner_of(
 					collection_id: CollectionId,
@@ -408,7 +406,7 @@ mod helpers {
 				}
 			}
 
-			type $name = Erc721Precompile<Erc721Mock, AddressMapping>;
+			type $name = Erc721Precompile<Erc721Mock>;
 		};
 	}
 

@@ -3,12 +3,16 @@ use fp_evm::{Precompile, PrecompileHandle, PrecompileOutput};
 use frame_support::pallet_prelude::*;
 use pallet_living_assets_ownership::{address_to_collection_id, CollectionId};
 use precompile_utils::{
-	revert, succeed, Address, Bytes, EvmDataWriter, EvmResult, FunctionModifier,
-	PrecompileHandleExt,
+	keccak256, revert, succeed, Address, Bytes, EvmDataWriter, EvmResult, FunctionModifier, LogExt,
+	LogsBuilder, PrecompileHandleExt,
 };
 
-use sp_core::{H160, U256};
+use sp_core::{H160, H256, U256};
 use sp_std::{fmt::Debug, marker::PhantomData, vec, vec::Vec};
+
+/// Solidity selector of the TransferFrom log, which is the Keccak of the Log signature.
+pub const SELECTOR_LOG_TRANSFER_FROM: [u8; 32] =
+	keccak256!("TransferFrom(address,address,uint256)");
 
 #[precompile_utils_macro::generate_function_selector]
 #[derive(Debug, PartialEq)]
@@ -22,14 +26,11 @@ pub enum Action {
 }
 
 /// Wrapper for the precompile function.
-pub struct Erc721Precompile<AssetManager, AddressMapping>(
-	PhantomData<(AssetManager, AddressMapping)>,
-);
+pub struct Erc721Precompile<AssetManager>(PhantomData<AssetManager>);
 
-impl<AssetManager, AddressMapping> Precompile for Erc721Precompile<AssetManager, AddressMapping>
+impl<AssetManager> Precompile for Erc721Precompile<AssetManager>
 where
 	AssetManager: pallet_living_assets_ownership::traits::Erc721,
-	AddressMapping: pallet_evm::AddressMapping<AssetManager::AccountId>,
 {
 	fn execute(handle: &mut impl PrecompileHandle) -> EvmResult<PrecompileOutput> {
 		// collection id is encoded into the contract address
@@ -47,15 +48,14 @@ where
 		match selector {
 			Action::TokenURI => Self::token_uri(collection_id, handle),
 			Action::OwnerOf => Self::owner_of(collection_id, handle),
-			Action::TransferFrom => Self::transfer_from(handle),
+			Action::TransferFrom => Self::transfer_from(collection_id, handle),
 		}
 	}
 }
 
-impl<AssetManager, AddressMapping> Erc721Precompile<AssetManager, AddressMapping>
+impl<AssetManager> Erc721Precompile<AssetManager>
 where
 	AssetManager: pallet_living_assets_ownership::traits::Erc721,
-	AddressMapping: pallet_evm::AddressMapping<AssetManager::AccountId>,
 {
 	fn owner_of(
 		collection_id: CollectionId,
@@ -83,19 +83,16 @@ where
 		Ok(succeed(EvmDataWriter::new().write(Bytes(uri)).build()))
 	}
 
-	fn transfer_from(handle: &mut impl PrecompileHandle) -> EvmResult<PrecompileOutput> {
+	fn transfer_from(
+		collection_id: CollectionId,
+		handle: &mut impl PrecompileHandle,
+	) -> EvmResult<PrecompileOutput> {
 		// get input data
 		let mut input = handle.read_input()?;
 		input.expect_arguments(3)?;
 		let from: H160 = input.read::<Address>()?.into();
 		let to: H160 = input.read::<Address>()?.into();
 		let asset_id: U256 = input.read()?;
-
-		// collection id is encoded into the contract address
-		let collection_id = match address_to_collection_id(handle.code_address()) {
-			Ok(collection_id) => collection_id,
-			Err(_) => return Err(revert("invalid collection address")),
-		};
 
 		// get current owner
 		let result = Self::owner_of(collection_id, handle)?;
@@ -111,10 +108,20 @@ where
 		ensure!(from != to, revert("sender and receiver cannot be the same"));
 		ensure!(to != H160::zero(), revert("receiver cannot be zero address"));
 
-		match AssetManager::transfer_from(collection_id, from, to, asset_id) {
-			Ok(_) => Ok(succeed(vec![])),
-			Err(err) => Err(revert(err)),
-		}
+		AssetManager::transfer_from(collection_id, from, to, asset_id)
+			.map_err(|err| revert(err))?;
+
+		LogsBuilder::new(handle.context().address)
+			.log4(
+				SELECTOR_LOG_TRANSFER_FROM,
+				from,
+				to,
+				H256::from_slice(asset_id.encode().as_slice()),
+				Vec::new(),
+			)
+			.record(handle)?;
+
+		Ok(succeed(vec![]))
 	}
 }
 

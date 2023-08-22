@@ -237,7 +237,7 @@ mod traits {
 	fn owner_of_asset_of_unexistent_collection_should_error() {
 		new_test_ext().execute_with(|| {
 			let result = <LivingAssetsModule as Erc721>::owner_of(0, 2.into());
-			assert_err!(result, Error::UnexistentCollection);
+			assert_err!(result, Error::CollectionDoesNotExist);
 		});
 	}
 
@@ -267,7 +267,7 @@ mod traits {
 			CollectionBaseURI::<Test>::insert(1, BaseURI::default());
 			assert_noop!(
 				<LivingAssetsModule as Erc721>::transfer_from(1, sender, receiver, asset_id,),
-				Error::<Test>::SenderNotOwner
+				Error::<Test>::NoPermission
 			);
 		});
 	}
@@ -282,7 +282,7 @@ mod traits {
 			CollectionBaseURI::<Test>::insert(1, BaseURI::default());
 			assert_noop!(
 				<LivingAssetsModule as Erc721>::transfer_from(1, sender, sender, asset_id,),
-				Error::<Test>::SameSenderReceiver
+				Error::<Test>::CannotTransferSelf
 			);
 		});
 	}
@@ -313,7 +313,7 @@ mod traits {
 			assert!(Asset::<Test>::get(asset_id).is_none());
 			assert_noop!(
 				<LivingAssetsModule as Erc721>::transfer_from(1, sender, receiver, asset_id,),
-				Error::<Test>::UnexistentCollection
+				Error::<Test>::CollectionDoesNotExist
 			);
 		});
 	}
@@ -343,7 +343,7 @@ mod traits {
 	fn token_uri_of_unexistent_collection() {
 		new_test_ext().execute_with(|| {
 			let result = <LivingAssetsModule as Erc721>::token_uri(0, 2.into());
-			assert_err!(result, Error::UnexistentCollection);
+			assert_err!(result, Error::CollectionDoesNotExist);
 		});
 	}
 
