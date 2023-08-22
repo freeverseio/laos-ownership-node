@@ -950,58 +950,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "bp-bridge-hub-kusama"
-version = "0.1.0"
-source = "git+https://github.com/freeverseio/parity-bridges-common.git?branch=polkadot-v1.0.0#58717c36d662b2bfe18b91fe4703556fb30d4a90"
-dependencies = [
- "bp-bridge-hub-cumulus",
- "bp-messages",
- "bp-runtime",
- "frame-support",
- "sp-api",
- "sp-std 8.0.0 (git+https://github.com/paritytech/substrate?branch=polkadot-v1.0.0)",
-]
-
-[[package]]
-name = "bp-bridge-hub-polkadot"
-version = "0.1.0"
-source = "git+https://github.com/freeverseio/parity-bridges-common.git?branch=polkadot-v1.0.0#58717c36d662b2bfe18b91fe4703556fb30d4a90"
-dependencies = [
- "bp-bridge-hub-cumulus",
- "bp-messages",
- "bp-runtime",
- "frame-support",
- "sp-api",
- "sp-std 8.0.0 (git+https://github.com/paritytech/substrate?branch=polkadot-v1.0.0)",
-]
-
-[[package]]
-name = "bp-bridge-hub-rococo"
-version = "0.1.0"
-source = "git+https://github.com/freeverseio/parity-bridges-common.git?branch=polkadot-v1.0.0#58717c36d662b2bfe18b91fe4703556fb30d4a90"
-dependencies = [
- "bp-bridge-hub-cumulus",
- "bp-messages",
- "bp-runtime",
- "frame-support",
- "sp-api",
- "sp-std 8.0.0 (git+https://github.com/paritytech/substrate?branch=polkadot-v1.0.0)",
-]
-
-[[package]]
-name = "bp-bridge-hub-wococo"
-version = "0.1.0"
-source = "git+https://github.com/freeverseio/parity-bridges-common.git?branch=polkadot-v1.0.0#58717c36d662b2bfe18b91fe4703556fb30d4a90"
-dependencies = [
- "bp-bridge-hub-cumulus",
- "bp-messages",
- "bp-runtime",
- "frame-support",
- "sp-api",
- "sp-std 8.0.0 (git+https://github.com/paritytech/substrate?branch=polkadot-v1.0.0)",
-]
-
-[[package]]
 name = "bp-evochain"
 version = "0.1.0"
 source = "git+https://github.com/freeverseio/parity-bridges-common.git?branch=polkadot-v1.0.0#58717c36d662b2bfe18b91fe4703556fb30d4a90"
@@ -1043,18 +991,6 @@ dependencies = [
  "sp-core",
  "sp-runtime",
  "sp-std 8.0.0 (git+https://github.com/paritytech/substrate?branch=polkadot-v1.0.0)",
-]
-
-[[package]]
-name = "bp-kusama"
-version = "0.1.0"
-source = "git+https://github.com/freeverseio/parity-bridges-common.git?branch=polkadot-v1.0.0#58717c36d662b2bfe18b91fe4703556fb30d4a90"
-dependencies = [
- "bp-header-chain",
- "bp-polkadot-core",
- "bp-runtime",
- "frame-support",
- "sp-api",
 ]
 
 [[package]]
@@ -1134,18 +1070,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "bp-polkadot"
-version = "0.1.0"
-source = "git+https://github.com/freeverseio/parity-bridges-common.git?branch=polkadot-v1.0.0#58717c36d662b2bfe18b91fe4703556fb30d4a90"
-dependencies = [
- "bp-header-chain",
- "bp-polkadot-core",
- "bp-runtime",
- "frame-support",
- "sp-api",
-]
-
-[[package]]
 name = "bp-polkadot-core"
 version = "0.1.0"
 source = "git+https://github.com/freeverseio/parity-bridges-common.git?branch=polkadot-v1.0.0#58717c36d662b2bfe18b91fe4703556fb30d4a90"
@@ -1211,18 +1135,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "bp-rococo"
-version = "0.1.0"
-source = "git+https://github.com/freeverseio/parity-bridges-common.git?branch=polkadot-v1.0.0#58717c36d662b2bfe18b91fe4703556fb30d4a90"
-dependencies = [
- "bp-header-chain",
- "bp-polkadot-core",
- "bp-runtime",
- "frame-support",
- "sp-api",
-]
-
-[[package]]
 name = "bp-runtime"
 version = "0.1.0"
 source = "git+https://github.com/freeverseio/parity-bridges-common.git?branch=polkadot-v1.0.0#58717c36d662b2bfe18b91fe4703556fb30d4a90"
@@ -1271,19 +1183,6 @@ source = "git+https://github.com/freeverseio/parity-bridges-common.git?branch=po
 dependencies = [
  "bp-header-chain",
  "bp-polkadot-core",
- "bp-runtime",
- "frame-support",
- "sp-api",
-]
-
-[[package]]
-name = "bp-wococo"
-version = "0.1.0"
-source = "git+https://github.com/freeverseio/parity-bridges-common.git?branch=polkadot-v1.0.0#58717c36d662b2bfe18b91fe4703556fb30d4a90"
-dependencies = [
- "bp-header-chain",
- "bp-polkadot-core",
- "bp-rococo",
  "bp-runtime",
  "frame-support",
  "sp-api",
@@ -7906,24 +7805,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "pallet-bridge-beefy"
-version = "0.1.0"
-source = "git+https://github.com/freeverseio/parity-bridges-common.git?branch=polkadot-v1.0.0#58717c36d662b2bfe18b91fe4703556fb30d4a90"
-dependencies = [
- "bp-beefy",
- "bp-runtime",
- "frame-support",
- "frame-system",
- "log",
- "parity-scale-codec",
- "scale-info",
- "serde",
- "sp-core",
- "sp-runtime",
- "sp-std 8.0.0 (git+https://github.com/paritytech/substrate?branch=polkadot-v1.0.0)",
-]
-
-[[package]]
 name = "pallet-bridge-grandpa"
 version = "0.1.0"
 source = "git+https://github.com/freeverseio/parity-bridges-common.git?branch=polkadot-v1.0.0#58717c36d662b2bfe18b91fe4703556fb30d4a90"
@@ -11323,87 +11204,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e5ea92a5b6195c6ef2a0295ea818b312502c6fc94dde986c5553242e18fd4ce2"
 
 [[package]]
-name = "relay-bridge-hub-kusama-client"
-version = "0.1.0"
-source = "git+https://github.com/freeverseio/parity-bridges-common.git?branch=polkadot-v1.0.0#58717c36d662b2bfe18b91fe4703556fb30d4a90"
-dependencies = [
- "bp-bridge-hub-kusama",
- "bp-bridge-hub-polkadot",
- "bp-header-chain",
- "bp-messages",
- "bp-parachains",
- "bp-polkadot",
- "parity-scale-codec",
- "relay-substrate-client",
- "scale-info",
- "sp-core",
- "sp-runtime",
-]
-
-[[package]]
-name = "relay-bridge-hub-polkadot-client"
-version = "0.1.0"
-source = "git+https://github.com/freeverseio/parity-bridges-common.git?branch=polkadot-v1.0.0#58717c36d662b2bfe18b91fe4703556fb30d4a90"
-dependencies = [
- "bp-bridge-hub-kusama",
- "bp-bridge-hub-polkadot",
- "bp-header-chain",
- "bp-kusama",
- "bp-messages",
- "bp-parachains",
- "bp-runtime",
- "parity-scale-codec",
- "relay-substrate-client",
- "scale-info",
- "sp-core",
- "sp-runtime",
-]
-
-[[package]]
-name = "relay-bridge-hub-rococo-client"
-version = "0.1.0"
-source = "git+https://github.com/freeverseio/parity-bridges-common.git?branch=polkadot-v1.0.0#58717c36d662b2bfe18b91fe4703556fb30d4a90"
-dependencies = [
- "bp-bridge-hub-rococo",
- "bp-bridge-hub-wococo",
- "bp-header-chain",
- "bp-messages",
- "bp-parachains",
- "bp-polkadot-core",
- "bp-wococo",
- "bridge-runtime-common",
- "parity-scale-codec",
- "relay-substrate-client",
- "scale-info",
- "sp-core",
- "sp-runtime",
- "sp-weights",
- "subxt",
-]
-
-[[package]]
-name = "relay-bridge-hub-wococo-client"
-version = "0.1.0"
-source = "git+https://github.com/freeverseio/parity-bridges-common.git?branch=polkadot-v1.0.0#58717c36d662b2bfe18b91fe4703556fb30d4a90"
-dependencies = [
- "bp-bridge-hub-rococo",
- "bp-bridge-hub-wococo",
- "bp-header-chain",
- "bp-parachains",
- "bp-polkadot-core",
- "bp-rococo",
- "bridge-runtime-common",
- "parity-scale-codec",
- "relay-bridge-hub-rococo-client",
- "relay-substrate-client",
- "scale-info",
- "sp-core",
- "sp-runtime",
- "sp-weights",
- "subxt",
-]
-
-[[package]]
 name = "relay-evochain-client"
 version = "0.1.0"
 dependencies = [
@@ -11417,17 +11217,6 @@ dependencies = [
  "relay-utils",
  "sp-core",
  "sp-runtime",
-]
-
-[[package]]
-name = "relay-kusama-client"
-version = "0.1.0"
-source = "git+https://github.com/freeverseio/parity-bridges-common.git?branch=polkadot-v1.0.0#58717c36d662b2bfe18b91fe4703556fb30d4a90"
-dependencies = [
- "bp-kusama",
- "relay-substrate-client",
- "relay-utils",
- "sp-core",
 ]
 
 [[package]]
@@ -11466,66 +11255,6 @@ dependencies = [
  "sp-runtime",
  "sp-weights",
  "subxt",
-]
-
-[[package]]
-name = "relay-polkadot-client"
-version = "0.1.0"
-source = "git+https://github.com/freeverseio/parity-bridges-common.git?branch=polkadot-v1.0.0#58717c36d662b2bfe18b91fe4703556fb30d4a90"
-dependencies = [
- "bp-polkadot",
- "relay-substrate-client",
- "relay-utils",
- "sp-core",
-]
-
-[[package]]
-name = "relay-rialto-client"
-version = "0.1.0"
-source = "git+https://github.com/freeverseio/parity-bridges-common.git?branch=polkadot-v1.0.0#58717c36d662b2bfe18b91fe4703556fb30d4a90"
-dependencies = [
- "bp-rialto",
- "frame-support",
- "frame-system",
- "pallet-transaction-payment",
- "parity-scale-codec",
- "relay-substrate-client",
- "relay-utils",
- "rialto-runtime",
- "sp-core",
- "sp-runtime",
-]
-
-[[package]]
-name = "relay-rialto-parachain-client"
-version = "0.1.0"
-source = "git+https://github.com/freeverseio/parity-bridges-common.git?branch=polkadot-v1.0.0#58717c36d662b2bfe18b91fe4703556fb30d4a90"
-dependencies = [
- "bp-bridge-hub-cumulus",
- "bp-header-chain",
- "bp-messages",
- "bp-millau",
- "bp-polkadot-core",
- "bp-rialto-parachain",
- "bridge-runtime-common",
- "parity-scale-codec",
- "relay-substrate-client",
- "scale-info",
- "sp-core",
- "sp-runtime",
- "sp-weights",
- "subxt",
-]
-
-[[package]]
-name = "relay-rococo-client"
-version = "0.1.0"
-source = "git+https://github.com/freeverseio/parity-bridges-common.git?branch=polkadot-v1.0.0#58717c36d662b2bfe18b91fe4703556fb30d4a90"
-dependencies = [
- "bp-rococo",
- "relay-substrate-client",
- "relay-utils",
- "sp-core",
 ]
 
 [[package]]
@@ -11595,28 +11324,6 @@ dependencies = [
  "thiserror",
  "time 0.3.25",
  "tokio",
-]
-
-[[package]]
-name = "relay-westend-client"
-version = "0.1.0"
-source = "git+https://github.com/freeverseio/parity-bridges-common.git?branch=polkadot-v1.0.0#58717c36d662b2bfe18b91fe4703556fb30d4a90"
-dependencies = [
- "bp-westend",
- "relay-substrate-client",
- "relay-utils",
- "sp-core",
-]
-
-[[package]]
-name = "relay-wococo-client"
-version = "0.1.0"
-source = "git+https://github.com/freeverseio/parity-bridges-common.git?branch=polkadot-v1.0.0#58717c36d662b2bfe18b91fe4703556fb30d4a90"
-dependencies = [
- "bp-wococo",
- "relay-substrate-client",
- "relay-utils",
- "sp-core",
 ]
 
 [[package]]
@@ -11692,67 +11399,6 @@ dependencies = [
  "sp-api",
  "sp-block-builder",
  "sp-consensus-aura",
- "sp-core",
- "sp-inherents",
- "sp-io",
- "sp-offchain",
- "sp-runtime",
- "sp-session",
- "sp-std 8.0.0 (git+https://github.com/paritytech/substrate?branch=polkadot-v1.0.0)",
- "sp-transaction-pool",
- "sp-version",
- "substrate-wasm-builder",
- "xcm",
- "xcm-builder",
- "xcm-executor",
-]
-
-[[package]]
-name = "rialto-runtime"
-version = "0.1.0"
-source = "git+https://github.com/freeverseio/parity-bridges-common.git?branch=polkadot-v1.0.0#58717c36d662b2bfe18b91fe4703556fb30d4a90"
-dependencies = [
- "bp-header-chain",
- "bp-messages",
- "bp-millau",
- "bp-relayers",
- "bp-rialto",
- "bp-runtime",
- "bridge-runtime-common",
- "frame-benchmarking",
- "frame-executive",
- "frame-support",
- "frame-system",
- "frame-system-rpc-runtime-api",
- "pallet-authority-discovery",
- "pallet-babe",
- "pallet-balances",
- "pallet-beefy",
- "pallet-beefy-mmr",
- "pallet-bridge-beefy",
- "pallet-bridge-grandpa",
- "pallet-bridge-messages",
- "pallet-bridge-relayers",
- "pallet-grandpa",
- "pallet-message-queue",
- "pallet-mmr",
- "pallet-session",
- "pallet-shift-session-manager",
- "pallet-sudo",
- "pallet-timestamp",
- "pallet-transaction-payment",
- "pallet-transaction-payment-rpc-runtime-api",
- "pallet-xcm",
- "parity-scale-codec",
- "polkadot-primitives",
- "polkadot-runtime-common",
- "polkadot-runtime-parachains",
- "scale-info",
- "sp-api",
- "sp-authority-discovery",
- "sp-block-builder",
- "sp-consensus-babe",
- "sp-consensus-beefy",
  "sp-core",
  "sp-inherents",
  "sp-io",
@@ -15011,76 +14657,6 @@ dependencies = [
  "prometheus",
  "thiserror",
  "tokio",
-]
-
-[[package]]
-name = "substrate-relay"
-version = "1.0.1"
-dependencies = [
- "anyhow",
- "async-std",
- "async-trait",
- "bp-evochain",
- "bp-header-chain",
- "bp-messages",
- "bp-millau",
- "bp-parachains",
- "bp-polkadot-core",
- "bp-rialto",
- "bp-rialto-parachain",
- "bp-runtime",
- "bp-test-utils",
- "bridge-runtime-common",
- "finality-grandpa",
- "frame-support",
- "futures",
- "hex",
- "hex-literal 0.4.1",
- "laos-runtime",
- "log",
- "millau-runtime",
- "node-template-runtime",
- "num-format",
- "num-traits",
- "pallet-bridge-messages",
- "pallet-bridge-parachains",
- "parachains-relay",
- "parity-scale-codec",
- "polkadot-parachain",
- "polkadot-primitives",
- "polkadot-runtime-common",
- "polkadot-runtime-parachains",
- "rbtag",
- "relay-bridge-hub-kusama-client",
- "relay-bridge-hub-polkadot-client",
- "relay-bridge-hub-rococo-client",
- "relay-bridge-hub-wococo-client",
- "relay-evochain-client",
- "relay-kusama-client",
- "relay-millau-client",
- "relay-ownership-parachain-client",
- "relay-polkadot-client",
- "relay-rialto-client",
- "relay-rialto-parachain-client",
- "relay-rococo-client",
- "relay-substrate-client",
- "relay-utils",
- "relay-westend-client",
- "relay-wococo-client",
- "rialto-parachain-runtime",
- "rialto-runtime",
- "rustc-hex",
- "signal-hook",
- "signal-hook-async-std",
- "sp-core",
- "sp-keyring",
- "sp-runtime",
- "structopt",
- "strum 0.25.0",
- "substrate-relay-helper",
- "tempfile",
- "xcm",
- "xcm-executor",
 ]
 
 [[package]]
