@@ -3,7 +3,7 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 use fp_evm::{Precompile, PrecompileHandle, PrecompileOutput};
 use pallet_living_assets_ownership::{
-	collection_id_to_address, traits::CollectionManager, BaseURI, CollectionId,
+	collection_id_to_address, traits::CollectionManager, CollectionId,
 };
 use parity_scale_codec::Encode;
 use precompile_utils::{

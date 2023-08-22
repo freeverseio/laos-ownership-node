@@ -325,12 +325,14 @@ mod traits {
 		let receiver = H160::from_str(BOB).unwrap();
 		new_test_ext().execute_with(|| {
 			System::set_block_number(1);
-			assert!(Asset::<Test>::get(asset_id).is_none());
 			CollectionBaseURI::<Test>::insert(1, BaseURI::default());
+			assert!(Asset::<Test>::get(asset_id).is_none());
+			assert_eq!(<LivingAssetsModule as Erc721>::owner_of(1, asset_id).unwrap(), sender);
 			assert_ok!(<LivingAssetsModule as Erc721>::transfer_from(
 				1, sender, receiver, asset_id,
 			));
 			assert_eq!(Asset::<Test>::get(asset_id).unwrap(), receiver);
+			assert_eq!(<LivingAssetsModule as Erc721>::owner_of(1, asset_id).unwrap(), receiver);
 			System::assert_last_event(Event::AssetTransferred { asset_id, receiver }.into());
 		});
 	}

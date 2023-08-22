@@ -174,10 +174,9 @@ pub mod pallet {
 		type AccountId = T::AccountId;
 
 		fn owner_of(collection_id: CollectionId, asset_id: U256) -> Result<H160, Self::Error> {
-			match CollectionBaseURI::<T>::get(collection_id) {
-				Some(_) => Ok(convert_asset_id_to_owner(asset_id)),
-				None => Err(Error::UnexistentCollection),
-			}
+			CollectionBaseURI::<T>::get(collection_id).ok_or(Error::UnexistentCollection)?;
+			let owner = H160::from_slice(asset::<T>(asset_id).encode().as_slice());
+			Ok(owner.into())
 		}
 
 		fn transfer_from(

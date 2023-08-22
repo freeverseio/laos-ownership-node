@@ -1,4 +1,4 @@
-use crate::{BaseURI, CollectionId};
+use crate::CollectionId;
 use sp_core::{H160, U256};
 use sp_std::vec::Vec;
 
