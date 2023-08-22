@@ -320,8 +320,11 @@ mod traits {
 
 	#[test]
 	fn sucessful_transfer_from_trait_should_work() {
-		let asset_id = U256::from(5);
-		let sender = H160::from_str("0000000000000000000000000000000000000005").unwrap();
+		// let asset_id = U256::from(5);
+		let asset_id = U256::from(
+			hex::decode("03C0F0f4ab324C46e55D02D0033343B4Be8A55532d").unwrap().as_slice(),
+		);
+		let sender = H160::from_str("C0F0f4ab324C46e55D02D0033343B4Be8A55532d").unwrap();
 		let receiver = H160::from_str(BOB).unwrap();
 		new_test_ext().execute_with(|| {
 			System::set_block_number(1);
