@@ -272,8 +272,10 @@ fn testnet_genesis(
 						(
 							address.into(),
 							GenesisAccount {
-							   code: revert_bytecode.clone(),
-							   ..Default::default(),
+								nonce: Default::default(),
+								balance: Default::default(),
+								storage: Default::default(),
+								code: revert_bytecode.clone(),
 							},
 						)
 					})
