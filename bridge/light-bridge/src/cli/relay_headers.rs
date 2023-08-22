@@ -20,25 +20,9 @@ use sp_core::Pair;
 use structopt::StructOpt;
 use strum::{EnumString, EnumVariantNames, VariantNames};
 
-use crate::bridges::{
-	kusama_polkadot::{
-		kusama_headers_to_bridge_hub_polkadot::KusamaToBridgeHubPolkadotCliBridge,
-		polkadot_headers_to_bridge_hub_kusama::PolkadotToBridgeHubKusamaCliBridge,
-	},
-	ownership_parachain_evochain::{
-		evochain_headers_to_ownership_parachain::EvochainToOwnershipParachainCliBridge,
-		millau_headers_to_ownership_parachain::MillauToOwnershipParachainCliBridge,
-	},
-	rialto_millau::{
-		millau_headers_to_rialto::MillauToRialtoCliBridge,
-		rialto_headers_to_millau::RialtoToMillauCliBridge,
-	},
-	rialto_parachain_millau::millau_headers_to_rialto_parachain::MillauToRialtoParachainCliBridge,
-	rococo_wococo::{
-		rococo_headers_to_bridge_hub_wococo::RococoToBridgeHubWococoCliBridge,
-		wococo_headers_to_bridge_hub_rococo::WococoToBridgeHubRococoCliBridge,
-	},
-	westend_millau::westend_headers_to_millau::WestendToMillauCliBridge,
+use crate::bridges::ownership_parachain_evochain::{
+	evochain_headers_to_ownership_parachain::EvochainToOwnershipParachainCliBridge,
+	millau_headers_to_ownership_parachain::MillauToOwnershipParachainCliBridge,
 };
 use relay_substrate_client::Client;
 use relay_utils::metrics::{GlobalMetrics, StandaloneMetric};
@@ -70,17 +54,8 @@ pub struct RelayHeaders {
 #[strum(serialize_all = "kebab_case")]
 /// Headers relay bridge.
 pub enum RelayHeadersBridge {
-	MillauToRialto,
-	RialtoToMillau,
-	WestendToMillau,
-	MillauToRialtoParachain,
-	RococoToBridgeHubWococo,
-	WococoToBridgeHubRococo,
-	KusamaToBridgeHubPolkadot,
-	PolkadotToBridgeHubKusama,
 	EvochainToOwnershipParachain,
 	MillauToOwnershipParachain,
-	// EvochainToRialtoParachain,
 }
 
 #[async_trait]
@@ -121,49 +96,19 @@ where
 	}
 }
 
-impl HeadersRelayer for MillauToRialtoCliBridge {}
-impl HeadersRelayer for RialtoToMillauCliBridge {}
-impl HeadersRelayer for WestendToMillauCliBridge {}
-impl HeadersRelayer for MillauToRialtoParachainCliBridge {}
-impl HeadersRelayer for RococoToBridgeHubWococoCliBridge {}
-impl HeadersRelayer for WococoToBridgeHubRococoCliBridge {}
-impl HeadersRelayer for KusamaToBridgeHubPolkadotCliBridge {}
-impl HeadersRelayer for PolkadotToBridgeHubKusamaCliBridge {}
 impl HeadersRelayer for EvochainToOwnershipParachainCliBridge {}
 impl HeadersRelayer for MillauToOwnershipParachainCliBridge {}
-// impl HeadersRelayer for EvochainToRialtoParachainCliBridge {}
 
 impl RelayHeaders {
 	/// Run the command.
 	pub async fn run(self) -> anyhow::Result<()> {
 		match self.bridge {
-			RelayHeadersBridge::MillauToRialto => MillauToRialtoCliBridge::relay_headers(self),
-			RelayHeadersBridge::RialtoToMillau => RialtoToMillauCliBridge::relay_headers(self),
-			RelayHeadersBridge::WestendToMillau => WestendToMillauCliBridge::relay_headers(self),
-			RelayHeadersBridge::MillauToRialtoParachain => {
-				MillauToRialtoParachainCliBridge::relay_headers(self)
-			},
-			RelayHeadersBridge::RococoToBridgeHubWococo => {
-				RococoToBridgeHubWococoCliBridge::relay_headers(self)
-			},
-			RelayHeadersBridge::WococoToBridgeHubRococo => {
-				WococoToBridgeHubRococoCliBridge::relay_headers(self)
-			},
-			RelayHeadersBridge::KusamaToBridgeHubPolkadot => {
-				KusamaToBridgeHubPolkadotCliBridge::relay_headers(self)
-			},
-			RelayHeadersBridge::PolkadotToBridgeHubKusama => {
-				PolkadotToBridgeHubKusamaCliBridge::relay_headers(self)
-			},
 			RelayHeadersBridge::EvochainToOwnershipParachain => {
 				EvochainToOwnershipParachainCliBridge::relay_headers(self)
 			},
 			RelayHeadersBridge::MillauToOwnershipParachain => {
 				MillauToOwnershipParachainCliBridge::relay_headers(self)
-			}
-			// RelayHeadersBridge::EvochainToRialtoParachain => {
-			// 	EvochainToRialtoParachainCliBridge::relay_headers(self)
-			// },
+			},
 		}
 		.await
 	}

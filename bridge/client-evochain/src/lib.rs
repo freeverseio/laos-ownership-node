@@ -94,8 +94,6 @@ impl ChainWithTransactions for Evochain {
 				frame_system::CheckNonce::<evochain_runtime::Runtime>::from(unsigned.nonce),
 				frame_system::CheckWeight::<evochain_runtime::Runtime>::new(),
 				pallet_transaction_payment::ChargeTransactionPayment::<evochain_runtime::Runtime>::from(unsigned.tip),
-				evochain_runtime::BridgeRejectObsoleteHeadersAndMessages,
-				evochain_runtime::BridgeRefundOwnershipParachainMessages::default(),
 			),
 			(
 				(),
@@ -106,8 +104,6 @@ impl ChainWithTransactions for Evochain {
 				(),
 				(),
 				(),
-				(),
-				()
 			),
 		);
 		let signature = raw_payload.using_encoded(|payload| param.signer.sign(payload));

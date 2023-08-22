@@ -23,7 +23,10 @@ use crate::{
 			kusama_headers_to_bridge_hub_polkadot::KusamaToBridgeHubPolkadotCliBridge,
 			polkadot_headers_to_bridge_hub_kusama::PolkadotToBridgeHubKusamaCliBridge,
 		},
-		ownership_parachain_evochain::evochain_headers_to_ownership_parachain::EvochainToOwnershipParachainCliBridge,
+		ownership_parachain_evochain::{
+			evochain_headers_to_ownership_parachain::EvochainToOwnershipParachainCliBridge,
+			millau_headers_to_ownership_parachain::MillauToOwnershipParachainCliBridge,
+		},
 		rialto_millau::{
 			millau_headers_to_rialto::MillauToRialtoCliBridge,
 			rialto_headers_to_millau::RialtoToMillauCliBridge,
@@ -74,6 +77,8 @@ pub enum InitBridgeName {
 	KusamaToBridgeHubPolkadot,
 	PolkadotToBridgeHubKusama,
 	EvochainToOwnershipParachain,
+	MillauToOwnershipParachain,
+	// EvochainToRialtoParachain,
 }
 
 #[async_trait]
@@ -145,6 +150,22 @@ impl BridgeInitializer for MillauToRialtoParachainCliBridge {
 		RuntimeCall::Sudo(SudoCall::sudo { call: Box::new(initialize_call) })
 	}
 }
+// impl BridgeInitializer for EvochainToRialtoParachainCliBridge {
+// 	type Engine = GrandpaFinalityEngine<Self::Source>;
+
+// 	fn encode_init_bridge(
+// 		init_data: <Self::Engine as Engine<Self::Source>>::InitializationData,
+// 	) -> <Self::Target as Chain>::Call {
+// 		type RuntimeCall = relay_rialto_parachain_client::RuntimeCall;
+// 		type BridgeGrandpaCall = relay_rialto_parachain_client::BridgeGrandpaEvochainCall;
+// 		type SudoCall = relay_rialto_parachain_client::SudoCall;
+
+// 		let initialize_call: relay_rialto_parachain_client::runtime_types::rialto_parachain_runtime::RuntimeCall =
+// 			RuntimeCall::BridgeEvochainGrandpa(BridgeGrandpaCall::initialize { init_data });
+
+// 		RuntimeCall::Sudo(SudoCall::sudo { call: Box::new(initialize_call) })
+// 	}
+// }
 
 impl BridgeInitializer for RialtoToMillauCliBridge {
 	type Engine = GrandpaFinalityEngine<Self::Source>;
@@ -251,6 +272,23 @@ impl BridgeInitializer for EvochainToOwnershipParachainCliBridge {
 	}
 }
 
+impl BridgeInitializer for MillauToOwnershipParachainCliBridge {
+	type Engine = GrandpaFinalityEngine<Self::Source>;
+
+	fn encode_init_bridge(
+		init_data: <Self::Engine as Engine<Self::Source>>::InitializationData,
+	) -> <Self::Target as Chain>::Call {
+		type RuntimeCall = relay_ownership_parachain_client::RuntimeCall;
+		type BridgeGrandpaCall = relay_ownership_parachain_client::BridgeGrandpaCallMillau;
+		type SudoCall = relay_ownership_parachain_client::SudoCall;
+
+		let initialize_call: RuntimeCall =
+			RuntimeCall::BridgeMillauGrandpa(BridgeGrandpaCall::initialize { init_data });
+
+		RuntimeCall::Sudo(SudoCall::sudo { call: Box::new(initialize_call) })
+	}
+}
+
 impl InitBridge {
 	/// Run the command.
 	pub async fn run(self) -> anyhow::Result<()> {
@@ -276,6 +314,12 @@ impl InitBridge {
 			InitBridgeName::EvochainToOwnershipParachain => {
 				EvochainToOwnershipParachainCliBridge::init_bridge(self)
 			},
+			InitBridgeName::MillauToOwnershipParachain => {
+				MillauToOwnershipParachainCliBridge::init_bridge(self)
+			},
+			// InitBridgeName::EvochainToRialtoParachain => {
+			// 	EvochainToRialtoParachainCliBridge::init_bridge(self)
+			// },
 		}
 		.await
 	}

@@ -32,16 +32,10 @@ use bp_messages::LaneId;
 use relay_substrate_client::SimpleRuntimeVersion;
 
 pub(crate) mod bridge;
-pub(crate) mod encode_message;
-pub(crate) mod send_message;
 
 mod chain_schema;
 mod init_bridge;
-mod register_parachain;
 mod relay_headers;
-mod relay_headers_and_messages;
-mod relay_messages;
-mod relay_parachains;
 mod resubmit_transactions;
 
 /// The target that will be used when publishing logs related to this pallet.
@@ -66,34 +60,12 @@ pub enum Command {
 	/// The on-chain bridge component should have been already initialized with
 	/// `init-bridge` sub-command.
 	RelayHeaders(relay_headers::RelayHeaders),
-	/// Start messages relay between two chains.
-	///
-	/// Ties up to `Messages` pallets on both chains and starts relaying messages.
-	/// Requires the header relay to be already running.
-	RelayMessages(relay_messages::RelayMessages),
-	/// Start headers and messages relay between two Substrate chains.
-	///
-	/// This high-level relay internally starts four low-level relays: two `RelayHeaders`
-	/// and two `RelayMessages` relays. Headers are only relayed when they are required by
-	/// the message relays - i.e. when there are messages or confirmations that needs to be
-	/// relayed between chains.
-	RelayHeadersAndMessages(Box<relay_headers_and_messages::RelayHeadersAndMessages>),
 	/// Initialize on-chain bridge pallet with current header data.
 	///
 	/// Sends initialization transaction to bootstrap the bridge with current finalized block data.
 	InitBridge(init_bridge::InitBridge),
-	/// Send custom message over the bridge.
-	///
-	/// Allows interacting with the bridge by sending messages over `Messages` component.
-	/// The message is being sent to the source chain, delivered to the target chain and dispatched
-	/// there.
-	SendMessage(send_message::SendMessage),
 	/// Resubmit transactions with increased tip if they are stalled.
 	ResubmitTransactions(resubmit_transactions::ResubmitTransactions),
-	/// Register parachain.
-	RegisterParachain(register_parachain::RegisterParachain),
-	///
-	RelayParachains(relay_parachains::RelayParachains),
 }
 
 impl Command {
@@ -102,10 +74,7 @@ impl Command {
 		use relay_utils::initialize::{initialize_logger, initialize_relay};
 
 		match self {
-			Self::RelayHeaders(_)
-			| Self::RelayMessages(_)
-			| Self::RelayHeadersAndMessages(_)
-			| Self::InitBridge(_) => {
+			Self::RelayHeaders(_) | Self::InitBridge(_) => {
 				initialize_relay();
 			},
 			_ => {
@@ -118,13 +87,8 @@ impl Command {
 	async fn do_run(self) -> anyhow::Result<()> {
 		match self {
 			Self::RelayHeaders(arg) => arg.run().await?,
-			Self::RelayMessages(arg) => arg.run().await?,
-			Self::RelayHeadersAndMessages(arg) => arg.run().await?,
 			Self::InitBridge(arg) => arg.run().await?,
-			Self::SendMessage(arg) => arg.run().await?,
 			Self::ResubmitTransactions(arg) => arg.run().await?,
-			Self::RegisterParachain(arg) => arg.run().await?,
-			Self::RelayParachains(arg) => arg.run().await?,
 		}
 		Ok(())
 	}

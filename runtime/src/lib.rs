@@ -157,7 +157,7 @@ pub type Nonce = bp_ownership_parachain::Nonce;
 pub type Address = MultiAddress<AccountId, ()>;
 
 /// Block header type as expected by this runtime.
-pub type Header = generic::Header<BlockNumber, BlakeTwo256>;
+pub type Header = generic::Header<BlockNumber, bp_ownership_parachain::Hasher>;
 
 /// Block type as expected by this runtime.
 pub type Block = generic::Block<Header, UncheckedExtrinsic>;
@@ -666,51 +666,28 @@ impl pallet_base_fee::Config for Runtime {
 
 // Bridge pallets
 
-impl pallet_bridge_relayers::Config for Runtime {
-	type RuntimeEvent = RuntimeEvent;
-	type Reward = Balance;
-	type PaymentProcedure =
-		bp_relayers::PayRewardFromAccount<pallet_balances::Pallet<Runtime>, AccountId>;
-	type StakeAndSlash = ();
-	type WeightInfo = ();
-}
-
-pub type EvochainGrandpaInstance = ();
-
 parameter_types! {
 	pub const MaxMessagesToPruneAtOnce: bp_messages::MessageNonce = 8;
 	pub const RootAccountForPayments: Option<AccountId> = None;
 }
 
-/// Instance of the messages pallet used to relay messages to/from Evolution chain.
-pub type WithEvochainMessagesInstance = ();
-
-impl pallet_bridge_messages::Config<WithEvochainMessagesInstance> for Runtime {
-	type RuntimeEvent = RuntimeEvent;
-	type WeightInfo = pallet_bridge_messages::weights::BridgeWeight<Runtime>;
-
-	type ThisChain = bp_ownership_parachain::OwnershipParachain;
-	type BridgedChain = bp_evochain::Evochain;
-	type BridgedHeaderChain = BridgeEvochainGrandpa;
-
-	type OutboundPayload = bridge_runtime_common::messages_xcm_extension::XcmAsPlainPayload;
-	type InboundPayload = bridge_runtime_common::messages_xcm_extension::XcmAsPlainPayload;
-
-	type DeliveryPayments = ();
-	type DeliveryConfirmationPayments = pallet_bridge_relayers::DeliveryConfirmationPaymentsAdapter<
-		Runtime,
-		WithEvochainMessagesInstance,
-		frame_support::traits::ConstU128<100_000>,
-	>;
-
-	type MessageDispatch = crate::evochain_messages::FromEvochainMessageDispatch;
-}
+pub type EvochainGrandpaInstance = ();
 
 impl pallet_bridge_grandpa::Config for Runtime {
 	type RuntimeEvent = RuntimeEvent;
 	type BridgedChain = bp_evochain::Evochain;
 	type MaxFreeMandatoryHeadersPerBlock = ConstU32<4>;
 	type HeadersToKeep = ConstU32<{ bp_evochain::DAYS as u32 }>;
+	type WeightInfo = pallet_bridge_grandpa::weights::BridgeWeight<Runtime>;
+}
+
+pub type MillauGrandpaInstance = pallet_bridge_grandpa::Instance1;
+
+impl pallet_bridge_grandpa::Config<MillauGrandpaInstance> for Runtime {
+	type RuntimeEvent = RuntimeEvent;
+	type BridgedChain = bp_millau::Millau;
+	type MaxFreeMandatoryHeadersPerBlock = ConstU32<4>;
+	type HeadersToKeep = ConstU32<{ bp_millau::DAYS as u32 }>;
 	type WeightInfo = pallet_bridge_grandpa::weights::BridgeWeight<Runtime>;
 }
 
@@ -756,8 +733,7 @@ construct_runtime!(
 
 		// Bridge
 		BridgeEvochainGrandpa: pallet_bridge_grandpa = 60,
-		BridgeEvochainRelayers: pallet_bridge_relayers = 61,
-		BridgeEvochainMessages: pallet_bridge_messages = 62,
+		BridgeMillauGrandpa: pallet_bridge_grandpa::<Instance1> = 61,
 	}
 );
 
@@ -1201,6 +1177,17 @@ impl_runtime_apis! {
 		}
 	}
 
+	impl bp_millau::MillauFinalityApi<Block> for Runtime {
+		fn best_finalized() -> Option<bp_runtime::HeaderId<bp_millau::Hash, bp_millau::BlockNumber>> {
+			BridgeMillauGrandpa::best_finalized()
+		}
+
+		fn accepted_grandpa_finality_proofs(
+		) -> Vec<bp_header_chain::justification::GrandpaJustification<bp_millau::Header>> {
+			BridgeMillauGrandpa::accepted_finality_proofs()
+		}
+	}
+
 	impl bp_evochain::EvochainFinalityApi<Block> for Runtime {
 		fn best_finalized() -> Option<bp_runtime::HeaderId<bp_evochain::Hash, bp_evochain::BlockNumber>> {
 			BridgeEvochainGrandpa::best_finalized()
@@ -1209,31 +1196,6 @@ impl_runtime_apis! {
 		fn accepted_grandpa_finality_proofs(
 		) -> Vec<bp_header_chain::justification::GrandpaJustification<bp_evochain::Header>> {
 			BridgeEvochainGrandpa::accepted_finality_proofs()
-		}
-	}
-
-	impl bp_evochain::ToEvochainOutboundLaneApi<Block> for Runtime {
-		fn message_details(
-			lane: bp_messages::LaneId,
-			begin: bp_messages::MessageNonce,
-			end: bp_messages::MessageNonce,
-		) -> Vec<bp_messages::OutboundMessageDetails> {
-			bridge_runtime_common::messages_api::outbound_message_details::<
-				Runtime,
-				WithEvochainMessagesInstance,
-			>(lane, begin, end)
-		}
-	}
-
-	impl bp_evochain::FromEvochainInboundLaneApi<Block> for Runtime {
-		fn message_details(
-			lane: bp_messages::LaneId,
-			messages: Vec<(bp_messages::MessagePayload, bp_messages::OutboundMessageDetails)>,
-		) -> Vec<bp_messages::InboundMessageDetails> {
-			bridge_runtime_common::messages_api::inbound_message_details::<
-				Runtime,
-				WithEvochainMessagesInstance,
-			>(lane, messages)
 		}
 	}
 
