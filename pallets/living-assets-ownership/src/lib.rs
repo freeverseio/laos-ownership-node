@@ -5,7 +5,7 @@
 /// <https://docs.substrate.io/reference/frame-pallets/>
 pub use pallet::*;
 use parity_scale_codec::alloc::string::ToString;
-use sp_core::{H160, U256};
+use sp_core::H160;
 use sp_std::vec::Vec;
 
 mod functions;
@@ -22,10 +22,6 @@ pub mod pallet {
 	};
 	use frame_system::pallet_prelude::*;
 	use sp_core::{H160, U256};
-
-	/// Collection id type
-	/// TODO: use 256 bits
-	pub type CollectionId = u64;
 
 	/// Collection id type
 	pub type CollectionId = u64;
