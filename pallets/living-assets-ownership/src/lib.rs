@@ -174,12 +174,14 @@ pub mod pallet {
 		}
 
 		fn transfer_from(
+			origin: H160,
 			collection_id: CollectionId,
 			from: H160,
 			to: H160,
 			asset_id: U256,
 		) -> Result<(), Self::Error> {
 			Pallet::<T>::collection_base_uri(collection_id).ok_or(Error::CollectionDoesNotExist)?;
+			ensure!(origin == from, Error::NoPermission);
 			ensure!(asset_owner::<T>(asset_id) == from, Error::NoPermission);
 			ensure!(from != to, Error::CannotTransferSelf);
 			ensure!(to != H160::zero(), Error::ReceiverIsZeroAddress);
