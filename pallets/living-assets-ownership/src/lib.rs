@@ -21,6 +21,11 @@ pub mod pallet {
 		BoundedVec,
 	};
 	use frame_system::pallet_prelude::*;
+	use sp_core::{H160, U256};
+
+	/// Collection id type
+	/// TODO: use 256 bits
+	pub type CollectionId = u64;
 
 	/// Collection id type
 	pub type CollectionId = u64;
