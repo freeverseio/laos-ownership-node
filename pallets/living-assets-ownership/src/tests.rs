@@ -226,6 +226,28 @@ mod traits {
 	}
 
 	#[test]
+	fn caller_is_not_current_owner_should_fail() {
+		let asset_id = U256::from(5);
+		let sender = H160::from_str("0000000000000000000000000000000000000006").unwrap();
+		let receiver = H160::from_low_u64_be(BOB);
+		new_test_ext().execute_with(|| {
+			System::set_block_number(1);
+			assert!(AssetOwner::<Test>::get(asset_id).is_none());
+			CollectionBaseURI::<Test>::insert(1, BaseURI::default());
+			assert_noop!(
+				<LivingAssetsModule as Erc721>::transfer_from(
+					H160::from_low_u64_be(ALICE),
+					1,
+					sender,
+					receiver,
+					asset_id,
+				),
+				Error::<Test>::NoPermission
+			);
+		});
+	}
+
+	#[test]
 	fn sender_is_not_current_owner_should_fail() {
 		let asset_id = U256::from(5);
 		let sender = H160::from_str("0000000000000000000000000000000000000006").unwrap();
@@ -235,7 +257,9 @@ mod traits {
 			assert!(AssetOwner::<Test>::get(asset_id).is_none());
 			CollectionBaseURI::<Test>::insert(1, BaseURI::default());
 			assert_noop!(
-				<LivingAssetsModule as Erc721>::transfer_from(1, sender, receiver, asset_id,),
+				<LivingAssetsModule as Erc721>::transfer_from(
+					sender, 1, sender, receiver, asset_id,
+				),
 				Error::<Test>::NoPermission
 			);
 		});
@@ -250,7 +274,7 @@ mod traits {
 			assert!(AssetOwner::<Test>::get(asset_id).is_none());
 			CollectionBaseURI::<Test>::insert(1, BaseURI::default());
 			assert_noop!(
-				<LivingAssetsModule as Erc721>::transfer_from(1, sender, sender, asset_id,),
+				<LivingAssetsModule as Erc721>::transfer_from(sender, 1, sender, sender, asset_id,),
 				Error::<Test>::CannotTransferSelf
 			);
 		});
@@ -266,7 +290,9 @@ mod traits {
 			assert!(AssetOwner::<Test>::get(asset_id).is_none());
 			CollectionBaseURI::<Test>::insert(1, BaseURI::default());
 			assert_noop!(
-				<LivingAssetsModule as Erc721>::transfer_from(1, sender, receiver, asset_id,),
+				<LivingAssetsModule as Erc721>::transfer_from(
+					sender, 1, sender, receiver, asset_id,
+				),
 				Error::<Test>::TransferToNullAddress
 			);
 		});
@@ -281,7 +307,9 @@ mod traits {
 			System::set_block_number(1);
 			assert!(AssetOwner::<Test>::get(asset_id).is_none());
 			assert_noop!(
-				<LivingAssetsModule as Erc721>::transfer_from(1, sender, receiver, asset_id,),
+				<LivingAssetsModule as Erc721>::transfer_from(
+					sender, 1, sender, receiver, asset_id,
+				),
 				Error::<Test>::CollectionDoesNotExist
 			);
 		});
@@ -300,7 +328,7 @@ mod traits {
 			assert!(AssetOwner::<Test>::get(asset_id).is_none());
 			assert_eq!(<LivingAssetsModule as Erc721>::owner_of(1, asset_id).unwrap(), sender);
 			assert_ok!(<LivingAssetsModule as Erc721>::transfer_from(
-				1, sender, receiver, asset_id,
+				sender, 1, sender, receiver, asset_id,
 			));
 			assert_eq!(AssetOwner::<Test>::get(asset_id).unwrap(), receiver);
 			assert_eq!(<LivingAssetsModule as Erc721>::owner_of(1, asset_id).unwrap(), receiver);

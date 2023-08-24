@@ -257,12 +257,13 @@ mod helpers {
 				}
 
 				fn transfer_from(
+					origin: AccountId,
 					collection_id: CollectionId,
 					from: AccountId,
 					to: AccountId,
 					asset_id: U256,
 				) -> Result<(), Self::Error> {
-					($transfer_from)(collection_id, from, to, asset_id)
+					($transfer_from)(origin, collection_id, from, to, asset_id)
 				}
 			}
 
@@ -293,7 +294,7 @@ mod helpers {
 				$name,
 				|_asset_id, _collection_id| { $owner_of },
 				|_asset_id, _collection_id| { $token_uri },
-				|_collection_id, _from, _to, _asset_id| { $transfer_from }
+				|_origin, _collection_id, _from, _to, _asset_id| { $transfer_from }
 			);
 		};
 	}

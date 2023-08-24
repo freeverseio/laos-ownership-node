@@ -83,11 +83,13 @@ pub trait Erc721 {
 	///
 	/// # Arguments
 	///
+	/// * `origin` - The caller's address.
 	/// * `collection_id` - The unique identifier for the collection.
 	/// * `from` - The current owner of the asset.
 	/// * `to` - The new owner.
 	/// * `asset_id` - The unique identifier for the asset within the collection.
 	fn transfer_from(
+		origin: H160,
 		collection_id: CollectionId,
 		from: H160,
 		to: H160,

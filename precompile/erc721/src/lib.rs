@@ -93,7 +93,7 @@ where
 		let to: H160 = input.read::<Address>()?.into();
 		let asset_id: U256 = input.read()?;
 
-		AssetManager::transfer_from(collection_id, from, to, asset_id)
+		AssetManager::transfer_from(handle.context().caller, collection_id, from, to, asset_id)
 			.map_err(|err| revert(err))?;
 
 		LogsBuilder::new(handle.context().address)
