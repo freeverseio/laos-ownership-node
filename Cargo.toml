@@ -230,5 +230,5 @@ precompile-utils = { path = "./precompile/utils", default-features = false }
 precompile-utils-macro = { path = "./precompile/utils/macro", default-features = false }
 
 # runtime
+primitive = { path = "./primitive", default-features = false }
 laos-runtime = { path = "./runtime" }
-primitives = { path = "./primitives" }

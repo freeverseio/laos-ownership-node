@@ -1,3 +1,5 @@
+#![cfg_attr(not(feature = "std"), no_std)]
+
 use sp_runtime::{generic, traits::{BlakeTwo256, IdentifyAccount, Verify}, MultiSignature};
 use sp_core::H256;
 	
