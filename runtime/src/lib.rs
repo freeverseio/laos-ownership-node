@@ -18,9 +18,6 @@ use sp_core::{
 	crypto::{ByteArray, KeyTypeId},
 	OpaqueMetadata, H160, H256, U256,
 };
-use primitive::{
-	BlockNumber, Hash, Hashing, Header, Signature, AccountId, Balance, Nonce,
-};
 
 use sp_runtime::{
 	create_runtime_str, generic, impl_opaque_keys,
@@ -91,11 +88,36 @@ use precompiles::FrontierPrecompiles;
 /// Import the living assets ownership pallet.
 pub use pallet_living_assets_ownership;
 
+/// Alias to 512-bit hash when used in the context of a transaction signature on the chain.
+pub type Signature = primitive::Signature;
+
+/// Some way of identifying an account on the chain. We intentionally make it equivalent
+/// to the public key of our transaction signing scheme.
+pub type AccountId = primitive::AccountId;
+
+/// Balance of an account.
+pub type Balance = primitive::Balance;
+
 /// Index of a transaction in the chain.
 pub type Index = u32;
 
+/// A hash of some data used by the chain.
+pub type Hash = primitive::Hash;
+
+/// An index to a block.
+pub type BlockNumber = primitive::BlockNumber;
+
+/// The type for storing how many extrinsics an account has signed.
+pub type Nonce = primitive::Nonce;
+
+/// Hashing type
+pub type Hashing = primitive::Hasher;
+
 /// The address format for describing accounts.
 pub type Address = MultiAddress<AccountId, ()>;
+
+/// Block header type as expected by this runtime.
+pub type Header = primitive::Header;
 
 /// Block type as expected by this runtime.
 pub type Block = generic::Block<Header, UncheckedExtrinsic>;

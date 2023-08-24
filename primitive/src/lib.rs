@@ -9,8 +9,8 @@ pub type BlockNumber = u32;
 /// A hash of some data used by the chain.
 pub type Hash = H256;
 
-/// Hashing type
-pub	type Hashing = BlakeTwo256;
+/// Hasher type
+pub	type Hasher = BlakeTwo256;
 
 /// Block header type as expected by this runtime.
 pub type Header = generic::Header<BlockNumber, BlakeTwo256>;
