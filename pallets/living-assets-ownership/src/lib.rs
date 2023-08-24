@@ -61,11 +61,13 @@ pub mod pallet {
 	pub(super) type CollectionBaseURI<T: Config> =
 		StorageMap<_, Blake2_128Concat, CollectionId, BaseURI<T>, OptionQuery>;
 
+	/// Asset owner
 	#[pallet::storage]
-	pub(super) type Asset<T: Config> = StorageMap<_, Blake2_128Concat, U256, H160, OptionQuery>;
+	pub(super) type AssetOwner<T: Config> =
+		StorageMap<_, Blake2_128Concat, U256, H160, OptionQuery>;
 
 	fn asset_owner<T: Config>(key: U256) -> H160 {
-		Asset::<T>::get(key).unwrap_or_else(|| convert_asset_id_to_owner(key))
+		AssetOwner::<T>::get(key).unwrap_or_else(|| convert_asset_id_to_owner(key))
 	}
 
 	/// Pallet events
@@ -94,8 +96,8 @@ pub mod pallet {
 		AssetDoesNotExist,
 		// CannotTransferSelf,
 		CannotTransferSelf,
-		// ReceiverIsZeroAddress,
-		ReceiverIsZeroAddress,
+		// TransferToNullAddress,
+		TransferToNullAddress,
 	}
 
 	impl<T: Config> AsRef<[u8]> for Error<T> {
@@ -107,7 +109,7 @@ pub mod pallet {
 				Error::NoPermission => b"NoPermission",
 				Error::AssetDoesNotExist => b"AssetDoesNotExist",
 				Error::CannotTransferSelf => b"CannotTransferSelf",
-				Error::ReceiverIsZeroAddress => b"ReceiverIsZeroAddress",
+				Error::TransferToNullAddress => b"TransferToNullAddress",
 			}
 		}
 	}
@@ -182,9 +184,9 @@ pub mod pallet {
 			Pallet::<T>::collection_base_uri(collection_id).ok_or(Error::CollectionDoesNotExist)?;
 			ensure!(asset_owner::<T>(asset_id) == from, Error::NoPermission);
 			ensure!(from != to, Error::CannotTransferSelf);
-			ensure!(to != H160::zero(), Error::ReceiverIsZeroAddress);
+			ensure!(to != H160::zero(), Error::TransferToNullAddress);
 
-			Asset::<T>::set(asset_id, Some(to.clone()));
+			AssetOwner::<T>::set(asset_id, Some(to.clone()));
 			Self::deposit_event(Event::AssetTransferred { asset_id, receiver: to });
 
 			Ok(())

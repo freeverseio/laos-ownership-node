@@ -93,20 +93,6 @@ where
 		let to: H160 = input.read::<Address>()?.into();
 		let asset_id: U256 = input.read()?;
 
-		// get current owner
-		let result = Self::owner_of(collection_id, handle)?;
-		let owner: H160 = match TryInto::<Vec<u8>>::try_into(result.output) {
-			Ok(value) => H160::from_slice(&value.as_slice()[12..32]),
-			Err(_) => return Err(revert("error getting owner")),
-		};
-		let caller = handle.context().caller;
-
-		// checks
-		ensure!(owner == caller, revert("caller must be the current owner"));
-		ensure!(owner == from, revert("sender must be the current owner"));
-		ensure!(from != to, revert("sender and receiver cannot be the same"));
-		ensure!(to != H160::zero(), revert("receiver cannot be zero address"));
-
 		AssetManager::transfer_from(collection_id, from, to, asset_id)
 			.map_err(|err| revert(err))?;
 
