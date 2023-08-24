@@ -12,7 +12,6 @@ type AccountId = <Test as frame_system::Config>::AccountId;
 
 const ALICE: AccountId = 0x1234;
 const BOB: AccountId = 0x2234;
-// use super::*;
 
 #[test]
 fn base_uri_unexistent_collection_is_none() {
@@ -159,33 +158,51 @@ mod traits {
 	fn living_assets_ownership_trait_id_of_new_collection_should_be_consecutive() {
 		new_test_ext().execute_with(|| {
 			assert_eq!(
-				<LivingAssetsModule as CollectionManager>::create_collection(1, BaseURI::default())
-					.unwrap(),
+				<LivingAssetsModule as CollectionManager>::create_collection(
+					ALICE,
+					BaseURI::default()
+				)
+				.unwrap(),
 				0
 			);
 			assert_eq!(
-				<LivingAssetsModule as CollectionManager>::create_collection(1, BaseURI::default())
-					.unwrap(),
+				<LivingAssetsModule as CollectionManager>::create_collection(
+					ALICE,
+					BaseURI::default()
+				)
+				.unwrap(),
 				1
 			);
 			assert_eq!(
-				<LivingAssetsModule as CollectionManager>::create_collection(1, BaseURI::default())
-					.unwrap(),
+				<LivingAssetsModule as CollectionManager>::create_collection(
+					ALICE,
+					BaseURI::default()
+				)
+				.unwrap(),
 				2
 			);
 			assert_eq!(
-				<LivingAssetsModule as CollectionManager>::create_collection(1, BaseURI::default())
-					.unwrap(),
+				<LivingAssetsModule as CollectionManager>::create_collection(
+					ALICE,
+					BaseURI::default()
+				)
+				.unwrap(),
 				3
 			);
 			assert_eq!(
-				<LivingAssetsModule as CollectionManager>::create_collection(1, BaseURI::default())
-					.unwrap(),
+				<LivingAssetsModule as CollectionManager>::create_collection(
+					ALICE,
+					BaseURI::default()
+				)
+				.unwrap(),
 				4
 			);
 			assert_eq!(
-				<LivingAssetsModule as CollectionManager>::create_collection(1, BaseURI::default())
-					.unwrap(),
+				<LivingAssetsModule as CollectionManager>::create_collection(
+					ALICE,
+					BaseURI::default()
+				)
+				.unwrap(),
 				5
 			);
 		});
@@ -197,7 +214,7 @@ mod traits {
 
 		new_test_ext().execute_with(|| {
 			assert_ok!(<LivingAssetsModule as CollectionManager>::create_collection(
-				1,
+				ALICE,
 				base_uri.clone()
 			));
 			assert_eq!(LivingAssetsModule::collection_base_uri(0).unwrap(), base_uri);
@@ -215,9 +232,11 @@ mod traits {
 	#[test]
 	fn erc721_owner_of_asset_of_collection() {
 		new_test_ext().execute_with(|| {
-			let collection_id =
-				<LivingAssetsModule as CollectionManager>::create_collection(1, BaseURI::default())
-					.unwrap();
+			let collection_id = <LivingAssetsModule as CollectionManager>::create_collection(
+				ALICE,
+				BaseURI::default(),
+			)
+			.unwrap();
 			assert_eq!(
 				<LivingAssetsModule as Erc721>::owner_of(collection_id, 2.into()).unwrap(),
 				H160::from_low_u64_be(0x0000000000000002)
@@ -349,9 +368,11 @@ mod traits {
 		let base_uri = BaseURI::try_from("https://example.com".as_bytes().to_vec()).unwrap();
 
 		new_test_ext().execute_with(|| {
-			let collection_id =
-				<LivingAssetsModule as CollectionManager>::create_collection(1, base_uri.clone())
-					.unwrap();
+			let collection_id = <LivingAssetsModule as CollectionManager>::create_collection(
+				ALICE,
+				base_uri.clone(),
+			)
+			.unwrap();
 			assert_eq!(
 				<LivingAssetsModule as Erc721>::token_uri(collection_id, 2.into()).unwrap(),
 				"https://example.com/2".as_bytes().to_vec()

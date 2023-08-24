@@ -224,7 +224,7 @@ mod helpers {
 	/// # Arguments
 	///
 	/// * `$name`: An identifier to name the precompile mock type.
-	/// * `$owner_of`: A closure that takes `collection_id` and `asset_id` and returns a `Result<AccountId, &'static str>`.
+	/// * `$owner_of_collection`: A closure that takes `collection_id` and `asset_id` and returns a `Result<AccountId, &'static str>`.
 	///
 	/// # Example
 	///
@@ -236,7 +236,7 @@ mod helpers {
 	/// ```
 	#[macro_export]
 	macro_rules! impl_precompile_mock {
-		($name:ident, $owner_of:expr, $token_uri:expr, $transfer_from:expr) => {
+		($name:ident, $owner_of_collection:expr, $token_uri:expr, $transfer_from:expr) => {
 			struct Erc721Mock;
 
 			impl pallet_living_assets_ownership::traits::Erc721 for Erc721Mock {
@@ -246,7 +246,7 @@ mod helpers {
 					collection_id: CollectionId,
 					asset_id: U256,
 				) -> Result<AccountId, Self::Error> {
-					($owner_of)(collection_id, asset_id)
+					($owner_of_collection)(collection_id, asset_id)
 				}
 
 				fn token_uri(
