@@ -66,7 +66,7 @@ pub enum Command {
 impl Command {
 	// Initialize logger depending on the command.
 	fn init_logger(&self) {
-		use relay_utils::initialize::{initialize_relay};
+		use relay_utils::initialize::initialize_relay;
 
 		match self {
 			Self::RelayHeaders(_) | Self::InitBridge(_) => {
