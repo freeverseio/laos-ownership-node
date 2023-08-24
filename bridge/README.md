@@ -4,7 +4,7 @@ This directory contains common crates that are used for establishing bridge betw
 
 ### Relay
 
-`laos-relay` is a binary that is used to establish bridge between LAOS chains. It currently supports one-way bridge from LAOS evolution chain to LAOS ownership parachain. It syncs latest finalized header, submits finality proof to a light client installed in ownership parachain.
+`laos-relay` is used to establish bridge between LAOS chains. It currently supports one-way bridge from LAOS evolution chain to LAOS ownership parachain. It syncs latest finalized header, submits finality proof to a light client installed in ownership parachain. It is a modified, customized version of [substrate-relay](https://github.com/paritytech/parity-bridges-common/tree/master/relays/bin-substrate).
 
 *Supported Bridges*:
 
@@ -14,7 +14,6 @@ This directory contains common crates that are used for establishing bridge betw
 
 - `init-bridge` - initializes a bridge between two chains by registering current finalized header of source chain in target chain.
 - `relay-headers` - syncs latest finalized header, submits finality proof to a light client installed in target chain.
-- `resubmit-transactions` - resubmits transactions that failed or were rejected by target chain.
 
 ### Client crates
 

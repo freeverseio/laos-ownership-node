@@ -14,7 +14,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Parity Bridges Common.  If not, see <http://www.gnu.org/licenses/>.
 
-//! Declaration of all bridges between Rialto Parachain and Millau.
+//! Declaration of all bridges between Ownership Parachain and Evochain.
 
 pub mod evochain_headers_to_ownership_parachain;
-pub mod millau_headers_to_ownership_parachain;

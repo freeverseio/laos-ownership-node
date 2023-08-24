@@ -640,16 +640,6 @@ impl pallet_bridge_grandpa::Config for Runtime {
 	type WeightInfo = pallet_bridge_grandpa::weights::BridgeWeight<Runtime>;
 }
 
-pub type MillauGrandpaInstance = pallet_bridge_grandpa::Instance1;
-
-impl pallet_bridge_grandpa::Config<MillauGrandpaInstance> for Runtime {
-	type RuntimeEvent = RuntimeEvent;
-	type BridgedChain = bp_millau::Millau;
-	type MaxFreeMandatoryHeadersPerBlock = ConstU32<4>;
-	type HeadersToKeep = ConstU32<{ bp_millau::DAYS as u32 }>;
-	type WeightInfo = pallet_bridge_grandpa::weights::BridgeWeight<Runtime>;
-}
-
 // Create the runtime by composing the FRAME pallets that were previously configured.
 construct_runtime!(
 	pub enum Runtime
@@ -692,7 +682,6 @@ construct_runtime!(
 
 		// Bridge
 		BridgeEvochainGrandpa: pallet_bridge_grandpa = 60,
-		BridgeMillauGrandpa: pallet_bridge_grandpa::<Instance1> = 61,
 	}
 );
 
@@ -1133,17 +1122,6 @@ impl_runtime_apis! {
 	impl cumulus_primitives_core::CollectCollationInfo<Block> for Runtime {
 		fn collect_collation_info(header: &<Block as BlockT>::Header) -> cumulus_primitives_core::CollationInfo {
 			ParachainSystem::collect_collation_info(header)
-		}
-	}
-
-	impl bp_millau::MillauFinalityApi<Block> for Runtime {
-		fn best_finalized() -> Option<bp_runtime::HeaderId<bp_millau::Hash, bp_millau::BlockNumber>> {
-			BridgeMillauGrandpa::best_finalized()
-		}
-
-		fn accepted_grandpa_finality_proofs(
-		) -> Vec<bp_header_chain::justification::GrandpaJustification<bp_millau::Header>> {
-			BridgeMillauGrandpa::accepted_finality_proofs()
 		}
 	}
 

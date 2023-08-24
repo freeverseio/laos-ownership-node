@@ -18,10 +18,7 @@ use async_trait::async_trait;
 use codec::Encode;
 
 use crate::{
-	bridges::ownership_parachain_evochain::{
-		evochain_headers_to_ownership_parachain::EvochainToOwnershipParachainCliBridge,
-		millau_headers_to_ownership_parachain::MillauToOwnershipParachainCliBridge,
-	},
+	bridges::ownership_parachain_evochain::evochain_headers_to_ownership_parachain::EvochainToOwnershipParachainCliBridge,
 	cli::{bridge::CliBridgeBase, chain_schema::*},
 };
 use bp_runtime::Chain as ChainBase;
@@ -53,7 +50,6 @@ pub struct InitBridge {
 /// Bridge to initialize.
 pub enum InitBridgeName {
 	EvochainToOwnershipParachain,
-	MillauToOwnershipParachain,
 }
 
 #[async_trait]
@@ -113,32 +109,12 @@ impl BridgeInitializer for EvochainToOwnershipParachainCliBridge {
 	}
 }
 
-impl BridgeInitializer for MillauToOwnershipParachainCliBridge {
-	type Engine = GrandpaFinalityEngine<Self::Source>;
-
-	fn encode_init_bridge(
-		init_data: <Self::Engine as Engine<Self::Source>>::InitializationData,
-	) -> <Self::Target as Chain>::Call {
-		type RuntimeCall = relay_ownership_parachain_client::RuntimeCall;
-		type BridgeGrandpaCall = relay_ownership_parachain_client::BridgeGrandpaCallMillau;
-		type SudoCall = relay_ownership_parachain_client::SudoCall;
-
-		let initialize_call: RuntimeCall =
-			RuntimeCall::BridgeMillauGrandpa(BridgeGrandpaCall::initialize { init_data });
-
-		RuntimeCall::Sudo(SudoCall::sudo { call: Box::new(initialize_call) })
-	}
-}
-
 impl InitBridge {
 	/// Run the command.
 	pub async fn run(self) -> anyhow::Result<()> {
 		match self.bridge {
 			InitBridgeName::EvochainToOwnershipParachain => {
 				EvochainToOwnershipParachainCliBridge::init_bridge(self)
-			},
-			InitBridgeName::MillauToOwnershipParachain => {
-				MillauToOwnershipParachainCliBridge::init_bridge(self)
 			},
 		}
 		.await

@@ -91,7 +91,6 @@ pallet-evm-precompile-simple = { workspace = true }
 bp-header-chain = { workspace = true }
 bp-messages = { workspace = true }
 bp-evochain = { workspace = true }
-bp-millau = { workspace = true }
 bp-relayers = { workspace = true }
 bp-runtime = { workspace = true }
 bp-ownership-parachain = { workspace = true }
@@ -173,7 +172,6 @@ std = [
 	"pallet-evm-living-assets-ownership/std",
 	# Bridge deps,
 	"bp-evochain/std",
-	"bp-millau/std",
 	"bp-header-chain/std",
 	"bp-messages/std",
 	"bp-ownership-parachain/std",

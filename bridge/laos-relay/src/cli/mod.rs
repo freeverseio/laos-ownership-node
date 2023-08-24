@@ -16,8 +16,6 @@
 
 //! Deal with CLI args of substrate-to-substrate relay.
 
-use std::convert::TryInto;
-
 use async_std::prelude::*;
 use codec::{Decode, Encode};
 use futures::{select, FutureExt};
@@ -36,7 +34,6 @@ pub(crate) mod bridge;
 mod chain_schema;
 mod init_bridge;
 mod relay_headers;
-mod resubmit_transactions;
 
 /// The target that will be used when publishing logs related to this pallet.
 pub const LOG_TARGET: &str = "bridge";
@@ -64,21 +61,16 @@ pub enum Command {
 	///
 	/// Sends initialization transaction to bootstrap the bridge with current finalized block data.
 	InitBridge(init_bridge::InitBridge),
-	/// Resubmit transactions with increased tip if they are stalled.
-	ResubmitTransactions(resubmit_transactions::ResubmitTransactions),
 }
 
 impl Command {
 	// Initialize logger depending on the command.
 	fn init_logger(&self) {
-		use relay_utils::initialize::{initialize_logger, initialize_relay};
+		use relay_utils::initialize::{initialize_relay};
 
 		match self {
 			Self::RelayHeaders(_) | Self::InitBridge(_) => {
 				initialize_relay();
-			},
-			_ => {
-				initialize_logger(false);
 			},
 		}
 	}
@@ -88,7 +80,6 @@ impl Command {
 		match self {
 			Self::RelayHeaders(arg) => arg.run().await?,
 			Self::InitBridge(arg) => arg.run().await?,
-			Self::ResubmitTransactions(arg) => arg.run().await?,
 		}
 		Ok(())
 	}
@@ -148,13 +139,6 @@ impl std::str::FromStr for Balance {
 
 	fn from_str(s: &str) -> Result<Self, Self::Err> {
 		Ok(Self(s.parse()?))
-	}
-}
-
-impl Balance {
-	/// Cast balance to `u64` type, panicking if it's too large.
-	pub fn cast(&self) -> u64 {
-		self.0.try_into().expect("Balance is too high for this chain.")
 	}
 }
 

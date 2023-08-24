@@ -20,10 +20,7 @@ use sp_core::Pair;
 use structopt::StructOpt;
 use strum::{EnumString, EnumVariantNames, VariantNames};
 
-use crate::bridges::ownership_parachain_evochain::{
-	evochain_headers_to_ownership_parachain::EvochainToOwnershipParachainCliBridge,
-	millau_headers_to_ownership_parachain::MillauToOwnershipParachainCliBridge,
-};
+use crate::bridges::ownership_parachain_evochain::evochain_headers_to_ownership_parachain::EvochainToOwnershipParachainCliBridge;
 use relay_substrate_client::Client;
 use relay_utils::metrics::{GlobalMetrics, StandaloneMetric};
 use substrate_relay_helper::finality::SubstrateFinalitySyncPipeline;
@@ -55,7 +52,6 @@ pub struct RelayHeaders {
 /// Headers relay bridge.
 pub enum RelayHeadersBridge {
 	EvochainToOwnershipParachain,
-	MillauToOwnershipParachain,
 }
 
 #[async_trait]
@@ -97,7 +93,6 @@ where
 }
 
 impl HeadersRelayer for EvochainToOwnershipParachainCliBridge {}
-impl HeadersRelayer for MillauToOwnershipParachainCliBridge {}
 
 impl RelayHeaders {
 	/// Run the command.
@@ -105,9 +100,6 @@ impl RelayHeaders {
 		match self.bridge {
 			RelayHeadersBridge::EvochainToOwnershipParachain => {
 				EvochainToOwnershipParachainCliBridge::relay_headers(self)
-			},
-			RelayHeadersBridge::MillauToOwnershipParachain => {
-				MillauToOwnershipParachainCliBridge::relay_headers(self)
 			},
 		}
 		.await

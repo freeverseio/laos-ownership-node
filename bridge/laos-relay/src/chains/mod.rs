@@ -17,5 +17,4 @@
 //! Chain-specific relayer configuration.
 
 mod evochain;
-mod millau;
 mod ownership_parachain;

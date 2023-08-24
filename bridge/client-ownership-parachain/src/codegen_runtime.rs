@@ -1070,10 +1070,8 @@ pub mod api {
                                 #[codec(index = 60)]
                                 BridgeEvochainGrandpa(runtime_types::pallet_bridge_grandpa::pallet::Call),
                                 #[codec(index = 61)]
-                                BridgeMillauGrandpa(runtime_types::pallet_bridge_grandpa_millau::pallet::Call),
-                                #[codec(index = 62)]
                                 BridgeEvochainRelayers(runtime_types::pallet_bridge_relayers::pallet::Call),
-                                #[codec(index = 63)]
+                                #[codec(index = 62)]
                                 BridgeEvochainMessages(runtime_types::pallet_bridge_messages::pallet::Call),
                         }
                         #[derive(:: codec :: Decode, :: codec :: Encode, Clone, Debug, PartialEq)]
@@ -1111,10 +1109,8 @@ pub mod api {
                                 #[codec(index = 60)]
                                 BridgeEvochainGrandpa(runtime_types::pallet_bridge_grandpa::pallet::Event),
                                 #[codec(index = 61)]
-                                BridgeMillauGrandpa(runtime_types::pallet_bridge_grandpa_millau::pallet::Event),
-                                #[codec(index = 62)]
                                 BridgeEvochainRelayers(runtime_types::pallet_bridge_relayers::pallet::Event),
-                                #[codec(index = 63)]
+                                #[codec(index = 62)]
                                 BridgeEvochainMessages(runtime_types::pallet_bridge_messages::pallet::Event),
                         }
                         #[derive(:: codec :: Decode, :: codec :: Encode, Clone, Debug, PartialEq)]
@@ -1419,89 +1415,6 @@ pub mod api {
                                                         ::sp_runtime::generic::Header<
                                                                 ::core::primitive::u32,
                                                                 ::bp_evochain::Hasher,
-                                                        >,
-                                                >,
-                                        },
-                                }
-                        }
-                        pub mod storage_types {
-                                use super::runtime_types;
-                                #[derive(:: codec :: Decode, :: codec :: Encode, Clone, Debug, PartialEq)]
-                                pub struct StoredAuthoritySet {
-                                        pub authorities: runtime_types::bounded_collections::bounded_vec::BoundedVec<(
-                                                runtime_types::sp_consensus_grandpa::app::Public,
-                                                ::core::primitive::u64,
-                                        )>,
-                                        pub set_id: ::core::primitive::u64,
-                                }
-                        }
-                }
-                pub mod pallet_bridge_grandpa_millau {
-                        use super::runtime_types;
-                        pub mod pallet {
-                                use super::runtime_types;
-                                #[derive(:: codec :: Decode, :: codec :: Encode, Clone, Debug, PartialEq)]
-                                pub enum Call {
-                                        #[codec(index = 0)]
-                                        submit_finality_proof {
-                                                finality_target: ::std::boxed::Box<
-                                                        ::sp_runtime::generic::Header<
-                                                                ::core::primitive::u64,
-                                                                ::bp_millau::Hasher,
-                                                        >,
-                                                >,
-                                                justification: ::bp_header_chain::justification::GrandpaJustification<
-                                                        ::sp_runtime::generic::Header<
-                                                                ::core::primitive::u64,
-                                                                ::bp_millau::Hasher,
-                                                        >,
-                                                >,
-                                        },
-                                        #[codec(index = 1)]
-                                        initialize {
-                                                init_data: ::bp_header_chain::InitializationData<
-                                                        ::sp_runtime::generic::Header<
-                                                                ::core::primitive::u64,
-                                                                ::bp_millau::Hasher,
-                                                        >,
-                                                >,
-                                        },
-                                        #[codec(index = 2)]
-                                        set_owner { new_owner: ::core::option::Option<::sp_core::crypto::AccountId32> },
-                                        #[codec(index = 3)]
-                                        set_operating_mode {
-                                                operating_mode: runtime_types::bp_runtime::BasicOperatingMode,
-                                        },
-                                }
-                                #[derive(:: codec :: Decode, :: codec :: Encode, Clone, Debug, PartialEq)]
-                                pub enum Error {
-                                        #[codec(index = 0)]
-                                        InvalidJustification,
-                                        #[codec(index = 1)]
-                                        InvalidAuthoritySet,
-                                        #[codec(index = 2)]
-                                        OldHeader,
-                                        #[codec(index = 3)]
-                                        UnsupportedScheduledChange,
-                                        #[codec(index = 4)]
-                                        NotInitialized,
-                                        #[codec(index = 5)]
-                                        AlreadyInitialized,
-                                        #[codec(index = 6)]
-                                        TooManyAuthoritiesInSet,
-                                        #[codec(index = 7)]
-                                        BridgeModule(runtime_types::bp_runtime::OwnedBridgeModuleError),
-                                }
-                                #[derive(:: codec :: Decode, :: codec :: Encode, Clone, Debug, PartialEq)]
-                                pub enum Event {
-                                        #[codec(index = 0)]
-                                        UpdatedBestFinalizedHeader {
-                                                number: ::core::primitive::u64,
-                                                hash: bp_millau::MillauHash,
-                                                justification: ::bp_header_chain::justification::GrandpaJustification<
-                                                        ::sp_runtime::generic::Header<
-                                                                ::core::primitive::u64,
-                                                                ::bp_millau::Hasher,
                                                         >,
                                                 >,
                                         },

@@ -1010,32 +1010,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "bp-millau"
-version = "0.1.0"
-source = "git+https://github.com/freeverseio/parity-bridges-common.git?branch=polkadot-v1.0.0#0298cf94509177ce18119e9862f299cb18afc47c"
-dependencies = [
- "bp-beefy",
- "bp-header-chain",
- "bp-messages",
- "bp-runtime",
- "fixed-hash",
- "frame-support",
- "frame-system",
- "hash256-std-hasher",
- "impl-codec",
- "impl-serde",
- "parity-util-mem",
- "scale-info",
- "serde",
- "sp-api",
- "sp-core",
- "sp-io",
- "sp-runtime",
- "sp-std 8.0.0 (git+https://github.com/paritytech/substrate?branch=polkadot-v1.0.0)",
- "sp-trie",
-]
-
-[[package]]
 name = "bp-ownership-parachain"
 version = "0.1.0"
 source = "git+https://github.com/freeverseio/parity-bridges-common.git?branch=polkadot-v1.0.0#0298cf94509177ce18119e9862f299cb18afc47c"
@@ -1102,39 +1076,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "bp-rialto"
-version = "0.1.0"
-source = "git+https://github.com/freeverseio/parity-bridges-common.git?branch=polkadot-v1.0.0#0298cf94509177ce18119e9862f299cb18afc47c"
-dependencies = [
- "bp-header-chain",
- "bp-messages",
- "bp-runtime",
- "frame-support",
- "frame-system",
- "sp-api",
- "sp-core",
- "sp-runtime",
- "sp-std 8.0.0 (git+https://github.com/paritytech/substrate?branch=polkadot-v1.0.0)",
-]
-
-[[package]]
-name = "bp-rialto-parachain"
-version = "0.1.0"
-source = "git+https://github.com/freeverseio/parity-bridges-common.git?branch=polkadot-v1.0.0#0298cf94509177ce18119e9862f299cb18afc47c"
-dependencies = [
- "bp-bridge-hub-cumulus",
- "bp-messages",
- "bp-polkadot-core",
- "bp-runtime",
- "frame-support",
- "frame-system",
- "sp-api",
- "sp-core",
- "sp-runtime",
- "sp-std 8.0.0 (git+https://github.com/paritytech/substrate?branch=polkadot-v1.0.0)",
-]
-
-[[package]]
 name = "bp-runtime"
 version = "0.1.0"
 source = "git+https://github.com/freeverseio/parity-bridges-common.git?branch=polkadot-v1.0.0#0298cf94509177ce18119e9862f299cb18afc47c"
@@ -1175,23 +1116,6 @@ dependencies = [
  "sp-std 8.0.0 (git+https://github.com/paritytech/substrate?branch=polkadot-v1.0.0)",
  "sp-trie",
 ]
-
-[[package]]
-name = "bp-westend"
-version = "0.1.0"
-source = "git+https://github.com/freeverseio/parity-bridges-common.git?branch=polkadot-v1.0.0#0298cf94509177ce18119e9862f299cb18afc47c"
-dependencies = [
- "bp-header-chain",
- "bp-polkadot-core",
- "bp-runtime",
- "frame-support",
- "sp-api",
-]
-
-[[package]]
-name = "bp-xcm-bridge-hub-router"
-version = "0.1.0"
-source = "git+https://github.com/freeverseio/parity-bridges-common.git?branch=polkadot-v1.0.0#0298cf94509177ce18119e9862f299cb18afc47c"
 
 [[package]]
 name = "bridge-runtime-common"
@@ -5654,7 +5578,6 @@ dependencies = [
  "bp-evochain",
  "bp-header-chain",
  "bp-messages",
- "bp-millau",
  "bp-parachains",
  "bp-runtime",
  "bp-test-utils",
@@ -5666,7 +5589,6 @@ dependencies = [
  "hex-literal 0.4.1",
  "laos-runtime",
  "log",
- "millau-runtime",
  "node-template-runtime",
  "num-format",
  "num-traits",
@@ -5679,7 +5601,6 @@ dependencies = [
  "polkadot-runtime-parachains",
  "rbtag",
  "relay-evochain-client",
- "relay-millau-client",
  "relay-ownership-parachain-client",
  "relay-substrate-client",
  "relay-utils",
@@ -5704,7 +5625,6 @@ dependencies = [
  "bp-evochain",
  "bp-header-chain",
  "bp-messages",
- "bp-millau",
  "bp-ownership-parachain",
  "bp-relayers",
  "bp-runtime",
@@ -6661,69 +6581,6 @@ dependencies = [
  "futures",
  "rand 0.8.5",
  "thrift",
-]
-
-[[package]]
-name = "millau-runtime"
-version = "0.1.0"
-source = "git+https://github.com/freeverseio/parity-bridges-common.git?branch=polkadot-v1.0.0#0298cf94509177ce18119e9862f299cb18afc47c"
-dependencies = [
- "bp-header-chain",
- "bp-messages",
- "bp-millau",
- "bp-parachains",
- "bp-polkadot-core",
- "bp-relayers",
- "bp-rialto",
- "bp-rialto-parachain",
- "bp-runtime",
- "bp-westend",
- "bp-xcm-bridge-hub-router",
- "bridge-runtime-common",
- "frame-benchmarking",
- "frame-executive",
- "frame-support",
- "frame-system",
- "frame-system-rpc-runtime-api",
- "hex-literal 0.4.1",
- "pallet-aura",
- "pallet-balances",
- "pallet-beefy",
- "pallet-beefy-mmr",
- "pallet-bridge-grandpa",
- "pallet-bridge-messages",
- "pallet-bridge-parachains",
- "pallet-bridge-relayers",
- "pallet-grandpa",
- "pallet-mmr",
- "pallet-session",
- "pallet-shift-session-manager",
- "pallet-sudo",
- "pallet-timestamp",
- "pallet-transaction-payment",
- "pallet-transaction-payment-rpc-runtime-api",
- "pallet-utility",
- "pallet-xcm",
- "pallet-xcm-bridge-hub-router",
- "parity-scale-codec",
- "scale-info",
- "sp-api",
- "sp-block-builder",
- "sp-consensus-aura",
- "sp-consensus-beefy",
- "sp-core",
- "sp-inherents",
- "sp-io",
- "sp-offchain",
- "sp-runtime",
- "sp-session",
- "sp-std 8.0.0 (git+https://github.com/paritytech/substrate?branch=polkadot-v1.0.0)",
- "sp-transaction-pool",
- "sp-version",
- "substrate-wasm-builder",
- "xcm",
- "xcm-builder",
- "xcm-executor",
 ]
 
 [[package]]
@@ -8382,20 +8239,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "pallet-shift-session-manager"
-version = "0.1.0"
-source = "git+https://github.com/freeverseio/parity-bridges-common.git?branch=polkadot-v1.0.0#0298cf94509177ce18119e9862f299cb18afc47c"
-dependencies = [
- "frame-support",
- "frame-system",
- "pallet-session",
- "parity-scale-codec",
- "scale-info",
- "sp-staking",
- "sp-std 8.0.0 (git+https://github.com/paritytech/substrate?branch=polkadot-v1.0.0)",
-]
-
-[[package]]
 name = "pallet-society"
 version = "4.0.0-dev"
 source = "git+https://github.com/paritytech/substrate?branch=polkadot-v1.0.0#948fbd2fd1233dc26dbb9f9bbc1d2cca2c03945d"
@@ -8692,24 +8535,6 @@ dependencies = [
  "xcm",
  "xcm-builder",
  "xcm-executor",
-]
-
-[[package]]
-name = "pallet-xcm-bridge-hub-router"
-version = "0.1.0"
-source = "git+https://github.com/freeverseio/parity-bridges-common.git?branch=polkadot-v1.0.0#0298cf94509177ce18119e9862f299cb18afc47c"
-dependencies = [
- "bp-xcm-bridge-hub-router",
- "frame-benchmarking",
- "frame-support",
- "frame-system",
- "log",
- "parity-scale-codec",
- "scale-info",
- "sp-runtime",
- "sp-std 8.0.0 (git+https://github.com/paritytech/substrate?branch=polkadot-v1.0.0)",
- "xcm",
- "xcm-builder",
 ]
 
 [[package]]
@@ -11019,23 +10844,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "relay-millau-client"
-version = "0.1.0"
-source = "git+https://github.com/freeverseio/parity-bridges-common.git?branch=polkadot-v1.0.0#0298cf94509177ce18119e9862f299cb18afc47c"
-dependencies = [
- "bp-millau",
- "frame-support",
- "frame-system",
- "millau-runtime",
- "pallet-transaction-payment",
- "parity-scale-codec",
- "relay-substrate-client",
- "relay-utils",
- "sp-core",
- "sp-runtime",
-]
-
-[[package]]
 name = "relay-ownership-parachain-client"
 version = "0.1.0"
 dependencies = [
@@ -11043,7 +10851,6 @@ dependencies = [
  "bp-evochain",
  "bp-header-chain",
  "bp-messages",
- "bp-millau",
  "bp-ownership-parachain",
  "bp-polkadot-core",
  "bridge-runtime-common",

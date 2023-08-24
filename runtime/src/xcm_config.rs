@@ -28,7 +28,7 @@ parameter_types! {
 	pub const RelayNetwork: NetworkId = CustomNetworkId::Rococo.as_network_id();
 	pub RelayOrigin: RuntimeOrigin = cumulus_pallet_xcm::Origin::Relay.into();
 	pub UniversalLocation: InteriorMultiLocation = ThisNetwork::get().into();
-	/// The Millau network ID.
+	/// The Evochain network ID.
 	pub const EvochainNetwork: NetworkId = CustomNetworkId::Evochain.as_network_id();
 	/// The RialtoParachain network ID.
 	pub const ThisNetwork: NetworkId = CustomNetworkId::OwnershipParachain.as_network_id();
