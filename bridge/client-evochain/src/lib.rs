@@ -24,8 +24,11 @@ use relay_substrate_client::{
 	ChainWithTransactions, ChainWithUtilityPallet, Error as SubstrateError,
 	FullRuntimeUtilityPallet, NonceOf, SignParam, UnderlyingChainProvider, UnsignedTransaction,
 };
-use sp_core::{ecdsa, storage::StorageKey, Pair};
-use sp_runtime::generic::{SignedBlock, SignedPayload};
+use sp_core::{storage::StorageKey, Pair};
+use sp_runtime::{
+	generic::{SignedBlock, SignedPayload},
+	traits::IdentifyAccount,
+};
 use std::time::Duration;
 
 /// Evochain header id.
@@ -73,7 +76,7 @@ impl ChainWithBalances for Evochain {
 }
 
 impl ChainWithTransactions for Evochain {
-	type AccountKeyPair = sp_core::ecdsa::Pair;
+	type AccountKeyPair = sp_core::sr25519::Pair;
 	type SignedTransaction = evochain_runtime::UncheckedExtrinsic;
 
 	fn sign_transaction(
@@ -104,13 +107,13 @@ impl ChainWithTransactions for Evochain {
 			),
 		);
 		let signature = raw_payload.using_encoded(|payload| param.signer.sign(payload));
-		let signer = param.signer.public();
+		let signer: sp_runtime::MultiSigner = param.signer.public().into();
 		let (call, extra, _) = raw_payload.deconstruct();
 
 		Ok(evochain_runtime::UncheckedExtrinsic::new_signed(
 			call.into_decoded()?,
-			signer.into(),
-			bp_evochain::Signature::new(ecdsa::Signature(signature.0)),
+			signer.into_account(),
+			signature.into(),
 			extra,
 		))
 	}
@@ -122,7 +125,9 @@ impl ChainWithTransactions for Evochain {
 	fn is_signed_by(signer: &Self::AccountKeyPair, tx: &Self::SignedTransaction) -> bool {
 		tx.signature
 			.as_ref()
-			.map(|(address, _, _)| *address == evochain_runtime::Address::from(signer.public()))
+			.map(|(address, _, _)| {
+				*address == evochain_runtime::Address::from(*signer.public().as_array_ref())
+			})
 			.unwrap_or(false)
 	}
 
@@ -169,7 +174,7 @@ mod tests {
 				spec_version: 42,
 				transaction_version: 50000,
 				genesis_hash: [42u8; 32].into(),
-				signer: sp_core::ecdsa::Pair::from_seed_slice(&[1u8; 32]).unwrap(),
+				signer: sp_core::sr25519::Pair::from_seed_slice(&[1u8; 32]).unwrap(),
 			},
 			unsigned.clone(),
 		)

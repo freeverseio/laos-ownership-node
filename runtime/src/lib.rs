@@ -6,7 +6,6 @@
 #[cfg(feature = "std")]
 include!(concat!(env!("OUT_DIR"), "/wasm_binary.rs"));
 
-// pub mod evochain_messages;
 mod weights;
 pub mod xcm_config;
 use parity_scale_codec as codec;
