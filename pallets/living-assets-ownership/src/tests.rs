@@ -1,17 +1,19 @@
 use core::str::FromStr;
 
 use crate::{
-	address_to_collection_id, collection_id_to_address, is_collection_address, mock::*,
-	CollectionError, Event,
+	address_to_collection_id, collection_id_to_address, is_collection_address, mock::*, Asset,
+	CollectionBaseURI, CollectionError, Event,
 };
 use frame_support::assert_ok;
 use sp_core::H160;
 
 type BaseURI = crate::BaseURI<Test>;
+type AccountId = <Test as frame_system::Config>::AccountId;
 
-const ALICE: &'static str = "0xffffffffffffffffffffffff0000000000000001";
-const BOB: &'static str = "0xffffffffffffffffffffffff0000000000000002";
-use super::*;
+const ALICE: AccountId = 0x1234;
+const BOB: AccountId = 0x2234;
+// use super::*;
+
 #[test]
 fn base_uri_unexistent_collection_is_none() {
 	new_test_ext().execute_with(|| {
@@ -32,7 +34,7 @@ fn create_new_collection_should_create_sequential_collections() {
 		for i in 0..3 {
 			// Create the collection
 			assert_ok!(LivingAssetsModule::create_collection(
-				RuntimeOrigin::signed(H160::from_str(ALICE).unwrap()),
+				RuntimeOrigin::signed(ALICE),
 				base_uri.clone()
 			));
 
@@ -48,7 +50,7 @@ fn should_set_base_uri_when_creating_new_collection() {
 
 	new_test_ext().execute_with(|| {
 		assert_ok!(LivingAssetsModule::create_collection(
-			RuntimeOrigin::signed(H160::from_str(ALICE).unwrap()),
+			RuntimeOrigin::signed(ALICE),
 			base_uri.clone()
 		));
 		assert_eq!(LivingAssetsModule::collection_base_uri(0).unwrap(), base_uri);
@@ -62,37 +64,25 @@ fn create_new_collections_should_emit_events_with_collection_id_consecutive() {
 		System::set_block_number(1);
 
 		assert_ok!(LivingAssetsModule::create_collection(
-			RuntimeOrigin::signed(H160::from_str(ALICE).unwrap()),
+			RuntimeOrigin::signed(ALICE),
 			BaseURI::default()
 		));
-		System::assert_last_event(
-			Event::CollectionCreated { collection_id: 0, who: H160::from_str(ALICE).unwrap() }
-				.into(),
-		);
+		System::assert_last_event(Event::CollectionCreated { collection_id: 0, who: ALICE }.into());
 		assert_ok!(LivingAssetsModule::create_collection(
-			RuntimeOrigin::signed(H160::from_str(ALICE).unwrap()),
+			RuntimeOrigin::signed(ALICE),
 			BaseURI::default()
 		));
-		System::assert_last_event(
-			Event::CollectionCreated { collection_id: 1, who: H160::from_str(ALICE).unwrap() }
-				.into(),
-		);
+		System::assert_last_event(Event::CollectionCreated { collection_id: 1, who: ALICE }.into());
 		assert_ok!(LivingAssetsModule::create_collection(
-			RuntimeOrigin::signed(H160::from_str(ALICE).unwrap()),
+			RuntimeOrigin::signed(ALICE),
 			BaseURI::default()
 		));
-		System::assert_last_event(
-			Event::CollectionCreated { collection_id: 2, who: H160::from_str(ALICE).unwrap() }
-				.into(),
-		);
+		System::assert_last_event(Event::CollectionCreated { collection_id: 2, who: ALICE }.into());
 		assert_ok!(LivingAssetsModule::create_collection(
-			RuntimeOrigin::signed(H160::from_str(ALICE).unwrap()),
+			RuntimeOrigin::signed(ALICE),
 			BaseURI::default()
 		));
-		System::assert_last_event(
-			Event::CollectionCreated { collection_id: 3, who: H160::from_str(ALICE).unwrap() }
-				.into(),
-		);
+		System::assert_last_event(Event::CollectionCreated { collection_id: 3, who: ALICE }.into());
 	});
 }
 
@@ -156,12 +146,11 @@ mod traits {
 			System::set_block_number(1);
 
 			assert_ok!(<LivingAssetsModule as CollectionManager>::create_collection(
-				H160::from_str(ALICE).unwrap(),
+				ALICE,
 				BaseURI::default(),
 			));
 			System::assert_last_event(
-				Event::CollectionCreated { collection_id: 0, who: H160::from_str(ALICE).unwrap() }
-					.into(),
+				Event::CollectionCreated { collection_id: 0, who: ALICE }.into(),
 			);
 		});
 	}
@@ -170,51 +159,33 @@ mod traits {
 	fn living_assets_ownership_trait_id_of_new_collection_should_be_consecutive() {
 		new_test_ext().execute_with(|| {
 			assert_eq!(
-				<LivingAssetsModule as CollectionManager>::create_collection(
-					H160::from_str(ALICE).unwrap(),
-					BaseURI::default()
-				)
-				.unwrap(),
+				<LivingAssetsModule as CollectionManager>::create_collection(1, BaseURI::default())
+					.unwrap(),
 				0
 			);
 			assert_eq!(
-				<LivingAssetsModule as CollectionManager>::create_collection(
-					H160::from_str(ALICE).unwrap(),
-					BaseURI::default()
-				)
-				.unwrap(),
+				<LivingAssetsModule as CollectionManager>::create_collection(1, BaseURI::default())
+					.unwrap(),
 				1
 			);
 			assert_eq!(
-				<LivingAssetsModule as CollectionManager>::create_collection(
-					H160::from_str(ALICE).unwrap(),
-					BaseURI::default()
-				)
-				.unwrap(),
+				<LivingAssetsModule as CollectionManager>::create_collection(1, BaseURI::default())
+					.unwrap(),
 				2
 			);
 			assert_eq!(
-				<LivingAssetsModule as CollectionManager>::create_collection(
-					H160::from_str(ALICE).unwrap(),
-					BaseURI::default()
-				)
-				.unwrap(),
+				<LivingAssetsModule as CollectionManager>::create_collection(1, BaseURI::default())
+					.unwrap(),
 				3
 			);
 			assert_eq!(
-				<LivingAssetsModule as CollectionManager>::create_collection(
-					H160::from_str(ALICE).unwrap(),
-					BaseURI::default()
-				)
-				.unwrap(),
+				<LivingAssetsModule as CollectionManager>::create_collection(1, BaseURI::default())
+					.unwrap(),
 				4
 			);
 			assert_eq!(
-				<LivingAssetsModule as CollectionManager>::create_collection(
-					H160::from_str(ALICE).unwrap(),
-					BaseURI::default()
-				)
-				.unwrap(),
+				<LivingAssetsModule as CollectionManager>::create_collection(1, BaseURI::default())
+					.unwrap(),
 				5
 			);
 		});
@@ -226,7 +197,7 @@ mod traits {
 
 		new_test_ext().execute_with(|| {
 			assert_ok!(<LivingAssetsModule as CollectionManager>::create_collection(
-				H160::from_str(ALICE).unwrap(),
+				1,
 				base_uri.clone()
 			));
 			assert_eq!(LivingAssetsModule::collection_base_uri(0).unwrap(), base_uri);
@@ -244,11 +215,9 @@ mod traits {
 	#[test]
 	fn erc721_owner_of_asset_of_collection() {
 		new_test_ext().execute_with(|| {
-			let collection_id = <LivingAssetsModule as CollectionManager>::create_collection(
-				H160::from_str(ALICE).unwrap(),
-				BaseURI::default(),
-			)
-			.unwrap();
+			let collection_id =
+				<LivingAssetsModule as CollectionManager>::create_collection(1, BaseURI::default())
+					.unwrap();
 			assert_eq!(
 				<LivingAssetsModule as Erc721>::owner_of(collection_id, 2.into()).unwrap(),
 				H160::from_low_u64_be(0x0000000000000002)
@@ -260,7 +229,7 @@ mod traits {
 	fn sender_is_not_current_owner_should_fail() {
 		let asset_id = U256::from(5);
 		let sender = H160::from_str("0000000000000000000000000000000000000006").unwrap();
-		let receiver = H160::from_str(BOB).unwrap();
+		let receiver = H160::from_low_u64_be(BOB);
 		new_test_ext().execute_with(|| {
 			System::set_block_number(1);
 			assert!(Asset::<Test>::get(asset_id).is_none());
@@ -307,7 +276,7 @@ mod traits {
 	fn unexistent_collection_when_transfer_from_should_fail() {
 		let asset_id = U256::from(5);
 		let sender = H160::from_str("0000000000000000000000000000000000000005").unwrap();
-		let receiver = H160::from_str(BOB).unwrap();
+		let receiver = H160::from_low_u64_be(BOB);
 		new_test_ext().execute_with(|| {
 			System::set_block_number(1);
 			assert!(Asset::<Test>::get(asset_id).is_none());
@@ -324,7 +293,7 @@ mod traits {
 			hex::decode("03C0F0f4ab324C46e55D02D0033343B4Be8A55532d").unwrap().as_slice(),
 		);
 		let sender = H160::from_str("C0F0f4ab324C46e55D02D0033343B4Be8A55532d").unwrap();
-		let receiver = H160::from_str(BOB).unwrap();
+		let receiver = H160::from_low_u64_be(BOB);
 		new_test_ext().execute_with(|| {
 			System::set_block_number(1);
 			CollectionBaseURI::<Test>::insert(1, BaseURI::default());
@@ -352,11 +321,9 @@ mod traits {
 		let base_uri = BaseURI::try_from("https://example.com".as_bytes().to_vec()).unwrap();
 
 		new_test_ext().execute_with(|| {
-			let collection_id = <LivingAssetsModule as CollectionManager>::create_collection(
-				H160::from_str(ALICE).unwrap(),
-				base_uri.clone(),
-			)
-			.unwrap();
+			let collection_id =
+				<LivingAssetsModule as CollectionManager>::create_collection(1, base_uri.clone())
+					.unwrap();
 			assert_eq!(
 				<LivingAssetsModule as Erc721>::token_uri(collection_id, 2.into()).unwrap(),
 				"https://example.com/2".as_bytes().to_vec()

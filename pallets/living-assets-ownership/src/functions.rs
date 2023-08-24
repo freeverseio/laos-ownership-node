@@ -35,7 +35,7 @@ pub fn convert_asset_id_to_owner(value: U256) -> H160 {
 
 #[cfg(test)]
 mod tests {
-	use super::*;
+	use crate::{functions::convert_asset_id_to_owner, H160, U256};
 
 	#[test]
 	fn check_convert_asset_id_to_owner() {
