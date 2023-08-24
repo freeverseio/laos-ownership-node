@@ -1,8 +1,12 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 
-use sp_runtime::{generic, traits::{BlakeTwo256, IdentifyAccount, Verify}, MultiSignature};
 use sp_core::H256;
-	
+use sp_runtime::{
+	generic,
+	traits::{BlakeTwo256, IdentifyAccount, Verify},
+	MultiSignature,
+};
+
 /// An index to a block.
 pub type BlockNumber = u32;
 
@@ -10,7 +14,7 @@ pub type BlockNumber = u32;
 pub type Hash = H256;
 
 /// Hasher type
-pub	type Hasher = BlakeTwo256;
+pub type Hasher = BlakeTwo256;
 
 /// Block header type as expected by this runtime.
 pub type Header = generic::Header<BlockNumber, BlakeTwo256>;
@@ -27,10 +31,3 @@ pub type Balance = u128;
 
 /// The type for storing how many extrinsics an account has signed.
 pub type Nonce = u32;
-
-
-
-
-
-
-

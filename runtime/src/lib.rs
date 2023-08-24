@@ -26,7 +26,7 @@ use sp_runtime::{
 		PostDispatchInfoOf, UniqueSaturatedInto,
 	},
 	transaction_validity::{TransactionSource, TransactionValidity, TransactionValidityError},
-	ApplyExtrinsicResult, ConsensusEngineId, 
+	ApplyExtrinsicResult, ConsensusEngineId,
 };
 
 use sp_std::prelude::*;
