@@ -1,0 +1,18 @@
+[package]
+name = "primitive"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+sp-core = { workspace = true }
+sp-runtime = { workspace = true }
+
+[features]
+default = [
+	"std",
+]
+std = [
+    "sp-core/std",
+    "sp-runtime/std",
+]
+	

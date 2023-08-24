@@ -6,7 +6,8 @@ members = [
 	"node",
 	"runtime",
 	"precompile/*",
-	"pallets/*"
+	"pallets/*",
+	"primitive",
 ]
 
 
@@ -230,3 +231,4 @@ precompile-utils-macro = { path = "./precompile/utils/macro", default-features =
 
 # runtime
 laos-runtime = { path = "./runtime" }
+primitives = { path = "./primitives" }

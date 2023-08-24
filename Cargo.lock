@@ -9494,6 +9494,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "primitive"
+version = "0.1.0"
+dependencies = [
+ "sp-core",
+ "sp-runtime",
+]
+
+[[package]]
 name = "primitive-types"
 version = "0.12.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
