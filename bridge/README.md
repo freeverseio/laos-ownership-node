@@ -17,8 +17,7 @@ This directory contains common crates that are used for establishing bridge betw
 
 ### Client crates
 
-Crates with `client-{chain}` prefix are used to define types used in establishing a bridge with that specific `chain`. It contains higher level types than primitives, such as `Header`, `UnchekerHeader` and also creates a type that represents a `chain` itself.
-
+Crates with `client-{chain}` prefix are used to define types used in establishing a bridge with that specific `chain`. It contains higher level types than primitives, such as `HeaderId`, `SyncHeader`, etc. and also creates a type that represents the `chain` in light-client implementations.
 
 ## Build
 
