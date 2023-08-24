@@ -16,10 +16,6 @@ hex-literal = { workspace = true, optional = true}
 parity-scale-codec = { workspace = true, features = ["derive"] }
 scale-info = { workspace = true, features = ["derive"] }
 
-# Frontier
-pallet-evm = { workspace = true }
-pallet-ethereum = { workspace = true }
-
 # Substrate
 frame-benchmarking = { workspace = true, optional = true }
 frame-support = { workspace = true }
@@ -57,13 +53,8 @@ std = [
 	"sp-arithmetic/std",
 	"sp-core/std",
 	"sp-std/std",
-	# Frontier FRAME
-	"pallet-ethereum/std",
-	"pallet-evm/std",
 ]
 try-runtime = [
 	"frame-system/try-runtime",
 	"frame-support/try-runtime",
-	"pallet-evm/try-runtime",
-	"pallet-ethereum/try-runtime",
 ]

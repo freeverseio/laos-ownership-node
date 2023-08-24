@@ -131,25 +131,6 @@ pub mod pallet {
 		}
 	}
 
-	/// Errors that can occur when managing collections.
-	///
-	/// - `CollectionIdOverflow`: The ID for the new collection would overflow.
-	/// - `UnknownError`: An unspecified error occurred.
-	#[derive(Debug, PartialEq)]
-	pub enum CollectionManagerError {
-		CollectionIdOverflow,
-		UnknownError,
-	}
-
-	impl AsRef<[u8]> for CollectionManagerError {
-		fn as_ref(&self) -> &[u8] {
-			match self {
-				CollectionManagerError::CollectionIdOverflow => b"CollectionIdOverflow",
-				CollectionManagerError::UnknownError => b"UnknownError",
-			}
-		}
-	}
-
 	impl<T: Config> traits::CollectionManager for Pallet<T> {
 		type Error = Error<T>;
 		type AccountId = T::AccountId;
