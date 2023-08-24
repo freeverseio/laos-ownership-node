@@ -42,7 +42,7 @@ relay-utils = { git = "https://github.com/freeverseio/parity-bridges-common.git"
 # to prepare large XCM messages
 substrate-relay-helper = { git = "https://github.com/freeverseio/parity-bridges-common.git", branch = "polkadot-v1.0.0" }
 
-node-template-runtime = { git = "https://github.com/freeverseio/laos-evolution-node.git", branch = "feat/relayer-updates" }
+node-template-runtime = { git = "https://github.com/freeverseio/laos-evolution-node.git", branch = "use-bp-evochain" }
 laos-runtime = { path = "../../runtime" }
 
 # Substrate Dependencies

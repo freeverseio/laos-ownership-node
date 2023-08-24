@@ -1363,13 +1363,13 @@ pub mod api {
                                         submit_finality_proof {
                                                 finality_target: ::std::boxed::Box<
                                                         ::sp_runtime::generic::Header<
-                                                                ::core::primitive::u64,
+                                                                ::core::primitive::u32,
                                                                 ::bp_evochain::Hasher,
                                                         >,
                                                 >,
                                                 justification: ::bp_header_chain::justification::GrandpaJustification<
                                                         ::sp_runtime::generic::Header<
-                                                                ::core::primitive::u64,
+                                                                ::core::primitive::u32,
                                                                 ::bp_evochain::Hasher,
                                                         >,
                                                 >,
@@ -1378,7 +1378,7 @@ pub mod api {
                                         initialize {
                                                 init_data: ::bp_header_chain::InitializationData<
                                                         ::sp_runtime::generic::Header<
-                                                                ::core::primitive::u64,
+                                                                ::core::primitive::u32,
                                                                 ::bp_evochain::Hasher,
                                                         >,
                                                 >,
@@ -1413,11 +1413,11 @@ pub mod api {
                                 pub enum Event {
                                         #[codec(index = 0)]
                                         UpdatedBestFinalizedHeader {
-                                                number: ::core::primitive::u64,
+                                                number: ::core::primitive::u32,
                                                 hash: runtime_types::bp_evochain::evo_hash::EvoHash,
                                                 justification: ::bp_header_chain::justification::GrandpaJustification<
                                                         ::sp_runtime::generic::Header<
-                                                                ::core::primitive::u64,
+                                                                ::core::primitive::u32,
                                                                 ::bp_evochain::Hasher,
                                                         >,
                                                 >,

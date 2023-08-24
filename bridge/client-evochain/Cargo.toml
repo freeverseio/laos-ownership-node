@@ -13,7 +13,7 @@ relay-utils = { git = "https://github.com/freeverseio/parity-bridges-common.git"
 # Supported Chains
 
 bp-evochain = { git = "https://github.com/freeverseio/parity-bridges-common.git", branch = "polkadot-v1.0.0" }
-node-template-runtime = { git = "https://github.com/freeverseio/laos-evolution-node.git", branch = "feat/relayer-updates" }
+node-template-runtime = { git = "https://github.com/freeverseio/laos-evolution-node.git", branch = "use-bp-evochain" }
 
 # Substrate Dependencies
 
@@ -22,3 +22,4 @@ frame-system = { git = "https://github.com/paritytech/substrate", branch = "polk
 pallet-transaction-payment = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v1.0.0" }
 sp-core = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v1.0.0" }
 sp-runtime = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v1.0.0" }
+fp-account = { git = "https://github.com/paritytech/frontier.git", branch = "polkadot-v1.0.0", default-features = false, features = ["serde"] }
