@@ -10,10 +10,10 @@ mod weights;
 pub mod xcm_config;
 use parity_scale_codec as codec;
 
-use bp_ownership_parachain::{MAXIMUM_BLOCK_WEIGHT, NORMAL_DISPATCH_RATIO};
 use codec::{Decode, Encode};
 use core::marker::PhantomData;
 use cumulus_pallet_parachain_system::RelayNumberStrictlyIncreases;
+use ownership_parachain_primitives::{MAXIMUM_BLOCK_WEIGHT, NORMAL_DISPATCH_RATIO};
 use smallvec::smallvec;
 use sp_api::impl_runtime_apis;
 use sp_core::{
@@ -56,7 +56,6 @@ pub use sp_runtime::{MultiAddress, Perbill, Permill};
 use xcm_config::{RelayLocation, XcmConfig, XcmOriginToTransactDispatchOrigin};
 
 pub use pallet_bridge_grandpa::Call as BridgeGrandpaCall;
-pub use pallet_bridge_messages::Call as MessagesCall;
 pub use pallet_xcm::Call as XcmCall;
 
 #[cfg(any(feature = "std", test))]
@@ -90,32 +89,32 @@ use precompiles::FrontierPrecompiles;
 pub use pallet_living_assets_ownership;
 
 /// Alias to 512-bit hash when used in the context of a transaction signature on the chain.
-pub type Signature = bp_ownership_parachain::Signature;
+pub type Signature = ownership_parachain_primitives::Signature;
 
 /// Some way of identifying an account on the chain. We intentionally make it equivalent
 /// to the public key of our transaction signing scheme.
 pub type AccountId = <<Signature as Verify>::Signer as IdentifyAccount>::AccountId;
 
 /// Balance of an account.
-pub type Balance = bp_ownership_parachain::Balance;
+pub type Balance = ownership_parachain_primitives::Balance;
 
 /// Index of a transaction in the chain.
-pub type Index = bp_ownership_parachain::Nonce;
+pub type Index = ownership_parachain_primitives::Nonce;
 
 /// A hash of some data used by the chain.
-pub type Hash = bp_ownership_parachain::Hash;
+pub type Hash = ownership_parachain_primitives::Hash;
 
 /// An index to a block.
-pub type BlockNumber = bp_ownership_parachain::BlockNumber;
+pub type BlockNumber = ownership_parachain_primitives::BlockNumber;
 
 /// The type for storing how many extrinsics an account has signed.
-pub type Nonce = bp_ownership_parachain::Nonce;
+pub type Nonce = ownership_parachain_primitives::Nonce;
 
 /// The address format for describing accounts.
 pub type Address = MultiAddress<AccountId, ()>;
 
 /// Block header type as expected by this runtime.
-pub type Header = generic::Header<BlockNumber, bp_ownership_parachain::Hasher>;
+pub type Header = generic::Header<BlockNumber, ownership_parachain_primitives::Hasher>;
 
 /// Block type as expected by this runtime.
 pub type Block = generic::Block<Header, UncheckedExtrinsic>;
@@ -311,9 +310,9 @@ impl frame_system::Config for Runtime {
 	/// Weight information for the extrinsics of this pallet.
 	type SystemWeightInfo = ();
 	/// Block & extrinsics weights: base values and limits.
-	type BlockWeights = bp_ownership_parachain::BlockWeights;
+	type BlockWeights = ownership_parachain_primitives::BlockWeights;
 	/// The maximum length of a block (in bytes).
-	type BlockLength = bp_ownership_parachain::BlockLength;
+	type BlockLength = ownership_parachain_primitives::BlockLength;
 	/// This is used as an identifier of the chain. 42 is the generic substrate prefix.
 	type SS58Prefix = SS58Prefix;
 	/// The action to take on a Runtime Upgrade
@@ -624,19 +623,13 @@ impl pallet_base_fee::Config for Runtime {
 }
 
 // Bridge pallets
-
-parameter_types! {
-	pub const MaxMessagesToPruneAtOnce: bp_messages::MessageNonce = 8;
-	pub const RootAccountForPayments: Option<AccountId> = None;
-}
-
 pub type EvochainGrandpaInstance = ();
 
 impl pallet_bridge_grandpa::Config for Runtime {
 	type RuntimeEvent = RuntimeEvent;
 	type BridgedChain = bp_evochain::Evochain;
 	type MaxFreeMandatoryHeadersPerBlock = ConstU32<4>;
-	type HeadersToKeep = ConstU32<{ bp_evochain::DAYS as u32 }>;
+	type HeadersToKeep = ConstU32<{ bp_evochain::DAYS }>;
 	type WeightInfo = pallet_bridge_grandpa::weights::BridgeWeight<Runtime>;
 }
 
@@ -1140,7 +1133,7 @@ impl_runtime_apis! {
 	impl frame_try_runtime::TryRuntime<Block> for Runtime {
 		fn on_runtime_upgrade(checks: frame_try_runtime::UpgradeCheckSelect) -> (Weight, Weight) {
 			let weight = Executive::try_runtime_upgrade(checks).unwrap();
-			(weight, bp_ownership_parachain::BlockWeights::get().max_block)
+			(weight, ownership_parachain_primitives::BlockWeights::get().max_block)
 		}
 
 		fn execute_block(

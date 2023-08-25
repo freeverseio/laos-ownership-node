@@ -7,9 +7,8 @@ members = [
 	"runtime",
 	"precompile/*",
 	"pallets/*",
-	"bridge/*"
+	"primitives",
 ]
-
 
 [workspace.dependencies]
 parity-scale-codec = { version = "3.2.2", default-features = false, features = ["derive"] }
@@ -210,16 +209,11 @@ polkadot-cli = { git = "https://github.com/paritytech/polkadot", branch = "relea
 polkadot-service = { git = "https://github.com/paritytech/polkadot", branch = "release-v1.0.0" }
 
 # Bridge dependencies
-bp-header-chain = { git = "https://github.com/freeverseio/parity-bridges-common.git", branch = "polkadot-v1.0.0", default-features = false }
-bp-messages = { git = "https://github.com/freeverseio/parity-bridges-common.git", branch = "polkadot-v1.0.0", default-features = false }
 bp-evochain = { git = "https://github.com/freeverseio/parity-bridges-common.git", branch = "polkadot-v1.0.0", default-features = false }
-bp-relayers = { git = "https://github.com/freeverseio/parity-bridges-common.git", branch = "polkadot-v1.0.0", default-features = false }
+bp-header-chain = { git = "https://github.com/freeverseio/parity-bridges-common.git", branch = "polkadot-v1.0.0", default-features = false }
 bp-runtime = { git = "https://github.com/freeverseio/parity-bridges-common.git", branch = "polkadot-v1.0.0", default-features = false }
-bp-ownership-parachain = { git = "https://github.com/freeverseio/parity-bridges-common.git", branch = "polkadot-v1.0.0", default-features = false }
 bridge-runtime-common = { git = "https://github.com/freeverseio/parity-bridges-common.git", branch = "polkadot-v1.0.0", default-features = false }
 pallet-bridge-grandpa = { git = "https://github.com/freeverseio/parity-bridges-common.git", branch = "polkadot-v1.0.0", default-features = false }
-pallet-bridge-messages = { git = "https://github.com/freeverseio/parity-bridges-common.git", branch = "polkadot-v1.0.0", default-features = false }
-pallet-bridge-relayers = { git = "https://github.com/freeverseio/parity-bridges-common.git", branch = "polkadot-v1.0.0", default-features = false }
 
 # LAOS pallets
 pallet-living-assets-ownership = { path = "./pallets/living-assets-ownership", default-features = false }
@@ -229,6 +223,13 @@ pallet-evm-erc721 = { path = "./precompile/erc721", default-features = false }
 # Utils
 precompile-utils = { path = "./precompile/utils", default-features = false }
 precompile-utils-macro = { path = "./precompile/utils/macro", default-features = false }
+
+# LAOS dependencies
+ep-bridge = { git = "https://github.com/freeverseio/laos-evolution-node.git", branch = "feat/grandpa-rpc" }
+node-template-runtime = { git = "https://github.com/freeverseio/laos-evolution-node.git", branch = "feat/grandpa-rpc" }
+
+# Primitives
+ownership-parachain-primitives = { path = "./primitives", default-features = false }
 
 # runtime
 laos-runtime = { path = "./runtime" }

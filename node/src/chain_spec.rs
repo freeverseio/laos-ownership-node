@@ -270,7 +270,7 @@ fn testnet_genesis(
 					.iter()
 					.map(|&address| {
 						(
-							address.into(),
+							address,
 							GenesisAccount {
 								nonce: Default::default(),
 								balance: Default::default(),
