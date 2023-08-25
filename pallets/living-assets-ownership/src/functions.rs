@@ -26,22 +26,45 @@ impl<T: Config> Pallet<T> {
 	}
 }
 
+pub struct AssetId(pub U256);
+impl From<AssetId> for H160 {
+	fn from(asset_id: AssetId) -> H160 {
+		let mut bytes = [0u8; 20];
+		let asset_id_bytes: [u8; 32] = asset_id.0.into();
+		bytes.copy_from_slice(&asset_id_bytes[asset_id_bytes.len() - 20..]);
+		H160::from(bytes)
+	}
+}
+
+// TODO maybe collection also can be refactored
+
 pub fn convert_asset_id_to_owner(value: U256) -> H160 {
+	// TODO add tests so I use the next one instead of this
 	let mut bytes = [0u8; 20];
 	let value_bytes: [u8; 32] = value.into();
 	bytes.copy_from_slice(&value_bytes[value_bytes.len() - 20..]);
 	H160::from(bytes)
 }
 
+// TODO add docs for that, the objective of the PR, talk about the signing part and origin, todo moonbeam unified account, talk about this is not reacheable from polkadot js
+// TODO another refactor: refactor/add_config_to_erc721_trait
+// TODO remove branch change_requests, stash, feature/transfer_from_in_living_asset_pallet
+pub trait AccountMapping<T: Config> {
+	fn initial_owner(asset_id: U256) -> T::AccountId; // TODO if next one is fulfill maybe I can use impl From<AssetId> for H160 {
+	fn into_h160(account_id: T::AccountId) -> H160; // TODO this and next one if in exchange I get a response maybe I can use
+	fn from_h160(account_id: H160) -> T::AccountId;
+}
+
 #[cfg(test)]
 mod tests {
-	use crate::{functions::convert_asset_id_to_owner, H160, U256};
+	use crate::functions::{convert_asset_id_to_owner, AssetId}; // TODO unify this use or not AssetId
+	use sp_core::{H160, U256};
 
 	#[test]
 	fn check_convert_asset_id_to_owner() {
-		let value = U256::from(5);
+		let value: H160 = AssetId(U256::from(5)).into();
 		let expected_address = H160::from_low_u64_be(5);
-		assert_eq!(convert_asset_id_to_owner(value), expected_address);
+		assert_eq!(value, expected_address);
 	}
 
 	#[test]

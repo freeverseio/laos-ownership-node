@@ -5,23 +5,22 @@
 /// <https://docs.substrate.io/reference/frame-pallets/>
 pub use pallet::*;
 use parity_scale_codec::alloc::string::ToString;
-use sp_core::{H160, U256};
+use sp_core::H160;
 use sp_std::vec::Vec;
-
 mod functions;
 pub mod traits;
 
 #[frame_support::pallet]
 pub mod pallet {
 
-	use crate::functions::convert_asset_id_to_owner;
-
 	use super::*;
+	use crate::functions::AccountMapping;
 	use frame_support::{
 		pallet_prelude::{OptionQuery, ValueQuery, *},
 		BoundedVec,
 	};
 	use frame_system::pallet_prelude::*;
+	use sp_core::{H160, U256};
 
 	/// Collection id type
 	pub type CollectionId = u64;
@@ -46,6 +45,8 @@ pub mod pallet {
 		/// The base should be capped at 2,015 characters in length. This ensures room for
 		/// the token URI formation, where it combines `BaseURILimit`, a `'/'`, and a `tokenID`
 		/// (which takes up 33 characters).
+		type AccountMapping: AccountMapping<Self>;
+
 		#[pallet::constant]
 		type BaseURILimit: Get<u32>;
 	}
@@ -64,10 +65,10 @@ pub mod pallet {
 	/// Asset owner
 	#[pallet::storage]
 	pub(super) type AssetOwner<T: Config> =
-		StorageMap<_, Blake2_128Concat, U256, H160, OptionQuery>;
+		StorageMap<_, Blake2_128Concat, U256, T::AccountId, OptionQuery>;
 
-	fn asset_owner<T: Config>(key: U256) -> H160 {
-		AssetOwner::<T>::get(key).unwrap_or_else(|| convert_asset_id_to_owner(key))
+	fn asset_owner<T: Config>(key: U256) -> T::AccountId {
+		AssetOwner::<T>::get(key).unwrap_or_else(|| T::AccountMapping::initial_owner(key))
 	}
 
 	/// Pallet events
@@ -79,7 +80,7 @@ pub mod pallet {
 		CollectionCreated { collection_id: CollectionId, who: T::AccountId },
 		/// Asset transferred to `who`
 		/// parameters. [asset_id_id, who]
-		AssetTransferred { asset_id: U256, receiver: H160 },
+		AssetTransferred { asset_id: U256, receiver: T::AccountId },
 	}
 
 	// Errors inform users that something went wrong.
@@ -153,7 +154,7 @@ pub mod pallet {
 
 		fn owner_of(collection_id: CollectionId, asset_id: U256) -> Result<H160, Self::Error> {
 			Pallet::<T>::collection_base_uri(collection_id).ok_or(Error::CollectionDoesNotExist)?;
-			Ok(asset_owner::<T>(asset_id))
+			Ok(T::AccountMapping::into_h160(asset_owner::<T>(asset_id)))
 		}
 
 		fn transfer_from(
@@ -165,10 +166,14 @@ pub mod pallet {
 		) -> Result<(), Self::Error> {
 			Pallet::<T>::collection_base_uri(collection_id).ok_or(Error::CollectionDoesNotExist)?;
 			ensure!(origin == from, Error::NoPermission);
-			ensure!(asset_owner::<T>(asset_id) == from, Error::NoPermission);
+			ensure!(
+				T::AccountMapping::into_h160(asset_owner::<T>(asset_id)) == from,
+				Error::NoPermission
+			);
 			ensure!(from != to, Error::CannotTransferSelf);
 			ensure!(to != H160::zero(), Error::TransferToNullAddress);
 
+			let to = T::AccountMapping::from_h160(to.clone());
 			AssetOwner::<T>::set(asset_id, Some(to.clone()));
 			Self::deposit_event(Event::AssetTransferred { asset_id, receiver: to });
 
@@ -217,7 +222,10 @@ pub enum CollectionError {
 /// # Returns
 ///
 /// * An `H160` representation of the collection ID.
-pub fn collection_id_to_address(collection_id: CollectionId) -> H160 {
+pub fn collection_id_to_address(collection_id: CollectionId) -> H160
+// where
+// 	T::AccountId: From<[u8; 20]>,
+{
 	let mut bytes = [0u8; 20];
 	bytes[12..20].copy_from_slice(&collection_id.to_be_bytes());
 	for (i, byte) in ASSET_PRECOMPILE_ADDRESS_PREFIX.iter().enumerate() {
