@@ -1,4 +1,4 @@
-use crate::{self as pallet_livingassets_ownership, functions::AccountMapping};
+use crate::{self as pallet_livingassets_ownership, traits};
 use frame_support::traits::{ConstU16, ConstU64};
 use sp_core::{ConstU32, H160, H256, U256};
 use sp_runtime::{
@@ -53,7 +53,7 @@ impl pallet_livingassets_ownership::Config for Test {
 }
 
 pub struct MockAccountMapping;
-impl AccountMapping<Test> for MockAccountMapping {
+impl traits::AccountMapping<u64> for MockAccountMapping {
 	fn initial_owner(asset_id: U256) -> AccountId {
 		let mut first_eight_bytes = [0u8; 8];
 		let asset_id_bytes: [u8; 32] = asset_id.into();

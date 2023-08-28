@@ -96,3 +96,10 @@ pub trait Erc721 {
 		asset_id: U256,
 	) -> Result<(), Self::Error>;
 }
+
+// TODO docs
+pub trait AccountMapping<AccountId> {
+	fn initial_owner(asset_id: U256) -> AccountId;
+	fn into_h160(account_id: AccountId) -> H160;
+	fn from_h160(account_id: H160) -> AccountId;
+}

@@ -14,7 +14,7 @@ pub mod traits;
 pub mod pallet {
 
 	use super::*;
-	use crate::functions::AccountMapping;
+	use crate::traits::AccountMapping;
 	use frame_support::{
 		pallet_prelude::{OptionQuery, ValueQuery, *},
 		BoundedVec,
@@ -38,17 +38,18 @@ pub mod pallet {
 		type RuntimeEvent: From<Event<Self>> + IsType<<Self as frame_system::Config>::RuntimeEvent>;
 
 		/// Specifies the advised maximum length for a Base URI.
-		//s
+		///
 		/// The URI standard (RFC 3986) doesn't dictates a limit for the length of URIs.
 		/// However it seems the max supported length in browsers is 2,048 characters.
 		///
 		/// The base should be capped at 2,015 characters in length. This ensures room for
 		/// the token URI formation, where it combines `BaseURILimit`, a `'/'`, and a `tokenID`
 		/// (which takes up 33 characters).
-		type AccountMapping: AccountMapping<Self>;
-
 		#[pallet::constant]
 		type BaseURILimit: Get<u32>;
+
+		// TODO docs
+		type AccountMapping: traits::AccountMapping<Self::AccountId>;
 	}
 
 	/// Collection counter

@@ -508,6 +508,7 @@ impl pallet_collator_selection::Config for Runtime {
 impl pallet_living_assets_ownership::Config for Runtime {
 	type RuntimeEvent = RuntimeEvent;
 	type BaseURILimit = ConstU32<2015>;
+	type AccountMapping = AccountMapping<Self::AccountId>;
 }
 
 impl pallet_sudo::Config for Runtime {
@@ -516,7 +517,22 @@ impl pallet_sudo::Config for Runtime {
 	type WeightInfo = ();
 }
 
-// TODO impl AccountMapping for Runtime
+pub struct AccountMapping;
+// TODO bring what there is in tests
+impl traits::AccountMapping<AccountId> for AccountMapping {
+	fn initial_owner(asset_id: U256) -> AccountId {
+		let mut first_eight_bytes = [0u8; 8];
+		let asset_id_bytes: [u8; 32] = asset_id.into();
+		first_eight_bytes.copy_from_slice(&asset_id_bytes[asset_id_bytes.len() - 8..]);
+		u64::from_be_bytes(first_eight_bytes).into()
+	}
+	fn into_h160(account_id: AccountId) -> H160 {
+		H160::from_low_u64_be(account_id)
+	}
+	fn from_h160(account_id: H160) -> AccountId {
+		H160::to_low_u64_be(&account_id)
+	}
+}
 
 // Frontier
 
