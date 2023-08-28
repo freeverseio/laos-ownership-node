@@ -17,6 +17,7 @@ use sp_std::{boxed::Box, prelude::*, str::FromStr};
 use super::FrontierPrecompiles;
 
 type Block = frame_system::mocking::MockBlock<Runtime>;
+type AccountId = H160;
 
 // Configure a mock runtime to test the pallet.
 construct_runtime!(
@@ -38,7 +39,7 @@ impl frame_system::Config for Runtime {
 	type RuntimeCall = RuntimeCall;
 	type Hash = H256;
 	type Hashing = BlakeTwo256;
-	type AccountId = H160;
+	type AccountId = AccountId;
 	type Lookup = IdentityLookup<Self::AccountId>;
 	type RuntimeEvent = RuntimeEvent;
 	type BlockHashCount = ConstU64<250>;
@@ -89,6 +90,20 @@ impl pallet_timestamp::Config for Runtime {
 impl pallet_living_assets_ownership::Config for Runtime {
 	type RuntimeEvent = RuntimeEvent;
 	type BaseURILimit = ConstU32<256>;
+	type AccountMapping = MockAccountMapping;
+}
+
+pub struct MockAccountMapping;
+impl pallet_living_assets_ownership::traits::AccountMapping<AccountId> for MockAccountMapping {
+	fn initial_owner(asset_id: U256) -> AccountId {
+		pallet_living_assets_ownership::traits::AssetId(asset_id).initial_owner()
+	}
+	fn into_h160(account_id: AccountId) -> H160 {
+		account_id
+	}
+	fn into_account_id(account_id: H160) -> AccountId {
+		account_id
+	}
 }
 
 pub struct FixedGasPrice;

@@ -174,7 +174,7 @@ pub mod pallet {
 			ensure!(from != to, Error::CannotTransferSelf);
 			ensure!(to != H160::zero(), Error::TransferToNullAddress);
 
-			let to = T::AccountMapping::from_h160(to.clone());
+			let to = T::AccountMapping::into_account_id(to.clone());
 			AssetOwner::<T>::set(asset_id, Some(to.clone()));
 			Self::deposit_event(Event::AssetTransferred { asset_id, receiver: to });
 

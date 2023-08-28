@@ -53,7 +53,7 @@ impl pallet_livingassets_ownership::Config for Test {
 }
 
 pub struct MockAccountMapping;
-impl traits::AccountMapping<u64> for MockAccountMapping {
+impl traits::AccountMapping<AccountId> for MockAccountMapping {
 	fn initial_owner(asset_id: U256) -> AccountId {
 		let mut first_eight_bytes = [0u8; 8];
 		let asset_id_bytes: [u8; 32] = asset_id.into();
@@ -63,7 +63,7 @@ impl traits::AccountMapping<u64> for MockAccountMapping {
 	fn into_h160(account_id: AccountId) -> H160 {
 		H160::from_low_u64_be(account_id)
 	}
-	fn from_h160(account_id: H160) -> AccountId {
+	fn into_account_id(account_id: H160) -> AccountId {
 		H160::to_low_u64_be(&account_id)
 	}
 }

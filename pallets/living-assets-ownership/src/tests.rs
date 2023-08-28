@@ -1,11 +1,10 @@
 use crate::{
-	address_to_collection_id, collection_id_to_address, functions::AssetId, is_collection_address,
-	mock::*, AssetOwner, CollectionBaseURI, CollectionError, Event,
+	address_to_collection_id, collection_id_to_address, is_collection_address, mock::*, AssetOwner,
+	CollectionBaseURI, CollectionError, Event,
 };
 use core::str::FromStr;
 use frame_support::assert_ok;
 use sp_core::H160;
-use sp_runtime::AccountId32;
 
 type BaseURI = crate::BaseURI<Test>;
 type AccountId = <Test as frame_system::Config>::AccountId;
@@ -379,37 +378,4 @@ mod traits {
 			);
 		});
 	}
-}
-
-#[test]
-fn account_mapping() {
-	use crate::traits::AccountMapping;
-	use sp_core::U256;
-	use sp_runtime::{
-		traits::{IdentifyAccount, Verify},
-		MultiSignature,
-	};
-
-	pub struct MockAccountMapping;
-	type AccountId = <<MultiSignature as Verify>::Signer as IdentifyAccount>::AccountId;
-	// TODO currently this is a copy from where exists in the runtime, we should import what there is
-	// we might create a integration test folder as Astar does
-	impl AccountMapping<AccountId> for MockAccountMapping {
-		fn initial_owner(asset_id: U256) -> AccountId {
-			AccountId32::from_str(AssetId(asset_id).initial_owner().to_string().as_str()).unwrap()
-			AddressMapping::into_account_id(caller);
-			pallet_evm::HashedAddressMapping::<BlakeTwo256>::into_account_id(address);
-
-		}
-		fn into_h160(account_id: AccountId) -> H160 {
-			todo!("")
-		}
-		fn from_h160(account_id: H160) -> AccountId {
-			todo!("")
-		}
-	}
-	assert_eq!(
-		MockAccountMapping::initial_owner(U256::from(0)),
-		AccountId32::from_str("0000000000000000000000000000000000000000").unwrap()
-	);
 }

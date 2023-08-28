@@ -1,7 +1,6 @@
 //! Contains helper and utility functions of the pallet
 use super::*;
 use frame_support::sp_runtime::traits::One;
-use sp_core::{H160, U256};
 
 impl<T: Config> Pallet<T> {
 	/// See [Self::create_collection]
@@ -26,21 +25,9 @@ impl<T: Config> Pallet<T> {
 	}
 }
 
-// TODO
-// Representation of an asset ID
-pub struct AssetId(pub U256);
-impl AssetId {
-	pub fn initial_owner(&self) -> H160 {
-		let mut bytes = [0u8; 20];
-		let asset_id_bytes: [u8; 32] = self.0.into();
-		bytes.copy_from_slice(&asset_id_bytes[asset_id_bytes.len() - 20..]);
-		H160::from(bytes)
-	}
-}
-
 #[cfg(test)]
 mod tests {
-	use crate::functions::AssetId;
+	use crate::traits::AssetId;
 	use sp_core::{H160, U256};
 
 	#[test]
