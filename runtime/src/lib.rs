@@ -1123,9 +1123,9 @@ impl_runtime_apis! {
 			BridgeEvochainGrandpa::best_finalized()
 		}
 
-		fn accepted_grandpa_finality_proofs(
-		) -> Vec<bp_header_chain::justification::GrandpaJustification<bp_evochain::Header>> {
-			BridgeEvochainGrandpa::accepted_finality_proofs()
+		fn synced_headers_grandpa_info(
+		) -> Vec<bp_header_chain::StoredHeaderGrandpaInfo<bp_evochain::Header>> {
+			BridgeEvochainGrandpa::synced_headers_grandpa_info()
 		}
 	}
 

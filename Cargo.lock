@@ -731,54 +731,26 @@ dependencies = [
 ]
 
 [[package]]
-name = "bp-beefy"
-version = "0.1.0"
-source = "git+https://github.com/freeverseio/parity-bridges-common.git?branch=polkadot-v1.0.0#0298cf94509177ce18119e9862f299cb18afc47c"
-dependencies = [
- "binary-merkle-tree",
- "bp-runtime",
- "frame-support",
- "pallet-beefy-mmr",
- "pallet-mmr",
- "parity-scale-codec",
- "scale-info",
- "serde",
- "sp-consensus-beefy",
- "sp-runtime",
- "sp-std",
-]
-
-[[package]]
 name = "bp-evochain"
 version = "0.1.0"
-source = "git+https://github.com/freeverseio/parity-bridges-common.git?branch=polkadot-v1.0.0#0298cf94509177ce18119e9862f299cb18afc47c"
+source = "git+https://github.com/freeverseio/parity-bridges-common.git?branch=laos-crates#a84a61b8be542cd93083102dbad90fd2948c1ed8"
 dependencies = [
- "bp-beefy",
  "bp-header-chain",
  "bp-messages",
  "bp-runtime",
- "fixed-hash",
- "fp-account",
+ "evochain-primitives",
  "frame-support",
  "frame-system",
- "hash256-std-hasher",
- "impl-codec",
- "impl-serde",
- "parity-util-mem",
- "scale-info",
- "serde",
  "sp-api",
  "sp-core",
- "sp-io",
  "sp-runtime",
  "sp-std",
- "sp-trie",
 ]
 
 [[package]]
 name = "bp-header-chain"
 version = "0.1.0"
-source = "git+https://github.com/freeverseio/parity-bridges-common.git?branch=polkadot-v1.0.0#0298cf94509177ce18119e9862f299cb18afc47c"
+source = "git+https://github.com/freeverseio/parity-bridges-common.git?branch=laos-crates#a84a61b8be542cd93083102dbad90fd2948c1ed8"
 dependencies = [
  "bp-runtime",
  "finality-grandpa",
@@ -795,7 +767,7 @@ dependencies = [
 [[package]]
 name = "bp-messages"
 version = "0.1.0"
-source = "git+https://github.com/freeverseio/parity-bridges-common.git?branch=polkadot-v1.0.0#0298cf94509177ce18119e9862f299cb18afc47c"
+source = "git+https://github.com/freeverseio/parity-bridges-common.git?branch=laos-crates#a84a61b8be542cd93083102dbad90fd2948c1ed8"
 dependencies = [
  "bp-header-chain",
  "bp-runtime",
@@ -811,7 +783,7 @@ dependencies = [
 [[package]]
 name = "bp-parachains"
 version = "0.1.0"
-source = "git+https://github.com/freeverseio/parity-bridges-common.git?branch=polkadot-v1.0.0#0298cf94509177ce18119e9862f299cb18afc47c"
+source = "git+https://github.com/freeverseio/parity-bridges-common.git?branch=laos-crates#a84a61b8be542cd93083102dbad90fd2948c1ed8"
 dependencies = [
  "bp-header-chain",
  "bp-polkadot-core",
@@ -828,7 +800,7 @@ dependencies = [
 [[package]]
 name = "bp-polkadot-core"
 version = "0.1.0"
-source = "git+https://github.com/freeverseio/parity-bridges-common.git?branch=polkadot-v1.0.0#0298cf94509177ce18119e9862f299cb18afc47c"
+source = "git+https://github.com/freeverseio/parity-bridges-common.git?branch=laos-crates#a84a61b8be542cd93083102dbad90fd2948c1ed8"
 dependencies = [
  "bp-messages",
  "bp-runtime",
@@ -846,7 +818,7 @@ dependencies = [
 [[package]]
 name = "bp-relayers"
 version = "0.1.0"
-source = "git+https://github.com/freeverseio/parity-bridges-common.git?branch=polkadot-v1.0.0#0298cf94509177ce18119e9862f299cb18afc47c"
+source = "git+https://github.com/freeverseio/parity-bridges-common.git?branch=laos-crates#a84a61b8be542cd93083102dbad90fd2948c1ed8"
 dependencies = [
  "bp-messages",
  "bp-runtime",
@@ -860,7 +832,7 @@ dependencies = [
 [[package]]
 name = "bp-runtime"
 version = "0.1.0"
-source = "git+https://github.com/freeverseio/parity-bridges-common.git?branch=polkadot-v1.0.0#0298cf94509177ce18119e9862f299cb18afc47c"
+source = "git+https://github.com/freeverseio/parity-bridges-common.git?branch=laos-crates#a84a61b8be542cd93083102dbad90fd2948c1ed8"
 dependencies = [
  "frame-support",
  "frame-system",
@@ -882,7 +854,7 @@ dependencies = [
 [[package]]
 name = "bp-test-utils"
 version = "0.1.0"
-source = "git+https://github.com/freeverseio/parity-bridges-common.git?branch=polkadot-v1.0.0#0298cf94509177ce18119e9862f299cb18afc47c"
+source = "git+https://github.com/freeverseio/parity-bridges-common.git?branch=laos-crates#a84a61b8be542cd93083102dbad90fd2948c1ed8"
 dependencies = [
  "bp-header-chain",
  "bp-parachains",
@@ -902,7 +874,7 @@ dependencies = [
 [[package]]
 name = "bridge-runtime-common"
 version = "0.1.0"
-source = "git+https://github.com/freeverseio/parity-bridges-common.git?branch=polkadot-v1.0.0#0298cf94509177ce18119e9862f299cb18afc47c"
+source = "git+https://github.com/freeverseio/parity-bridges-common.git?branch=laos-crates#a84a61b8be542cd93083102dbad90fd2948c1ed8"
 dependencies = [
  "bp-header-chain",
  "bp-messages",
@@ -3002,6 +2974,17 @@ dependencies = [
  "evm-core",
  "primitive-types",
  "sha3",
+]
+
+[[package]]
+name = "evochain-primitives"
+version = "0.1.0"
+source = "git+https://github.com/freeverseio/laos-evolution-node?branch=dev#29f06d59dec02318989f6ee13cfe0ad0825a75ce"
+dependencies = [
+ "frame-support",
+ "frame-system",
+ "sp-core",
+ "sp-runtime",
 ]
 
 [[package]]
@@ -6732,7 +6715,7 @@ dependencies = [
 [[package]]
 name = "pallet-bridge-grandpa"
 version = "0.1.0"
-source = "git+https://github.com/freeverseio/parity-bridges-common.git?branch=polkadot-v1.0.0#0298cf94509177ce18119e9862f299cb18afc47c"
+source = "git+https://github.com/freeverseio/parity-bridges-common.git?branch=laos-crates#a84a61b8be542cd93083102dbad90fd2948c1ed8"
 dependencies = [
  "bp-header-chain",
  "bp-runtime",
@@ -6753,7 +6736,7 @@ dependencies = [
 [[package]]
 name = "pallet-bridge-messages"
 version = "0.1.0"
-source = "git+https://github.com/freeverseio/parity-bridges-common.git?branch=polkadot-v1.0.0#0298cf94509177ce18119e9862f299cb18afc47c"
+source = "git+https://github.com/freeverseio/parity-bridges-common.git?branch=laos-crates#a84a61b8be542cd93083102dbad90fd2948c1ed8"
 dependencies = [
  "bp-header-chain",
  "bp-messages",
@@ -6774,7 +6757,7 @@ dependencies = [
 [[package]]
 name = "pallet-bridge-parachains"
 version = "0.1.0"
-source = "git+https://github.com/freeverseio/parity-bridges-common.git?branch=polkadot-v1.0.0#0298cf94509177ce18119e9862f299cb18afc47c"
+source = "git+https://github.com/freeverseio/parity-bridges-common.git?branch=laos-crates#a84a61b8be542cd93083102dbad90fd2948c1ed8"
 dependencies = [
  "bp-header-chain",
  "bp-parachains",
@@ -6795,7 +6778,7 @@ dependencies = [
 [[package]]
 name = "pallet-bridge-relayers"
 version = "0.1.0"
-source = "git+https://github.com/freeverseio/parity-bridges-common.git?branch=polkadot-v1.0.0#0298cf94509177ce18119e9862f299cb18afc47c"
+source = "git+https://github.com/freeverseio/parity-bridges-common.git?branch=laos-crates#a84a61b8be542cd93083102dbad90fd2948c1ed8"
 dependencies = [
  "bp-messages",
  "bp-relayers",
