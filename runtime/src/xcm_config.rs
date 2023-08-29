@@ -1,8 +1,7 @@
 use super::{
-	AccountId, AllPalletsWithSystem, Balances, ParachainSystem, PolkadotXcm, Runtime, RuntimeCall,
-	RuntimeEvent, RuntimeOrigin, WeightToFee, XcmpQueue,
+	AccountId, AllPalletsWithSystem, Balances, ParachainInfo, ParachainSystem, PolkadotXcm,
+	Runtime, RuntimeCall, RuntimeEvent, RuntimeOrigin, WeightToFee, XcmpQueue,
 };
-use bridge_runtime_common::CustomNetworkId;
 use core::{marker::PhantomData, ops::ControlFlow};
 use frame_support::{
 	log, match_types, parameter_types,
@@ -25,13 +24,9 @@ use xcm_executor::{traits::Properties, traits::ShouldExecute, XcmExecutor};
 
 parameter_types! {
 	pub const RelayLocation: MultiLocation = MultiLocation::parent();
-	pub const RelayNetwork: NetworkId = CustomNetworkId::Rococo.as_network_id();
-	pub RelayOrigin: RuntimeOrigin = cumulus_pallet_xcm::Origin::Relay.into();
-	pub UniversalLocation: InteriorMultiLocation = ThisNetwork::get().into();
-	/// The Evochain network ID.
-	pub const EvochainNetwork: NetworkId = CustomNetworkId::Evochain.as_network_id();
-	/// The RialtoParachain network ID.
-	pub const ThisNetwork: NetworkId = CustomNetworkId::OwnershipParachain.as_network_id();
+	pub const RelayNetwork: Option<NetworkId> = None;
+	pub RelayChainOrigin: RuntimeOrigin = cumulus_pallet_xcm::Origin::Relay.into();
+	pub UniversalLocation: InteriorMultiLocation = Parachain(ParachainInfo::parachain_id().into()).into();
 }
 
 /// Type for specifying how a `MultiLocation` can be converted into an `AccountId`. This is used
@@ -70,7 +65,7 @@ pub type XcmOriginToTransactDispatchOrigin = (
 	SovereignSignedViaLocation<LocationToAccountId, RuntimeOrigin>,
 	// Native converter for Relay-chain (Parent) location; will convert to a `Relay` origin when
 	// recognized.
-	RelayChainAsNative<RelayOrigin, RuntimeOrigin>,
+	RelayChainAsNative<RelayChainOrigin, RuntimeOrigin>,
 	// Native converter for sibling Parachains; will convert to a `SiblingPara` origin when
 	// recognized.
 	SiblingParachainAsNative<cumulus_pallet_xcm::Origin, RuntimeOrigin>,
@@ -179,13 +174,6 @@ pub type Barrier = DenyThenTry<
 	),
 >;
 
-/// Dispatches received XCM messages from other chain.
-pub type OnOwnershipParachainBlobDispatcher =
-	xcm_builder::BridgeBlobDispatcher<XcmRouter, UniversalLocation, ()>;
-
-/// XCM weigher type.
-pub type XcmWeigher = FixedWeightBounds<UnitWeightCost, RuntimeCall, MaxInstructions>;
-
 pub struct XcmConfig;
 impl xcm_executor::Config for XcmConfig {
 	type RuntimeCall = RuntimeCall;
@@ -194,10 +182,10 @@ impl xcm_executor::Config for XcmConfig {
 	type AssetTransactor = LocalAssetTransactor;
 	type OriginConverter = XcmOriginToTransactDispatchOrigin;
 	type IsReserve = NativeAsset;
-	type IsTeleporter = NativeAsset;
+	type IsTeleporter = (); // Teleporting is disabled.
 	type UniversalLocation = UniversalLocation;
 	type Barrier = Barrier;
-	type Weigher = XcmWeigher;
+	type Weigher = FixedWeightBounds<UnitWeightCost, RuntimeCall, MaxInstructions>;
 	type Trader =
 		UsingComponents<WeightToFee, RelayLocation, AccountId, Balances, ToAuthor<Runtime>>;
 	type ResponseHandler = PolkadotXcm;
