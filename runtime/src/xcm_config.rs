@@ -194,7 +194,7 @@ impl xcm_executor::Config for XcmConfig {
 	type AssetTransactor = LocalAssetTransactor;
 	type OriginConverter = XcmOriginToTransactDispatchOrigin;
 	type IsReserve = NativeAsset;
-	type IsTeleporter = NativeAsset; 
+	type IsTeleporter = NativeAsset;
 	type UniversalLocation = UniversalLocation;
 	type Barrier = Barrier;
 	type Weigher = XcmWeigher;
