@@ -5035,6 +5035,7 @@ dependencies = [
  "frame-system-benchmarking",
  "frame-system-rpc-runtime-api",
  "frame-try-runtime",
+ "hex",
  "hex-literal 0.4.1",
  "pallet-aura",
  "pallet-authorship",

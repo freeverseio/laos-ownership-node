@@ -98,20 +98,11 @@ pub trait Erc721 {
 }
 
 // TODO docs
-// Representation of an asset ID
-pub struct AssetId(pub U256);
-impl AssetId {
-	pub fn initial_owner(&self) -> H160 {
-		let mut bytes = [0u8; 20];
-		let asset_id_bytes: [u8; 32] = self.0.into();
-		bytes.copy_from_slice(&asset_id_bytes[asset_id_bytes.len() - 20..]);
-		H160::from(bytes)
-	}
-}
-
-// TODO docs
 pub trait AccountMapping<AccountId> {
-	fn initial_owner(asset_id: U256) -> AccountId;
 	fn into_h160(account_id: AccountId) -> H160;
 	fn into_account_id(account_id: H160) -> AccountId;
+}
+
+pub trait AssetIdToAddress<AccountId> {
+	fn initial_owner(asset_id: U256) -> AccountId;
 }

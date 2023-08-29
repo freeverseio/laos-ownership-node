@@ -14,7 +14,7 @@ pub mod traits;
 pub mod pallet {
 
 	use super::*;
-	use crate::traits::AccountMapping;
+	use crate::traits::{AccountMapping, AssetIdToAddress};
 	use frame_support::{
 		pallet_prelude::{OptionQuery, ValueQuery, *},
 		BoundedVec,
@@ -50,6 +50,7 @@ pub mod pallet {
 
 		// TODO docs
 		type AccountMapping: traits::AccountMapping<Self::AccountId>;
+		type AssetIdToAddress: traits::AssetIdToAddress<Self::AccountId>;
 	}
 
 	/// Collection counter
@@ -69,7 +70,7 @@ pub mod pallet {
 		StorageMap<_, Blake2_128Concat, U256, T::AccountId, OptionQuery>;
 
 	fn asset_owner<T: Config>(key: U256) -> T::AccountId {
-		AssetOwner::<T>::get(key).unwrap_or_else(|| T::AccountMapping::initial_owner(key))
+		AssetOwner::<T>::get(key).unwrap_or_else(|| T::AssetIdToAddress::initial_owner(key))
 	}
 
 	/// Pallet events

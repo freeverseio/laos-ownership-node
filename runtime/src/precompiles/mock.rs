@@ -91,18 +91,22 @@ impl pallet_living_assets_ownership::Config for Runtime {
 	type RuntimeEvent = RuntimeEvent;
 	type BaseURILimit = ConstU32<256>;
 	type AccountMapping = MockAccountMapping;
+	type AssetIdToAddress = MockAssetIdToAddress;
 }
 
 pub struct MockAccountMapping;
 impl pallet_living_assets_ownership::traits::AccountMapping<AccountId> for MockAccountMapping {
-	fn initial_owner(asset_id: U256) -> AccountId {
-		pallet_living_assets_ownership::traits::AssetId(asset_id).initial_owner()
-	}
 	fn into_h160(account_id: AccountId) -> H160 {
 		account_id
 	}
 	fn into_account_id(account_id: H160) -> AccountId {
 		account_id
+	}
+}
+pub struct MockAssetIdToAddress;
+impl pallet_living_assets_ownership::traits::AssetIdToAddress<AccountId> for MockAssetIdToAddress {
+	fn initial_owner(_asset_id: U256) -> AccountId {
+		H160::zero()
 	}
 }
 

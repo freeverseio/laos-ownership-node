@@ -510,6 +510,7 @@ impl pallet_living_assets_ownership::Config for Runtime {
 	type RuntimeEvent = RuntimeEvent;
 	type BaseURILimit = ConstU32<2015>;
 	type AccountMapping = AccountMapping;
+	type AssetIdToAddress = AssetIdToAddress;
 }
 
 impl pallet_sudo::Config for Runtime {
@@ -520,10 +521,6 @@ impl pallet_sudo::Config for Runtime {
 
 pub struct AccountMapping;
 impl pallet_living_assets_ownership::traits::AccountMapping<AccountId> for AccountMapping {
-	fn initial_owner(asset_id: U256) -> AccountId {
-		let owner = pallet_living_assets_ownership::traits::AssetId(asset_id).initial_owner();
-		Self::into_account_id(owner)
-	}
 	fn into_h160(account_id: AccountId) -> H160 {
 		let mut bytes = [0u8; 20];
 		let account_id_bytes: [u8; 32] = account_id.into();
@@ -534,6 +531,19 @@ impl pallet_living_assets_ownership::traits::AccountMapping<AccountId> for Accou
 		let mut data = [0u8; 32];
 		data[12..].copy_from_slice(&account_id.0);
 		AccountId32::from(data)
+	}
+}
+
+pub struct AssetIdToAddress;
+impl pallet_living_assets_ownership::traits::AssetIdToAddress<AccountId> for AssetIdToAddress {
+	fn initial_owner(asset_id: U256) -> AccountId {
+		let mut bytes = [0u8; 20];
+		let asset_id_bytes: [u8; 32] = asset_id.into();
+		bytes.copy_from_slice(&asset_id_bytes[asset_id_bytes.len() - 20..]);
+		let owner = H160::from(bytes);
+		<AccountMapping as pallet_living_assets_ownership::traits::AccountMapping<AccountId>>::into_account_id(
+			owner,
+		)
 	}
 }
 
