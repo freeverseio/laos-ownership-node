@@ -348,9 +348,9 @@ mod traits {
 			assert_ok!(<LivingAssetsModule as Erc721>::transfer_from(
 				sender, 1, sender, receiver, asset_id,
 			));
-			assert_eq!(AssetOwner::<Test>::get(asset_id).unwrap(), receiver);
+			assert_eq!(AssetOwner::<Test>::get(asset_id).unwrap(), BOB);
 			assert_eq!(<LivingAssetsModule as Erc721>::owner_of(1, asset_id).unwrap(), receiver);
-			System::assert_last_event(Event::AssetTransferred { asset_id, receiver }.into());
+			System::assert_last_event(Event::AssetTransferred { asset_id, receiver: BOB }.into());
 		});
 	}
 
