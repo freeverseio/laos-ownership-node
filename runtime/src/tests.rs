@@ -78,12 +78,12 @@ fn asset_id_to_address_two_assets_same_owner() {
 
 	assert_eq!(
 		TestAssetIdToAddress::initial_owner(asset1),
-		AccountId32::from_str("000000000000000000000000ffffffffffffffffffffffffffffffffffffffff")
+		AccountId32::from_str("000000000000000000000000c0f0f4ab324c46e55d02d0033343b4be8a55532d")
 			.unwrap()
 	);
 	assert_eq!(
 		TestAssetIdToAddress::initial_owner(asset2),
-		AccountId32::from_str("000000000000000000000000ffffffffffffffffffffffffffffffffffffffff")
+		AccountId32::from_str("000000000000000000000000c0f0f4ab324c46e55d02d0033343b4be8a55532d")
 			.unwrap()
 	);
 }

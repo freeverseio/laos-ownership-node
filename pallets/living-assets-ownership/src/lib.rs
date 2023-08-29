@@ -48,8 +48,12 @@ pub mod pallet {
 		#[pallet::constant]
 		type BaseURILimit: Get<u32>;
 
-		// TODO docs
+		/// Type alias for implementing the `AccountMapping` trait for a given account ID type.
+		/// This allows you to define custom logic for converting between account IDs and H160 addresses.
 		type AccountMapping: traits::AccountMapping<Self::AccountId>;
+
+		/// Type alias for implementing the `AssetIdToAddress` trait for a given account ID type.
+		/// This allows you to specify which account should initially own each new asset.
 		type AssetIdToAddress: traits::AssetIdToAddress<Self::AccountId>;
 	}
 
