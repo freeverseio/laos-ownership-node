@@ -627,9 +627,9 @@ pub type EvochainGrandpaInstance = ();
 
 impl pallet_bridge_grandpa::Config for Runtime {
 	type RuntimeEvent = RuntimeEvent;
-	type BridgedChain = bp_evochain::Evochain;
+	type BridgedChain = bp_laos_evolution::Evochain;
 	type MaxFreeMandatoryHeadersPerBlock = ConstU32<4>;
-	type HeadersToKeep = ConstU32<{ bp_evochain::DAYS }>;
+	type HeadersToKeep = ConstU32<{ bp_laos_evolution::DAYS }>;
 	type WeightInfo = pallet_bridge_grandpa::weights::BridgeWeight<Runtime>;
 }
 
@@ -1118,13 +1118,13 @@ impl_runtime_apis! {
 		}
 	}
 
-	impl bp_evochain::EvochainFinalityApi<Block> for Runtime {
-		fn best_finalized() -> Option<bp_runtime::HeaderId<bp_evochain::Hash, bp_evochain::BlockNumber>> {
+	impl bp_laos_evolution::EvochainFinalityApi<Block> for Runtime {
+		fn best_finalized() -> Option<bp_runtime::HeaderId<bp_laos_evolution::Hash, bp_laos_evolution::BlockNumber>> {
 			BridgeEvochainGrandpa::best_finalized()
 		}
 
 		fn synced_headers_grandpa_info(
-		) -> Vec<bp_header_chain::StoredHeaderGrandpaInfo<bp_evochain::Header>> {
+		) -> Vec<bp_header_chain::StoredHeaderGrandpaInfo<bp_laos_evolution::Header>> {
 			BridgeEvochainGrandpa::synced_headers_grandpa_info()
 		}
 	}

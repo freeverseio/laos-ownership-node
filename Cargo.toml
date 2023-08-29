@@ -209,7 +209,7 @@ polkadot-cli = { git = "https://github.com/paritytech/polkadot", branch = "relea
 polkadot-service = { git = "https://github.com/paritytech/polkadot", branch = "release-v1.0.0" }
 
 # Bridge dependencies
-bp-evochain = { git = "https://github.com/freeverseio/parity-bridges-common.git", branch = "laos-crates", default-features = false }
+bp-laos-evolution = { git = "https://github.com/freeverseio/parity-bridges-common.git", branch = "laos-crates", default-features = false }
 bp-header-chain = { git = "https://github.com/freeverseio/parity-bridges-common.git", branch = "laos-crates", default-features = false }
 bp-runtime = { git = "https://github.com/freeverseio/parity-bridges-common.git", branch = "laos-crates", default-features = false }
 bridge-runtime-common = { git = "https://github.com/freeverseio/parity-bridges-common.git", branch = "laos-crates", default-features = false }
@@ -223,9 +223,6 @@ pallet-evm-erc721 = { path = "./precompile/erc721", default-features = false }
 # Utils
 precompile-utils = { path = "./precompile/utils", default-features = false }
 precompile-utils-macro = { path = "./precompile/utils/macro", default-features = false }
-
-# LAOS dependencies
-node-template-runtime = { git = "https://github.com/freeverseio/laos-evolution-node.git", branch = "dev" }
 
 # Primitives
 ownership-parachain-primitives = { path = "./primitives", default-features = false }
