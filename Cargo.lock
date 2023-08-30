@@ -7176,6 +7176,7 @@ dependencies = [
 name = "pallet-living-assets-ownership"
 version = "0.0.1"
 dependencies = [
+ "derive_more",
  "frame-benchmarking",
  "frame-support",
  "frame-system",

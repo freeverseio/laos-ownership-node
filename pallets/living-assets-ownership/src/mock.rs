@@ -1,14 +1,47 @@
 use crate::{self as pallet_livingassets_ownership, traits};
+use core::fmt::Debug;
 use frame_support::traits::{ConstU16, ConstU64};
+use frame_support::{
+	dispatch::Vec,
+	pallet_prelude::*,
+	sp_runtime::traits::Hash,
+	traits::{fungible, OriginTrait},
+};
+use parity_scale_codec::{Decode, Encode, MaxEncodedLen};
+use scale_info::TypeInfo;
+use serde::{Deserialize, Serialize};
 use sp_core::{ConstU32, H160, H256, U256};
 use sp_runtime::{
 	traits::{BlakeTwo256, IdentityLookup},
 	BuildStorage,
 };
-use sp_std::{boxed::Box, prelude::*};
+use std::fmt;
 
+use sp_std::{boxed::Box, prelude::*};
+// Substrate
+use sp_core::{ecdsa, RuntimeDebug};
 type Block = frame_system::mocking::MockBlock<Test>;
 type Nonce = u32;
+#[derive(
+	Copy,
+	Clone,
+	// Eq,
+	// PartialEq,
+	Ord,
+	PartialOrd,
+	Default,
+	Encode,
+	Decode,
+	MaxEncodedLen,
+	TypeInfo,
+	// Debug,
+	DebugNoBound,
+	PartialEqNoBound,
+	EqNoBound,
+	derive_more::Display,
+	Serialize,
+	Deserialize,
+)]
 pub struct CustomAccountId(u64);
 impl From<H160> for CustomAccountId {
 	fn from(nonce: H160) -> Self {
