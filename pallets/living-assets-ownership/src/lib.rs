@@ -52,7 +52,7 @@ pub mod pallet {
 		/// This allows you to define custom logic for converting between account IDs and H160 addresses.
 		type AccountMapping: traits::AccountMapping<<Self as pallet::Config>::AccountId>;
 
-		type AccountId: IsType<<Self as frame_system::Config>::AccountId> + From<H160>;
+		type AccountId: IsType<<Self as frame_system::Config>::AccountId> + From<H160> + Parameter + Member + MaxEncodedLen;
 
 		/// Type alias for implementing the `AssetIdToAddress` trait for a given account ID type.
 		/// This allows you to specify which account should initially own each new asset.
@@ -133,7 +133,7 @@ pub mod pallet {
 		pub fn create_collection(origin: OriginFor<T>, base_uri: BaseURI<T>) -> DispatchResult {
 			let who = ensure_signed(origin)?;
 
-			match Self::do_create_collection(who, base_uri) {
+			match Self::do_create_collection(who.into(), base_uri) {
 				Ok(_) => Ok(()),
 				Err(err) => Err(err.into()),
 			}
