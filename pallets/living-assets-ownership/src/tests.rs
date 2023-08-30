@@ -9,8 +9,8 @@ use sp_core::H160;
 type BaseURI = crate::BaseURI<Test>;
 type AccountId = <Test as frame_system::Config>::AccountId;
 
-const ALICE: AccountId = 0x1234;
-const BOB: AccountId = 0x2234;
+const ALICE: AccountId = AccountId(0x1234);
+const BOB: AccountId = AccountId(0x2234);
 
 #[test]
 fn base_uri_unexistent_collection_is_none() {
