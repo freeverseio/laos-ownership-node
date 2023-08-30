@@ -14,7 +14,6 @@ pub mod traits;
 pub mod pallet {
 
 	use super::*;
-	use crate::traits::AssetIdToAddress;
 	use frame_support::{
 		pallet_prelude::{OptionQuery, ValueQuery, *},
 		BoundedVec,
@@ -49,13 +48,19 @@ pub mod pallet {
 		#[pallet::constant]
 		type BaseURILimit: Get<u32>;
 
-		/// Type alias for implementing the `AccountMapping` trait for a given account ID type.
-		/// This allows you to define custom logic for converting between account IDs and H160 addresses.
-		type AccountMapping: Convert<Self::AccountId, H160> + Convert<H160, Self::AccountId>;
+		/// This associated type defines a conversion from the `AccountId` type, which is internal
+		/// to the implementing type (represented by `Self`), to an `H160` type. The `H160` type
+		/// is commonly used to represent Ethereum addresses.
+		type AccountIdToH160: Convert<Self::AccountId, H160>;
+
+		/// This associated type defines a conversion from an `H160` type back to the `AccountId` type,
+		/// which is internal to the implementing type (represented by `Self`). This conversion is
+		/// often necessary for mapping Ethereum addresses back to native account IDs.
+		type AccountIdFromH160: Convert<H160, Self::AccountId>;
 
 		/// Type alias for implementing the `AssetIdToAddress` trait for a given account ID type.
 		/// This allows you to specify which account should initially own each new asset.
-		type AssetIdToAddress: AssetIdToAddress<Self::AccountId>;
+		type AssetIdToAddress: Convert<U256, Self::AccountId>;
 	}
 
 	/// Collection counter
@@ -75,7 +80,7 @@ pub mod pallet {
 		StorageMap<_, Blake2_128Concat, U256, T::AccountId, OptionQuery>;
 
 	fn asset_owner<T: Config>(key: U256) -> T::AccountId {
-		AssetOwner::<T>::get(key).unwrap_or_else(|| T::AssetIdToAddress::initial_owner(key))
+		AssetOwner::<T>::get(key).unwrap_or_else(|| T::AssetIdToAddress::convert(key))
 	}
 
 	/// Pallet events
@@ -161,7 +166,7 @@ pub mod pallet {
 
 		fn owner_of(collection_id: CollectionId, asset_id: U256) -> Result<H160, Self::Error> {
 			Pallet::<T>::collection_base_uri(collection_id).ok_or(Error::CollectionDoesNotExist)?;
-			Ok(T::AccountMapping::convert(asset_owner::<T>(asset_id)))
+			Ok(T::AccountIdToH160::convert(asset_owner::<T>(asset_id)))
 		}
 
 		fn transfer_from(
@@ -174,13 +179,13 @@ pub mod pallet {
 			Pallet::<T>::collection_base_uri(collection_id).ok_or(Error::CollectionDoesNotExist)?;
 			ensure!(origin == from, Error::NoPermission);
 			ensure!(
-				T::AccountMapping::convert(asset_owner::<T>(asset_id)) == from,
+				T::AccountIdToH160::convert(asset_owner::<T>(asset_id)) == from,
 				Error::NoPermission
 			);
 			ensure!(from != to, Error::CannotTransferSelf);
 			ensure!(to != H160::zero(), Error::TransferToNullAddress);
 
-			let to = T::AccountMapping::convert(to.clone());
+			let to = T::AccountIdFromH160::convert(to.clone());
 			AssetOwner::<T>::set(asset_id, Some(to.clone()));
 			Self::deposit_event(Event::AssetTransferred { asset_id, receiver: to });
 
@@ -252,7 +257,7 @@ pub fn collection_id_to_address(collection_id: CollectionId) -> H160 {
 /// * A `Result` which is either the `CollectionId` or an error indicating the address is invalid.
 pub fn address_to_collection_id(address: H160) -> Result<CollectionId, CollectionError> {
 	if &address.0[0..12] != ASSET_PRECOMPILE_ADDRESS_PREFIX {
-		return Err(CollectionError::InvalidPrefix);
+		return Err(CollectionError::InvalidPrefix)
 	}
 	let id_bytes: [u8; 8] = address.0[12..].try_into().unwrap();
 	Ok(CollectionId::from_be_bytes(id_bytes))

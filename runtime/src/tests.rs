@@ -1,27 +1,31 @@
 use core::str::FromStr;
 
 use super::*;
-use pallet_living_assets_ownership::traits::{AccountMapping, AssetIdToAddress};
 use sp_core::U256;
 use sp_runtime::AccountId32;
 
 #[test]
 fn account_mappping_type_zero_values() {
-	type TestAccountMapping = <Runtime as pallet_living_assets_ownership::Config>::AccountMapping;
+	type TestAccountIdFromH160 =
+		<Runtime as pallet_living_assets_ownership::Config>::AccountIdFromH160;
+	assert_eq!(TestAccountIdFromH160::convert(H160::zero()), AccountId32::from([0u8; 32]));
 
-	assert_eq!(TestAccountMapping::convert(AccountId32::from([0u8; 32])), H160::zero());
-	assert_eq!(TestAccountMapping::convert(H160::zero()), AccountId32::from([0u8; 32]));
+	type TestAccountIdToH160 = <Runtime as pallet_living_assets_ownership::Config>::AccountIdToH160;
+	assert_eq!(TestAccountIdToH160::convert(AccountId32::from([0u8; 32])), H160::zero());
 }
 
 #[test]
 fn account_mappping_type_max_values() {
-	type TestAccountMapping = <Runtime as pallet_living_assets_ownership::Config>::AccountMapping;
+	type TestAccountIdToH160 = <Runtime as pallet_living_assets_ownership::Config>::AccountIdToH160;
 	assert_eq!(
-		TestAccountMapping::into_h160(AccountId32::from([0xFFu8; 32])),
+		TestAccountIdToH160::convert(AccountId32::from([0xFFu8; 32])),
 		H160::from([0xFFu8; 20])
 	);
+
+	type TestAccountIdFromH160 =
+		<Runtime as pallet_living_assets_ownership::Config>::AccountIdFromH160;
 	assert_eq!(
-		TestAccountMapping::convert(H160::from([0xFFu8; 20])),
+		TestAccountIdFromH160::convert(H160::from([0xFFu8; 20])),
 		AccountId32::from_str("000000000000000000000000ffffffffffffffffffffffffffffffffffffffff")
 			.unwrap()
 	);
@@ -31,7 +35,7 @@ fn asset_id_to_address_type_zero_values() {
 	type TestAssetIdToAddress =
 		<Runtime as pallet_living_assets_ownership::Config>::AssetIdToAddress;
 
-	assert_eq!(TestAssetIdToAddress::initial_owner(U256::from(0)), AccountId32::from([0u8; 32]));
+	assert_eq!(TestAssetIdToAddress::convert(U256::from(0)), AccountId32::from([0u8; 32]));
 }
 
 #[test]
@@ -39,7 +43,7 @@ fn asset_id_to_address_type_max_values() {
 	type TestAssetIdToAddress =
 		<Runtime as pallet_living_assets_ownership::Config>::AssetIdToAddress;
 	assert_eq!(
-		TestAssetIdToAddress::initial_owner(U256::max_value()),
+		TestAssetIdToAddress::convert(U256::max_value()),
 		AccountId32::from_str("000000000000000000000000ffffffffffffffffffffffffffffffffffffffff")
 			.unwrap()
 	);
@@ -49,7 +53,7 @@ fn asset_id_to_address_two_assets_same_owner() {
 	type TestAssetIdToAddress =
 		<Runtime as pallet_living_assets_ownership::Config>::AssetIdToAddress;
 	assert_eq!(
-		TestAssetIdToAddress::initial_owner(U256::max_value()),
+		TestAssetIdToAddress::convert(U256::max_value()),
 		AccountId32::from_str("000000000000000000000000ffffffffffffffffffffffffffffffffffffffff")
 			.unwrap()
 	);
@@ -77,12 +81,12 @@ fn asset_id_to_address_two_assets_same_owner() {
 	);
 
 	assert_eq!(
-		TestAssetIdToAddress::initial_owner(asset1),
+		TestAssetIdToAddress::convert(asset1),
 		AccountId32::from_str("000000000000000000000000c0f0f4ab324c46e55d02d0033343b4be8a55532d")
 			.unwrap()
 	);
 	assert_eq!(
-		TestAssetIdToAddress::initial_owner(asset2),
+		TestAssetIdToAddress::convert(asset2),
 		AccountId32::from_str("000000000000000000000000c0f0f4ab324c46e55d02d0033343b4be8a55532d")
 			.unwrap()
 	);

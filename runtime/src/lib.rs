@@ -29,7 +29,7 @@ use sp_runtime::{
 		IdentifyAccount, PostDispatchInfoOf, UniqueSaturatedInto, Verify,
 	},
 	transaction_validity::{TransactionSource, TransactionValidity, TransactionValidityError},
-	AccountId32, ApplyExtrinsicResult, ConsensusEngineId, MultiSignature,
+	AccountId32, ApplyExtrinsicResult, ConsensusEngineId,
 };
 
 use sp_std::prelude::*;
@@ -87,7 +87,7 @@ mod precompiles;
 use precompiles::FrontierPrecompiles;
 
 /// Import the living assets ownership pallet.
-pub use pallet_living_assets_ownership::traits::AssetIdToAddress;
+pub use pallet_living_assets_ownership;
 
 /// Alias to 512-bit hash when used in the context of a transaction signature on the chain.
 pub type Signature = ownership_parachain_primitives::Signature;
@@ -470,7 +470,8 @@ impl pallet_collator_selection::Config for Runtime {
 impl pallet_living_assets_ownership::Config for Runtime {
 	type RuntimeEvent = RuntimeEvent;
 	type BaseURILimit = ConstU32<2015>;
-	type AccountMapping = AccountMapping;
+	type AccountIdToH160 = AccountIdToH160;
+	type AccountIdFromH160 = AccountIdFromH160;
 	type AssetIdToAddress = AssetIdToAddress;
 }
 
@@ -480,8 +481,12 @@ impl pallet_sudo::Config for Runtime {
 	type WeightInfo = ();
 }
 
-pub struct AccountMapping;
-impl Convert<AccountId, H160> for AccountMapping {
+/// A struct responsible for converting an `AccountId` to an `H160` address.
+///
+/// The `AccountIdToH160` struct provides a conversion from `AccountId`, typically used
+/// as a native identity in a blockchain, to an `H160` address, commonly used in Ethereum-like networks.
+pub struct AccountIdToH160;
+impl Convert<AccountId, H160> for AccountIdToH160 {
 	fn convert(account_id: AccountId) -> H160 {
 		let mut bytes = [0u8; 20];
 		let account_id_bytes: [u8; 32] = account_id.into();
@@ -489,7 +494,13 @@ impl Convert<AccountId, H160> for AccountMapping {
 		H160::from(bytes)
 	}
 }
-impl Convert<H160, AccountId> for AccountMapping {
+
+/// A struct responsible for converting an `H160` address to an `AccountId`.
+///
+/// The `AccountIdFromH160` struct provides a conversion from `H160`, commonly used in Ethereum-like networks,
+/// to `AccountId`, typically used as a native identity in a blockchain.
+pub struct AccountIdFromH160;
+impl Convert<H160, AccountId> for AccountIdFromH160 {
 	fn convert(account_id: H160) -> AccountId {
 		let mut data = [0u8; 32];
 		data[12..].copy_from_slice(&account_id.0);
@@ -497,17 +508,16 @@ impl Convert<H160, AccountId> for AccountMapping {
 	}
 }
 
+/// Represents a mapping between `AssetId` and `AccountId`.
+/// This struct provides functionalities to convert an `AssetId` (represented by `U256`) into an `AccountId`.
 pub struct AssetIdToAddress;
-impl AssetIdToAddress<AccountId> for AssetIdToAddress {
-	fn initial_owner(asset_id: U256) -> AccountId {
+impl Convert<U256, AccountId> for AssetIdToAddress {
+	fn convert(asset_id: U256) -> AccountId {
 		let mut bytes = [0u8; 20];
 		let asset_id_bytes: [u8; 32] = asset_id.into();
 		bytes.copy_from_slice(&asset_id_bytes[asset_id_bytes.len() - 20..]);
 		let owner = H160::from(bytes);
-		<AccountMapping as pallet_living_assets_ownership::traits::AccountMapping<
-			H160,
-			AccountId,
-		>>::convert(owner)
+		AccountIdFromH160::convert(owner)
 	}
 }
 
@@ -523,7 +533,7 @@ impl<F: FindAuthor<u32>> FindAuthor<H160> for FindAuthorTruncated<F> {
 	{
 		if let Some(author_index) = F::find_author(digests) {
 			let authority_id = Aura::authorities()[author_index as usize].clone();
-			return Some(H160::from_slice(&authority_id.to_raw_vec()[4..24]));
+			return Some(H160::from_slice(&authority_id.to_raw_vec()[4..24]))
 		}
 		None
 	}
@@ -802,9 +812,8 @@ impl fp_self_contained::SelfContainedCall for RuntimeCall {
 		len: usize,
 	) -> Option<Result<(), TransactionValidityError>> {
 		match self {
-			RuntimeCall::Ethereum(call) => {
-				call.pre_dispatch_self_contained(info, dispatch_info, len)
-			},
+			RuntimeCall::Ethereum(call) =>
+				call.pre_dispatch_self_contained(info, dispatch_info, len),
 			_ => None,
 		}
 	}
@@ -814,11 +823,10 @@ impl fp_self_contained::SelfContainedCall for RuntimeCall {
 		info: Self::SignedInfo,
 	) -> Option<sp_runtime::DispatchResultWithInfo<PostDispatchInfoOf<Self>>> {
 		match self {
-			call @ RuntimeCall::Ethereum(pallet_ethereum::Call::transact { .. }) => {
+			call @ RuntimeCall::Ethereum(pallet_ethereum::Call::transact { .. }) =>
 				Some(call.dispatch(RuntimeOrigin::from(
 					pallet_ethereum::RawOrigin::EthereumTransaction(info),
-				)))
-			},
+				))),
 			_ => None,
 		}
 	}

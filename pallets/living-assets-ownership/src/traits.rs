@@ -96,18 +96,3 @@ pub trait Erc721 {
 		asset_id: U256,
 	) -> Result<(), Self::Error>;
 }
-
-/// A trait for associating a given asset ID to an initial account ID.
-/// Useful for specifying which account should initially own a new asset.
-pub trait AssetIdToAddress<AccountId> {
-	/// Determines the initial owner of an asset given its ID.
-	///
-	/// # Arguments
-	///
-	/// * `asset_id` - The asset ID to query for its initial owner.
-	///
-	/// # Returns
-	///
-	/// Returns the account ID of the initial owner of the asset.
-	fn initial_owner(asset_id: U256) -> AccountId;
-}
