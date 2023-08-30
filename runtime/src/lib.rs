@@ -25,7 +25,7 @@ use sp_core::{
 use sp_runtime::{
 	create_runtime_str, generic, impl_opaque_keys,
 	traits::{
-		AccountIdLookup, BlakeTwo256, Block as BlockT, DispatchInfoOf, Dispatchable, Get,
+		AccountIdLookup, BlakeTwo256, Block as BlockT, Convert, DispatchInfoOf, Dispatchable, Get,
 		IdentifyAccount, PostDispatchInfoOf, UniqueSaturatedInto, Verify,
 	},
 	transaction_validity::{TransactionSource, TransactionValidity, TransactionValidityError},
@@ -87,7 +87,7 @@ mod precompiles;
 use precompiles::FrontierPrecompiles;
 
 /// Import the living assets ownership pallet.
-pub use pallet_living_assets_ownership;
+pub use pallet_living_assets_ownership::traits::AssetIdToAddress;
 
 /// Alias to 512-bit hash when used in the context of a transaction signature on the chain.
 pub type Signature = ownership_parachain_primitives::Signature;
@@ -481,14 +481,16 @@ impl pallet_sudo::Config for Runtime {
 }
 
 pub struct AccountMapping;
-impl pallet_living_assets_ownership::traits::AccountMapping<AccountId> for AccountMapping {
-	fn into_h160(account_id: AccountId) -> H160 {
+impl Convert<AccountId, H160> for AccountMapping {
+	fn convert(account_id: AccountId) -> H160 {
 		let mut bytes = [0u8; 20];
 		let account_id_bytes: [u8; 32] = account_id.into();
 		bytes.copy_from_slice(&account_id_bytes[account_id_bytes.len() - 20..]);
 		H160::from(bytes)
 	}
-	fn into_account_id(account_id: H160) -> AccountId {
+}
+impl Convert<H160, AccountId> for AccountMapping {
+	fn convert(account_id: H160) -> AccountId {
 		let mut data = [0u8; 32];
 		data[12..].copy_from_slice(&account_id.0);
 		AccountId32::from(data)
@@ -496,15 +498,16 @@ impl pallet_living_assets_ownership::traits::AccountMapping<AccountId> for Accou
 }
 
 pub struct AssetIdToAddress;
-impl pallet_living_assets_ownership::traits::AssetIdToAddress<AccountId> for AssetIdToAddress {
+impl AssetIdToAddress<AccountId> for AssetIdToAddress {
 	fn initial_owner(asset_id: U256) -> AccountId {
 		let mut bytes = [0u8; 20];
 		let asset_id_bytes: [u8; 32] = asset_id.into();
 		bytes.copy_from_slice(&asset_id_bytes[asset_id_bytes.len() - 20..]);
 		let owner = H160::from(bytes);
-		<AccountMapping as pallet_living_assets_ownership::traits::AccountMapping<AccountId>>::into_account_id(
-			owner,
-		)
+		<AccountMapping as pallet_living_assets_ownership::traits::AccountMapping<
+			H160,
+			AccountId,
+		>>::convert(owner)
 	}
 }
 

@@ -2,7 +2,7 @@ use crate::{self as pallet_livingassets_ownership, traits};
 use frame_support::traits::{ConstU16, ConstU64};
 use sp_core::{ConstU32, H160, H256, U256};
 use sp_runtime::{
-	traits::{BlakeTwo256, IdentityLookup},
+	traits::{BlakeTwo256, Convert, IdentityLookup},
 	BuildStorage,
 };
 use sp_std::{boxed::Box, prelude::*};
@@ -54,11 +54,13 @@ impl pallet_livingassets_ownership::Config for Test {
 }
 
 pub struct MockAccountMapping;
-impl traits::AccountMapping<AccountId> for MockAccountMapping {
-	fn into_h160(account_id: AccountId) -> H160 {
+impl Convert<AccountId, H160> for MockAccountMapping {
+	fn convert(account_id: AccountId) -> H160 {
 		H160::from_low_u64_be(account_id)
 	}
-	fn into_account_id(account_id: H160) -> AccountId {
+}
+impl Convert<H160, AccountId> for MockAccountMapping {
+	fn convert(account_id: H160) -> AccountId {
 		H160::to_low_u64_be(&account_id)
 	}
 }

@@ -97,32 +97,6 @@ pub trait Erc721 {
 	) -> Result<(), Self::Error>;
 }
 
-/// A trait defining the mapping between a generic account ID and an H160 address.
-/// This is useful for compatibility with Ethereum-like networks.
-pub trait AccountMapping<AccountId> {
-	/// Converts a generic account ID into an H160 address.
-	///
-	/// # Arguments
-	///
-	/// * `account_id` - The generic account ID to convert.
-	///
-	/// # Returns
-	///
-	/// Returns the H160 address corresponding to the input account ID.
-	fn into_h160(account_id: AccountId) -> H160;
-
-	/// Converts an H160 address into a generic account ID.
-	///
-	/// # Arguments
-	///
-	/// * `account_id` - The H160 address to convert.
-	///
-	/// # Returns
-	///
-	/// Returns the generic account ID corresponding to the input H160 address.
-	fn into_account_id(account_id: H160) -> AccountId;
-}
-
 /// A trait for associating a given asset ID to an initial account ID.
 /// Useful for specifying which account should initially own a new asset.
 pub trait AssetIdToAddress<AccountId> {

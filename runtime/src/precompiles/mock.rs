@@ -7,6 +7,8 @@ use pallet_evm::{
 	runner, EnsureAddressNever, EnsureAddressRoot, FeeCalculator, FixedGasWeightMapping,
 	IdentityAddressMapping, SubstrateBlockHashMapping,
 };
+
+use pallet_living_assets_ownership::traits::{AccountMapping, AssetIdToAddress};
 use sp_core::{H160, H256, U256};
 use sp_runtime::{
 	traits::{BlakeTwo256, IdentityLookup},
@@ -95,16 +97,18 @@ impl pallet_living_assets_ownership::Config for Runtime {
 }
 
 pub struct MockAccountMapping;
-impl pallet_living_assets_ownership::traits::AccountMapping<AccountId> for MockAccountMapping {
-	fn into_h160(account_id: AccountId) -> H160 {
+impl AccountMapping<AccountId, H160> for MockAccountMapping {
+	fn convert(account_id: AccountId) -> H160 {
 		account_id
 	}
-	fn into_account_id(account_id: H160) -> AccountId {
+}
+impl AccountMapping<H160, AccountId> for MockAccountMapping {
+	fn convert(account_id: H160) -> AccountId {
 		account_id
 	}
 }
 pub struct MockAssetIdToAddress;
-impl pallet_living_assets_ownership::traits::AssetIdToAddress<AccountId> for MockAssetIdToAddress {
+impl AssetIdToAddress<AccountId> for MockAssetIdToAddress {
 	fn initial_owner(_asset_id: U256) -> AccountId {
 		H160::zero()
 	}

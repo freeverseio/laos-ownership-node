@@ -14,13 +14,14 @@ pub mod traits;
 pub mod pallet {
 
 	use super::*;
-	use crate::traits::{AccountMapping, AssetIdToAddress};
+	use crate::traits::AssetIdToAddress;
 	use frame_support::{
 		pallet_prelude::{OptionQuery, ValueQuery, *},
 		BoundedVec,
 	};
 	use frame_system::pallet_prelude::*;
 	use sp_core::{H160, U256};
+	use sp_runtime::traits::Convert;
 
 	/// Collection id type
 	pub type CollectionId = u64;
@@ -50,11 +51,11 @@ pub mod pallet {
 
 		/// Type alias for implementing the `AccountMapping` trait for a given account ID type.
 		/// This allows you to define custom logic for converting between account IDs and H160 addresses.
-		type AccountMapping: traits::AccountMapping<Self::AccountId>;
+		type AccountMapping: Convert<Self::AccountId, H160> + Convert<H160, Self::AccountId>;
 
 		/// Type alias for implementing the `AssetIdToAddress` trait for a given account ID type.
 		/// This allows you to specify which account should initially own each new asset.
-		type AssetIdToAddress: traits::AssetIdToAddress<Self::AccountId>;
+		type AssetIdToAddress: AssetIdToAddress<Self::AccountId>;
 	}
 
 	/// Collection counter
@@ -160,7 +161,7 @@ pub mod pallet {
 
 		fn owner_of(collection_id: CollectionId, asset_id: U256) -> Result<H160, Self::Error> {
 			Pallet::<T>::collection_base_uri(collection_id).ok_or(Error::CollectionDoesNotExist)?;
-			Ok(T::AccountMapping::into_h160(asset_owner::<T>(asset_id)))
+			Ok(T::AccountMapping::convert(asset_owner::<T>(asset_id)))
 		}
 
 		fn transfer_from(
@@ -173,13 +174,13 @@ pub mod pallet {
 			Pallet::<T>::collection_base_uri(collection_id).ok_or(Error::CollectionDoesNotExist)?;
 			ensure!(origin == from, Error::NoPermission);
 			ensure!(
-				T::AccountMapping::into_h160(asset_owner::<T>(asset_id)) == from,
+				T::AccountMapping::convert(asset_owner::<T>(asset_id)) == from,
 				Error::NoPermission
 			);
 			ensure!(from != to, Error::CannotTransferSelf);
 			ensure!(to != H160::zero(), Error::TransferToNullAddress);
 
-			let to = T::AccountMapping::into_account_id(to.clone());
+			let to = T::AccountMapping::convert(to.clone());
 			AssetOwner::<T>::set(asset_id, Some(to.clone()));
 			Self::deposit_event(Event::AssetTransferred { asset_id, receiver: to });
 
@@ -228,10 +229,7 @@ pub enum CollectionError {
 /// # Returns
 ///
 /// * An `H160` representation of the collection ID.
-pub fn collection_id_to_address(collection_id: CollectionId) -> H160
-// where
-// 	T::AccountId: From<[u8; 20]>,
-{
+pub fn collection_id_to_address(collection_id: CollectionId) -> H160 {
 	let mut bytes = [0u8; 20];
 	bytes[12..20].copy_from_slice(&collection_id.to_be_bytes());
 	for (i, byte) in ASSET_PRECOMPILE_ADDRESS_PREFIX.iter().enumerate() {
