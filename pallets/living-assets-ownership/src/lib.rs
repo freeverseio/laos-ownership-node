@@ -50,11 +50,13 @@ pub mod pallet {
 
 		/// Type alias for implementing the `AccountMapping` trait for a given account ID type.
 		/// This allows you to define custom logic for converting between account IDs and H160 addresses.
-		type AccountMapping: traits::AccountMapping<Self::AccountId>;
+		type AccountMapping: traits::AccountMapping<<Self as pallet::Config>::AccountId>;
+
+		type AccountId: IsType<<Self as frame_system::Config>::AccountId> + From<H160>;
 
 		/// Type alias for implementing the `AssetIdToAddress` trait for a given account ID type.
 		/// This allows you to specify which account should initially own each new asset.
-		type AssetIdToAddress: traits::AssetIdToAddress<Self::AccountId>;
+		type AssetIdToAddress: traits::AssetIdToAddress<<Self as pallet::Config>::AccountId>;
 	}
 
 	/// Collection counter
@@ -71,9 +73,9 @@ pub mod pallet {
 	/// Asset owner
 	#[pallet::storage]
 	pub(super) type AssetOwner<T: Config> =
-		StorageMap<_, Blake2_128Concat, U256, T::AccountId, OptionQuery>;
+		StorageMap<_, Blake2_128Concat, U256, <T as pallet::Config>::AccountId, OptionQuery>;
 
-	fn asset_owner<T: Config>(key: U256) -> T::AccountId {
+	fn asset_owner<T: Config>(key: U256) -> <T as pallet::Config>::AccountId {
 		AssetOwner::<T>::get(key).unwrap_or_else(|| T::AssetIdToAddress::initial_owner(key))
 	}
 
@@ -83,10 +85,10 @@ pub mod pallet {
 	pub enum Event<T: Config> {
 		/// Collection created
 		/// parameters. [collection_id, who]
-		CollectionCreated { collection_id: CollectionId, who: T::AccountId },
+		CollectionCreated { collection_id: CollectionId, who: <T as pallet::Config>::AccountId },
 		/// Asset transferred to `who`
 		/// parameters. [asset_id_id, who]
-		AssetTransferred { asset_id: U256, receiver: T::AccountId },
+		AssetTransferred { asset_id: U256, receiver: <T as pallet::Config>::AccountId },
 	}
 
 	// Errors inform users that something went wrong.
@@ -140,7 +142,7 @@ pub mod pallet {
 
 	impl<T: Config> traits::CollectionManager for Pallet<T> {
 		type Error = Error<T>;
-		type AccountId = T::AccountId;
+		type AccountId = <T as pallet::Config>::AccountId;
 		type BaseURI = BaseURI<T>;
 
 		fn base_uri(collection_id: CollectionId) -> Option<Self::BaseURI> {
@@ -148,7 +150,7 @@ pub mod pallet {
 		}
 
 		fn create_collection(
-			owner: T::AccountId,
+			owner: <T as pallet::Config>::AccountId,
 			base_uri: Self::BaseURI,
 		) -> Result<CollectionId, Self::Error> {
 			Self::do_create_collection(owner, base_uri)
@@ -230,7 +232,7 @@ pub enum CollectionError {
 /// * An `H160` representation of the collection ID.
 pub fn collection_id_to_address(collection_id: CollectionId) -> H160
 // where
-// 	T::AccountId: From<[u8; 20]>,
+// 	<T as pallet::Config>::AccountId: From<[u8; 20]>,
 {
 	let mut bytes = [0u8; 20];
 	bytes[12..20].copy_from_slice(&collection_id.to_be_bytes());

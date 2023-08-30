@@ -9,7 +9,12 @@ use sp_std::{boxed::Box, prelude::*};
 
 type Block = frame_system::mocking::MockBlock<Test>;
 type Nonce = u32;
-type AccountId = u64;
+pub struct CustomAccountId(u64);
+impl From<H160> for CustomAccountId {
+	fn from(nonce: H160) -> Self {
+		1 // TODO dummy value
+	}
+}
 
 // Configure a mock runtime to test the pallet.
 frame_support::construct_runtime!(
@@ -31,7 +36,7 @@ impl frame_system::Config for Test {
 	type Hash = H256;
 	type Nonce = Nonce;
 	type Hashing = BlakeTwo256;
-	type AccountId = AccountId;
+	type AccountId = CustomAccountId;
 	type Lookup = IdentityLookup<Self::AccountId>;
 	type RuntimeEvent = RuntimeEvent;
 	type BlockHashCount = ConstU64<250>;
@@ -48,24 +53,25 @@ impl frame_system::Config for Test {
 
 impl pallet_livingassets_ownership::Config for Test {
 	type RuntimeEvent = RuntimeEvent;
+	type AccountId = CustomAccountId;
 	type BaseURILimit = ConstU32<256>;
 	type AccountMapping = MockAccountMapping;
 	type AssetIdToAddress = MockAssetIdToAddress;
 }
 
 pub struct MockAccountMapping;
-impl traits::AccountMapping<AccountId> for MockAccountMapping {
-	fn into_h160(account_id: AccountId) -> H160 {
+impl traits::AccountMapping<CustomAccountId> for MockAccountMapping {
+	fn into_h160(account_id: CustomAccountId) -> H160 {
 		H160::from_low_u64_be(account_id)
 	}
-	fn into_account_id(account_id: H160) -> AccountId {
+	fn into_account_id(account_id: H160) -> CustomAccountId {
 		H160::to_low_u64_be(&account_id)
 	}
 }
 
 pub struct MockAssetIdToAddress;
-impl traits::AssetIdToAddress<AccountId> for MockAssetIdToAddress {
-	fn initial_owner(asset_id: U256) -> AccountId {
+impl traits::AssetIdToAddress<CustomAccountId> for MockAssetIdToAddress {
+	fn initial_owner(asset_id: U256) -> CustomAccountId {
 		let mut first_eight_bytes = [0u8; 8];
 		let asset_id_bytes: [u8; 32] = asset_id.into();
 		first_eight_bytes.copy_from_slice(&asset_id_bytes[asset_id_bytes.len() - 8..]);
