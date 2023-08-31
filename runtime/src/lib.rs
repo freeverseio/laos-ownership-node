@@ -472,7 +472,7 @@ impl pallet_living_assets_ownership::Config for Runtime {
 	type RuntimeEvent = RuntimeEvent;
 	type BaseURILimit = ConstU32<2015>;
 	type AccountIdToH160 = AccountIdToH160;
-	type AccountIdFromH160 = AccountIdFromH160;
+	type H160ToAccountId = H160ToAccountId;
 	type AssetIdToAddress = AssetIdToAddress;
 }
 
@@ -498,10 +498,10 @@ impl Convert<AccountId, H160> for AccountIdToH160 {
 
 /// A struct responsible for converting an `H160` address to an `AccountId`.
 ///
-/// The `AccountIdFromH160` struct provides a conversion from `H160`, commonly used in Ethereum-like networks,
+/// The `H160ToAccountId` struct provides a conversion from `H160`, commonly used in Ethereum-like networks,
 /// to `AccountId`, typically used as a native identity in a blockchain.
-pub struct AccountIdFromH160;
-impl Convert<H160, AccountId> for AccountIdFromH160 {
+pub struct H160ToAccountId;
+impl Convert<H160, AccountId> for H160ToAccountId {
 	fn convert(account_id: H160) -> AccountId {
 		let mut data = [0u8; 32];
 		data[12..].copy_from_slice(&account_id.0);
@@ -518,7 +518,7 @@ impl Convert<U256, AccountId> for AssetIdToAddress {
 		let asset_id_bytes: [u8; 32] = asset_id.into();
 		bytes.copy_from_slice(&asset_id_bytes[asset_id_bytes.len() - 20..]);
 		let owner = H160::from(bytes);
-		AccountIdFromH160::convert(owner)
+		H160ToAccountId::convert(owner)
 	}
 }
 

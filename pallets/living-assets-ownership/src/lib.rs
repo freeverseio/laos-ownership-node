@@ -56,7 +56,7 @@ pub mod pallet {
 		/// This associated type defines a conversion from an `H160` type back to the `AccountId` type,
 		/// which is internal to the implementing type (represented by `Self`). This conversion is
 		/// often necessary for mapping Ethereum addresses back to native account IDs.
-		type AccountIdFromH160: Convert<H160, Self::AccountId>;
+		type H160ToAccountId: Convert<H160, Self::AccountId>;
 
 		/// Type alias for implementing the `AssetIdToAddress` trait for a given account ID type.
 		/// This allows you to specify which account should initially own each new asset.
@@ -185,7 +185,7 @@ pub mod pallet {
 			ensure!(from != to, Error::CannotTransferSelf);
 			ensure!(to != H160::zero(), Error::TransferToNullAddress);
 
-			let to = T::AccountIdFromH160::convert(to.clone());
+			let to = T::H160ToAccountId::convert(to.clone());
 			AssetOwner::<T>::set(asset_id, Some(to.clone()));
 			Self::deposit_event(Event::AssetTransferred { asset_id, receiver: to });
 

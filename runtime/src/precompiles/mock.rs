@@ -92,7 +92,7 @@ impl pallet_living_assets_ownership::Config for Runtime {
 	type RuntimeEvent = RuntimeEvent;
 	type BaseURILimit = ConstU32<256>;
 	type AccountIdToH160 = MockAccountIdToH160;
-	type AccountIdFromH160 = MockAccountIdFromH160;
+	type H160ToAccountId = MockH160ToAccountId;
 	type AssetIdToAddress = MockAssetIdToAddress;
 }
 
@@ -102,8 +102,8 @@ impl Convert<AccountId, H160> for MockAccountIdToH160 {
 		account_id
 	}
 }
-pub struct MockAccountIdFromH160;
-impl Convert<H160, AccountId> for MockAccountIdFromH160 {
+pub struct MockH160ToAccountId;
+impl Convert<H160, AccountId> for MockH160ToAccountId {
 	fn convert(account_id: H160) -> AccountId {
 		account_id
 	}

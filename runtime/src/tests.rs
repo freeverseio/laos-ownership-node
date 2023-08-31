@@ -6,9 +6,8 @@ use sp_runtime::AccountId32;
 
 #[test]
 fn account_mappping_type_zero_values() {
-	type TestAccountIdFromH160 =
-		<Runtime as pallet_living_assets_ownership::Config>::AccountIdFromH160;
-	assert_eq!(TestAccountIdFromH160::convert(H160::zero()), AccountId32::from([0u8; 32]));
+	type TestH160ToAccountId = <Runtime as pallet_living_assets_ownership::Config>::H160ToAccountId;
+	assert_eq!(TestH160ToAccountId::convert(H160::zero()), AccountId32::from([0u8; 32]));
 
 	type TestAccountIdToH160 = <Runtime as pallet_living_assets_ownership::Config>::AccountIdToH160;
 	assert_eq!(TestAccountIdToH160::convert(AccountId32::from([0u8; 32])), H160::zero());
@@ -22,10 +21,9 @@ fn account_mappping_type_max_values() {
 		H160::from([0xFFu8; 20])
 	);
 
-	type TestAccountIdFromH160 =
-		<Runtime as pallet_living_assets_ownership::Config>::AccountIdFromH160;
+	type TestH160ToAccountId = <Runtime as pallet_living_assets_ownership::Config>::H160ToAccountId;
 	assert_eq!(
-		TestAccountIdFromH160::convert(H160::from([0xFFu8; 20])),
+		TestH160ToAccountId::convert(H160::from([0xFFu8; 20])),
 		AccountId32::from_str("000000000000000000000000ffffffffffffffffffffffffffffffffffffffff")
 			.unwrap()
 	);
