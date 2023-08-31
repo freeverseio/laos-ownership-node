@@ -21,7 +21,10 @@ use xcm_builder::{
 	SiblingParachainConvertsVia, SignedAccountId32AsNative, SignedToAccountId32,
 	SovereignSignedViaLocation, TakeWeightCredit, UsingComponents, WithComputedOrigin,
 };
-use xcm_executor::{traits::Properties, traits::ShouldExecute, XcmExecutor};
+use xcm_executor::{
+	traits::{Properties, ShouldExecute},
+	XcmExecutor,
+};
 
 parameter_types! {
 	pub const RelayLocation: MultiLocation = MultiLocation::parent();
@@ -134,11 +137,11 @@ impl ShouldExecute for DenyReserveTransferToRelayChain {
 				InitiateReserveWithdraw {
 					reserve: MultiLocation { parents: 1, interior: Here },
 					..
-				}
-				| DepositReserveAsset {
+				} |
+				DepositReserveAsset {
 					dest: MultiLocation { parents: 1, interior: Here }, ..
-				}
-				| TransferReserveAsset {
+				} |
+				TransferReserveAsset {
 					dest: MultiLocation { parents: 1, interior: Here }, ..
 				} => {
 					Err(ProcessMessageError::Unsupported) // Deny
