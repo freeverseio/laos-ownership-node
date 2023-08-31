@@ -1,4 +1,4 @@
-use crate::{self as pallet_livingassets_ownership, traits};
+use crate::{self as pallet_livingassets_ownership};
 use frame_support::traits::{ConstU16, ConstU64};
 use sp_core::{ConstU32, H160, H256, U256};
 use sp_runtime::{
