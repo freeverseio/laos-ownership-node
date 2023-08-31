@@ -10,7 +10,7 @@ use pallet_evm::{
 
 use sp_core::{H160, H256, U256};
 use sp_runtime::{
-	traits::{BlakeTwo256, IdentityLookup},
+	traits::{BlakeTwo256, Convert, IdentityLookup},
 	ConsensusEngineId,
 };
 use sp_std::{boxed::Box, prelude::*, str::FromStr};
@@ -109,7 +109,7 @@ impl Convert<H160, AccountId> for MockAccountIdFromH160 {
 	}
 }
 pub struct MockAssetIdToAddress;
-impl AssetIdToAddress<U256, AccountId> for MockAssetIdToAddress {
+impl Convert<U256, AccountId> for MockAssetIdToAddress {
 	fn convert(_asset_id: U256) -> AccountId {
 		H160::zero()
 	}
