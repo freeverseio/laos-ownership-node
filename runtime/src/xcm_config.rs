@@ -2,7 +2,6 @@ use super::{
 	AccountId, AllPalletsWithSystem, Balances, ParachainSystem, PolkadotXcm, Runtime, RuntimeCall,
 	RuntimeEvent, RuntimeOrigin, WeightToFee, XcmpQueue,
 };
-use bridge_runtime_common::CustomNetworkId;
 use core::{marker::PhantomData, ops::ControlFlow};
 use frame_support::{
 	log, match_types, parameter_types,
@@ -28,12 +27,13 @@ use xcm_executor::{
 
 parameter_types! {
 	pub const RelayLocation: MultiLocation = MultiLocation::parent();
-	pub const RelayNetwork: NetworkId = CustomNetworkId::Rococo.as_network_id();
 	pub RelayOrigin: RuntimeOrigin = cumulus_pallet_xcm::Origin::Relay.into();
 	pub UniversalLocation: InteriorMultiLocation = ThisNetwork::get().into();
+	// The Freeverse Relay chain network ID.
+	pub const RelayNetwork: NetworkId = laos_bridge_runtime_common::CustomNetworkId::Rococo.as_network_id();
 	/// The Evochain network ID.
 	pub const EvochainNetwork: NetworkId = laos_bridge_runtime_common::CustomNetworkId::Evochain.as_network_id();
-	/// The RialtoParachain network ID.
+	/// The Ownership Parachain network ID.
 	pub const ThisNetwork: NetworkId = laos_bridge_runtime_common::CustomNetworkId::OwnershipParachain.as_network_id();
 }
 

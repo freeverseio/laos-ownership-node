@@ -5016,6 +5016,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "laos-bridge-runtime-common"
+version = "0.1.0"
+source = "git+https://github.com/freeverseio/laos-bridge?branch=feature/add_networkid_of_laos_networks#904b8f93db0e064282b747f8f9eafab699ac8946"
+dependencies = [
+ "xcm",
+]
+
+[[package]]
 name = "laos-runtime"
 version = "0.1.0"
 dependencies = [
@@ -5043,6 +5051,7 @@ dependencies = [
  "frame-try-runtime",
  "hex",
  "hex-literal 0.4.1",
+ "laos-bridge-runtime-common",
  "ownership-parachain-primitives",
  "pallet-aura",
  "pallet-authorship",

@@ -95,7 +95,6 @@ pallet-evm-precompile-simple = { workspace = true }
 bp-header-chain = { workspace = true }
 bp-laos-evolution = { workspace = true }
 bp-runtime = { workspace = true }
-bridge-runtime-common = { workspace = true }
 pallet-bridge-grandpa = { workspace = true }
 laos-bridge-runtime-common = { workspace = true }
 
