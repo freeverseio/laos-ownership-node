@@ -32,9 +32,9 @@ parameter_types! {
 	pub RelayOrigin: RuntimeOrigin = cumulus_pallet_xcm::Origin::Relay.into();
 	pub UniversalLocation: InteriorMultiLocation = ThisNetwork::get().into();
 	/// The Evochain network ID.
-	pub const EvochainNetwork: NetworkId = CustomNetworkId::Evochain.as_network_id();
+	pub const EvochainNetwork: NetworkId = laos_bridge_runtime_common::CustomNetworkId::Evochain.as_network_id();
 	/// The RialtoParachain network ID.
-	pub const ThisNetwork: NetworkId = CustomNetworkId::OwnershipParachain.as_network_id();
+	pub const ThisNetwork: NetworkId = laos_bridge_runtime_common::CustomNetworkId::OwnershipParachain.as_network_id();
 }
 
 /// Type for specifying how a `MultiLocation` can be converted into an `AccountId`. This is used

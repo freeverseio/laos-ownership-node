@@ -215,6 +215,7 @@ bp-header-chain = { git = "https://github.com/paritytech/parity-bridges-common.g
 bp-runtime = { git = "https://github.com/paritytech/parity-bridges-common.git", branch = "polkadot-v1.0.0", default-features = false }
 bridge-runtime-common = { git = "https://github.com/paritytech/parity-bridges-common.git", branch = "polkadot-v1.0.0", default-features = false }
 pallet-bridge-grandpa = { git = "https://github.com/paritytech/parity-bridges-common.git", branch = "polkadot-v1.0.0", default-features = false }
+laos-bridge-runtime-common = { git = "https://github.com/freeverseio/laos-bridge", branch = "feature/add_networkid_of_laos_networks", default-features = false }
 
 # LAOS pallets
 pallet-living-assets-ownership = { path = "./pallets/living-assets-ownership", default-features = false }

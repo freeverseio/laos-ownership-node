@@ -97,6 +97,7 @@ bp-laos-evolution = { workspace = true }
 bp-runtime = { workspace = true }
 bridge-runtime-common = { workspace = true }
 pallet-bridge-grandpa = { workspace = true }
+laos-bridge-runtime-common = { workspace = true }
 
 [dev-dependencies]
 bridge-runtime-common = { workspace = true, features = ["integrity-test"] }
