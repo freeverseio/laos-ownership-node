@@ -76,11 +76,19 @@ pub mod pallet {
 
 	/// Asset owner
 	#[pallet::storage]
-	pub(super) type AssetOwner<T: Config> =
-		StorageMap<_, Blake2_128Concat, U256, T::AccountId, OptionQuery>;
+	pub(super) type AssetOwner<T: Config> = StorageDoubleMap<
+		_,
+		Blake2_128Concat,
+		CollectionId,
+		Blake2_128Concat,
+		U256,
+		T::AccountId,
+		OptionQuery,
+	>;
 
-	fn asset_owner<T: Config>(key: U256) -> T::AccountId {
-		AssetOwner::<T>::get(key).unwrap_or_else(|| T::AssetIdToAddress::convert(key))
+	fn asset_owner<T: Config>(collection_id: CollectionId, asset_id: U256) -> T::AccountId {
+		AssetOwner::<T>::get(collection_id, asset_id)
+			.unwrap_or_else(|| T::AssetIdToAddress::convert(asset_id))
 	}
 
 	/// Pallet events
@@ -166,7 +174,7 @@ pub mod pallet {
 
 		fn owner_of(collection_id: CollectionId, asset_id: U256) -> Result<H160, Self::Error> {
 			Pallet::<T>::collection_base_uri(collection_id).ok_or(Error::CollectionDoesNotExist)?;
-			Ok(T::AccountIdToH160::convert(asset_owner::<T>(asset_id)))
+			Ok(T::AccountIdToH160::convert(asset_owner::<T>(collection_id, asset_id)))
 		}
 
 		fn transfer_from(
@@ -179,14 +187,14 @@ pub mod pallet {
 			Pallet::<T>::collection_base_uri(collection_id).ok_or(Error::CollectionDoesNotExist)?;
 			ensure!(origin == from, Error::NoPermission);
 			ensure!(
-				T::AccountIdToH160::convert(asset_owner::<T>(asset_id)) == from,
+				T::AccountIdToH160::convert(asset_owner::<T>(collection_id, asset_id)) == from,
 				Error::NoPermission
 			);
 			ensure!(from != to, Error::CannotTransferSelf);
 			ensure!(to != H160::zero(), Error::TransferToNullAddress);
 
 			let to = T::H160ToAccountId::convert(to.clone());
-			AssetOwner::<T>::set(asset_id, Some(to.clone()));
+			AssetOwner::<T>::set(collection_id, asset_id, Some(to.clone()));
 			Self::deposit_event(Event::AssetTransferred { asset_id, receiver: to });
 
 			Ok(())
@@ -257,7 +265,7 @@ pub fn collection_id_to_address(collection_id: CollectionId) -> H160 {
 /// * A `Result` which is either the `CollectionId` or an error indicating the address is invalid.
 pub fn address_to_collection_id(address: H160) -> Result<CollectionId, CollectionError> {
 	if &address.0[0..12] != ASSET_PRECOMPILE_ADDRESS_PREFIX {
-		return Err(CollectionError::InvalidPrefix);
+		return Err(CollectionError::InvalidPrefix)
 	}
 	let id_bytes: [u8; 8] = address.0[12..].try_into().unwrap();
 	Ok(CollectionId::from_be_bytes(id_bytes))
