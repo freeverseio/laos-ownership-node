@@ -473,7 +473,7 @@ impl pallet_living_assets_ownership::Config for Runtime {
 	type BaseURILimit = ConstU32<2015>;
 	type AccountIdToH160 = AccountIdToH160;
 	type H160ToAccountId = H160ToAccountId;
-	type AssetIdToAddress = AssetIdToAddress;
+	type AssetIdToInitialOwner = AssetIdToInitialOwner;
 }
 
 impl pallet_sudo::Config for Runtime {
@@ -511,8 +511,8 @@ impl Convert<H160, AccountId> for H160ToAccountId {
 
 /// Represents a mapping between `AssetId` and `AccountId`.
 /// This struct provides functionalities to convert an `AssetId` (represented by `U256`) into an `AccountId`.
-pub struct AssetIdToAddress;
-impl Convert<U256, AccountId> for AssetIdToAddress {
+pub struct AssetIdToInitialOwner;
+impl Convert<U256, AccountId> for AssetIdToInitialOwner {
 	fn convert(asset_id: U256) -> AccountId {
 		let mut bytes = [0u8; 20];
 		let asset_id_bytes: [u8; 32] = asset_id.into();
@@ -534,7 +534,7 @@ impl<F: FindAuthor<u32>> FindAuthor<H160> for FindAuthorTruncated<F> {
 	{
 		if let Some(author_index) = F::find_author(digests) {
 			let authority_id = Aura::authorities()[author_index as usize].clone();
-			return Some(H160::from_slice(&authority_id.to_raw_vec()[4..24]));
+			return Some(H160::from_slice(&authority_id.to_raw_vec()[4..24]))
 		}
 		None
 	}
@@ -813,9 +813,8 @@ impl fp_self_contained::SelfContainedCall for RuntimeCall {
 		len: usize,
 	) -> Option<Result<(), TransactionValidityError>> {
 		match self {
-			RuntimeCall::Ethereum(call) => {
-				call.pre_dispatch_self_contained(info, dispatch_info, len)
-			},
+			RuntimeCall::Ethereum(call) =>
+				call.pre_dispatch_self_contained(info, dispatch_info, len),
 			_ => None,
 		}
 	}
@@ -825,11 +824,10 @@ impl fp_self_contained::SelfContainedCall for RuntimeCall {
 		info: Self::SignedInfo,
 	) -> Option<sp_runtime::DispatchResultWithInfo<PostDispatchInfoOf<Self>>> {
 		match self {
-			call @ RuntimeCall::Ethereum(pallet_ethereum::Call::transact { .. }) => {
+			call @ RuntimeCall::Ethereum(pallet_ethereum::Call::transact { .. }) =>
 				Some(call.dispatch(RuntimeOrigin::from(
 					pallet_ethereum::RawOrigin::EthereumTransaction(info),
-				)))
-			},
+				))),
 			_ => None,
 		}
 	}

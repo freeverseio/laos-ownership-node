@@ -58,9 +58,9 @@ pub mod pallet {
 		/// often necessary for mapping Ethereum addresses back to native account IDs.
 		type H160ToAccountId: Convert<H160, Self::AccountId>;
 
-		/// Type alias for implementing the `AssetIdToAddress` trait for a given account ID type.
+		/// Type alias for implementing the `AssetIdToInitialOwner` trait for a given account ID type.
 		/// This allows you to specify which account should initially own each new asset.
-		type AssetIdToAddress: Convert<U256, Self::AccountId>;
+		type AssetIdToInitialOwner: Convert<U256, Self::AccountId>;
 	}
 
 	/// Collection counter
@@ -88,7 +88,7 @@ pub mod pallet {
 
 	fn asset_owner<T: Config>(collection_id: CollectionId, asset_id: U256) -> T::AccountId {
 		AssetOwner::<T>::get(collection_id, asset_id)
-			.unwrap_or_else(|| T::AssetIdToAddress::convert(asset_id))
+			.unwrap_or_else(|| T::AssetIdToInitialOwner::convert(asset_id))
 	}
 
 	/// Pallet events
