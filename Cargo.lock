@@ -7165,6 +7165,7 @@ dependencies = [
  "frame-system",
  "hex",
  "hex-literal 0.4.1",
+ "log",
  "parity-scale-codec",
  "scale-info",
  "serde",
