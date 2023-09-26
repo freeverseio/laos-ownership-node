@@ -154,6 +154,7 @@ pub type Executive = frame_executive::Executive<
 	frame_system::ChainContext<Runtime>,
 	Runtime,
 	AllPalletsWithSystem,
+	(pallet_living_assets_ownership::migrations::v1::version_unchecked::MigrateV0ToV1<Runtime>,),
 >;
 
 pub type Precompiles = FrontierPrecompiles<Runtime>;
@@ -213,7 +214,7 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
 	spec_name: create_runtime_str!("laos-parachain"),
 	impl_name: create_runtime_str!("laos-parachain"),
 	authoring_version: 1,
-	spec_version: 6,
+	spec_version: 7,
 	impl_version: 0,
 	apis: RUNTIME_API_VERSIONS,
 	transaction_version: 1,
