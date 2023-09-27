@@ -7,7 +7,9 @@ pub use pallet::*;
 use parity_scale_codec::alloc::string::ToString;
 use sp_core::H160;
 use sp_std::vec::Vec;
+
 mod functions;
+pub mod migrations;
 pub mod traits;
 
 #[frame_support::pallet]

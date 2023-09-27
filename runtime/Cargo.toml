@@ -175,6 +175,8 @@ std = [
 	"bp-runtime/std",
 	"bridge-runtime-common/std",
 	"pallet-bridge-grandpa/std",
+	"hex/std",
+	"ownership-parachain-primitives/std",
 ]
 
 runtime-benchmarks = [
